@@ -1,12 +1,16 @@
 package com.gossip.arrienda_tu_finca.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.gossip.arrienda_tu_finca.ModelMapper;
 import com.gossip.arrienda_tu_finca.entities.User;
 import com.gossip.arrienda_tu_finca.exceptions.UserNotValidException;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
 
+import jakarta.transaction.Transactional;
+
+@Service
 public class UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
@@ -23,6 +27,7 @@ public class UserService {
      * Creates a new user after checking if all the fields are valid
      * @param user
      */
+    @Transactional
     public void createUser(User user) {
         isUserValid(user);
         isNewUserEmailAndPasswordValid(user.getEmail(), user.getPassword());
