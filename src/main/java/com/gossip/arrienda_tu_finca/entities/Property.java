@@ -19,7 +19,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@Table(name = "properties")
+@Table(name = "property")
 public class Property {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +38,6 @@ public class Property {
     private boolean hasPool;
     private boolean hasGril;
 
-    // ManyToOne relationship with User
     @ManyToOne
     @JoinColumn(name = "owner_email", referencedColumnName = "email")
     private User owner;

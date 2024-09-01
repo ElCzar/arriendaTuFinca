@@ -22,4 +22,16 @@ public class GlobalExceptionHandler {
         HttpHeaders responseHeaders = new HttpHeaders();
         return new ResponseEntity<>(errorMessage, responseHeaders, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorMessage> handleUserNotFoundException(UserNotFoundException e) {
+        ErrorMessage errorMessage = new ErrorMessage(
+            "User not found: " + e.getMessage(), 
+            Calendar.getInstance().getTime(), 
+            HttpStatus.NOT_FOUND.value(), 
+            HttpStatus.NOT_FOUND.getReasonPhrase());
+        
+        HttpHeaders responseHeaders = new HttpHeaders();
+        return new ResponseEntity<>(errorMessage, responseHeaders, HttpStatus.NOT_FOUND);
+    }
 }
