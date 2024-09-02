@@ -13,8 +13,6 @@ import com.gossip.arrienda_tu_finca.exceptions.UserNotFoundException;
 import com.gossip.arrienda_tu_finca.exceptions.UserNotValidException;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
 
-import jakarta.transaction.Transactional;
-
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -22,10 +20,10 @@ public class UserService {
     private final PasswordEncryptionService passwordEncryptionService;
 
     @Autowired
-    public UserService(UserRepository userRepository, ModelMapper modelMapper, PasswordEncryptionService passwordEncryptionService) {
+    public UserService(UserRepository userRepository, ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
-        this.passwordEncryptionService = passwordEncryptionService;
+        this.passwordEncryptionService = new PasswordEncryptionService();
     }
 
     /**
@@ -48,8 +46,9 @@ public class UserService {
      * Makes login with the user's email and password
      * @param userDTO
      * @throws UserNotValidException if the user or password is not valid
+     * TODO change function to create a session and a token for the user
      */
-    public void login(LoginDTO loginDTO) throws UserNotValidException {
+    public Long login(LoginDTO loginDTO) throws UserNotValidException {
         User user = modelMapper.map(loginDTO, User.class);
 
         if (user == null) {
@@ -68,7 +67,8 @@ public class UserService {
             throw new UserNotValidException("Email or password is incorrect");
         }
 
-        // TODO: Implement JWT token
+        User uesrRepository = userRepository.findByEmail(user.getEmail());
+        return uesrRepository.getId();
     }
 
     /**
@@ -76,9 +76,9 @@ public class UserService {
      * @param user
      * @throws UserNotValidException if the user is not valid with a message explaining why
      */
-    @Transactional
     public void createUser(UserDTO userDTO) throws UserNotValidException {
         User user = modelMapper.map(userDTO, User.class);
+        
         isUserValid(user);
         isUserEmailAndPasswordValid(user.getEmail(), user.getPassword());
 

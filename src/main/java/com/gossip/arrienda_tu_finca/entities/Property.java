@@ -39,6 +39,6 @@ public class Property {
     private boolean hasGril;
 
     @ManyToOne
-    @JoinColumn(name = "owner_email", referencedColumnName = "email")
+    @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
 }

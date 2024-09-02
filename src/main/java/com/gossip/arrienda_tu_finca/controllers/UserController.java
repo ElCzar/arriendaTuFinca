@@ -17,7 +17,7 @@ import com.gossip.arrienda_tu_finca.dto.UserInfoDTO;
 import com.gossip.arrienda_tu_finca.services.UserService;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
 
@@ -43,9 +43,9 @@ public class UserController {
      * @return ResponseEntity<Void> with status 200
      */
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody LoginDTO loginDTO) {
-        userService.login(loginDTO);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Long> login(@RequestBody LoginDTO loginDTO) {
+        Long userId = userService.login(loginDTO);
+        return ResponseEntity.ok(userId);
     }
 
     /**
@@ -55,6 +55,7 @@ public class UserController {
      */
     @PostMapping("/create")
     public ResponseEntity<Void> createUser(@RequestBody UserDTO userDTO) {
+        System.out.println(userDTO.isHost() + " " + userDTO.isRenter());
         userService.createUser(userDTO);
         return ResponseEntity.ok().build();
     }
