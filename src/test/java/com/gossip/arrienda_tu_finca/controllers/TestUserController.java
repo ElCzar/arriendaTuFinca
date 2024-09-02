@@ -304,4 +304,6 @@ class TestUserController {
         assertEquals(true, userDifferent.isRenter());
         assertNotEquals(userOriginal.getId(), userDifferent.getId());
     }
+
+    
 } 
