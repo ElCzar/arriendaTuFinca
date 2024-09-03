@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gossip.arrienda_tu_finca.dto.ChangePasswordDTO;
+import com.gossip.arrienda_tu_finca.dto.ChangeUserInfoDTO;
 import com.gossip.arrienda_tu_finca.dto.LoginDTO;
 import com.gossip.arrienda_tu_finca.dto.UserDTO;
 import com.gossip.arrienda_tu_finca.dto.UserInfoDTO;
@@ -55,7 +56,6 @@ public class UserController {
      */
     @PostMapping("/create")
     public ResponseEntity<Void> createUser(@RequestBody UserDTO userDTO) {
-        System.out.println(userDTO.isHost() + " " + userDTO.isRenter());
         userService.createUser(userDTO);
         return ResponseEntity.ok().build();
     }
@@ -66,8 +66,8 @@ public class UserController {
      * @return ResponseEntity<Void> with status 200
      */
     @PutMapping("/update/{userId}")
-    public ResponseEntity<Void> updateUser(@RequestBody UserInfoDTO userInfoDTO, @PathVariable Long userId) {
-        userService.updateUser(userInfoDTO, userId);
+    public ResponseEntity<Void> updateUser(@RequestBody ChangeUserInfoDTO changeUserInfoDTO, @PathVariable Long userId) {
+        userService.updateUser(changeUserInfoDTO, userId);
         return ResponseEntity.ok().build();
     }
 

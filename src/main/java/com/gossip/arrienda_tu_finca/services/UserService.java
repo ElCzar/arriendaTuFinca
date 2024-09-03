@@ -1,10 +1,13 @@
 package com.gossip.arrienda_tu_finca.services;
 
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gossip.arrienda_tu_finca.dto.ChangePasswordDTO;
+import com.gossip.arrienda_tu_finca.dto.ChangeUserInfoDTO;
 import com.gossip.arrienda_tu_finca.dto.LoginDTO;
 import com.gossip.arrienda_tu_finca.dto.UserDTO;
 import com.gossip.arrienda_tu_finca.dto.UserInfoDTO;
@@ -12,6 +15,8 @@ import com.gossip.arrienda_tu_finca.entities.User;
 import com.gossip.arrienda_tu_finca.exceptions.UserNotFoundException;
 import com.gossip.arrienda_tu_finca.exceptions.UserNotValidException;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserService {
@@ -97,15 +102,29 @@ public class UserService {
      * @throws UserNotValidException if the user is not valid with a message explaining why
      * @throws UserNotFoundException if the user is not found
      */
-    public void updateUser(UserInfoDTO userInfoDTO, Long userId) throws UserNotValidException, UserNotFoundException {
-        User user = modelMapper.map(userInfoDTO, User.class);
-        isUserValid(user);
+    public void updateUser(ChangeUserInfoDTO changeUserInfoDTO, Long userId) throws UserNotValidException, UserNotFoundException {
+        User user = modelMapper.map(changeUserInfoDTO, User.class);
+        
+        Optional<User> optionalUserFromDB = userRepository.findById(userId);
 
-        if (!userRepository.existsById(userId)) {
+        if (optionalUserFromDB.isEmpty()) {
             throw new UserNotFoundException("User for update not found by id: " + userId);
         }
 
-        userRepository.save(user);
+        isUserValid(user);
+        User userFromDB = optionalUserFromDB.get();
+
+        if (!userFromDB.getEmail().equals(user.getEmail()) && userRepository.existsByEmail(user.getEmail())) {
+            throw new UserNotValidException("Email is already in use");
+        }
+
+        userFromDB.setName(user.getName());
+        userFromDB.setSurname(user.getSurname());
+        userFromDB.setEmail(user.getEmail());
+        userFromDB.setPhone(user.getPhone());
+        userFromDB.setHost(user.isHost());
+        userFromDB.setRenter(user.isRenter());
+        userRepository.save(userFromDB);
     }
 
     /**
@@ -126,8 +145,8 @@ public class UserService {
             throw new UserNotValidException("Email for password change is null or empty");
         }
 
-        // Just get the information for a login dto from the repository
-        LoginDTO userFromDB = userRepository.findLoginDTOByEmail(changePasswordDTO.getEmail());
+        // Get all information of the user from the database
+        User userFromDB = userRepository.findById(userId).orElse(null);
 
         if (userFromDB == null) {
             throw new UserNotFoundException("User for password update not found by id: " + userId);
@@ -139,8 +158,8 @@ public class UserService {
             throw new UserNotValidException("Old password for password change is incorrect");
         }
         isUserEmailAndPasswordValid(changePasswordDTO.getEmail(), changePasswordDTO.getNewPassword());
-        User user = modelMapper.map(changePasswordDTO, User.class);
-        userRepository.save(user);
+        userFromDB.setPassword(passwordEncryptionService.encryptPassword(changePasswordDTO.getNewPassword()));
+        userRepository.save(userFromDB);
     }
 
     /**
