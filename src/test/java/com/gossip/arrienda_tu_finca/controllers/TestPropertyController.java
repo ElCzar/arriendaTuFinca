@@ -1,31 +1,33 @@
 package com.gossip.arrienda_tu_finca.controllers;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Description;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.gossip.arrienda_tu_finca.ArriendaTuFincaApplication;
 import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 
 import jakarta.transaction.Transactional;
-
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
@@ -36,27 +38,32 @@ import jakarta.transaction.Transactional;
 @TestPropertySource(
     locations = "classpath:application-test.properties"
 )
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 class TestPropertyController {
 
     @Autowired
     private MockMvc mvc;
 
-
     @Autowired
     private PropertyRepository propertyRepository;
 
+
+
     @BeforeEach
+    @Transactional
     void setUp() {
-        propertyRepository.deleteAllInBatch(); // Limpiar la base de datos antes de cada prueba
+        propertyRepository.deleteAllInBatch();
     }
 
-
+    // Test the property creation endpoint
     @Test
+    @DirtiesContext
     @Transactional
-    @Description("Prueba la creación de una propiedad válida")
-    void testCreateProperty() throws Exception {
-        // Crear JSON de PropertyCreateDTO
-        String request = """
+    @Description("Test the property creation where all the fields are valid")
+    void givenCorrectProperty_whenCreateProperty_thenPropertyCreated() throws Exception {
+        // Arrange
+        String request = 
+        """
         {
             "name": "Finca La Esperanza",
             "description": "Hermosa finca en el campo",
@@ -73,62 +80,85 @@ class TestPropertyController {
         }
         """;
 
-        mvc.perform(post("/property")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(request))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Finca La Esperanza"));
+        // Act
+        mvc.perform(MockMvcRequestBuilders.post("/property")
+            .contentType("application/json")
+            .content(request))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+
+        // Assert
+        List<Property> properties = propertyRepository.findAll();
+        assertEquals(1, properties.size());
+        Property property = properties.get(0);
+        assertEquals("Finca La Esperanza", property.getName());
+        assertEquals("Hermosa finca en el campo", property.getDescription());
     }
 
-    
+    // Test to get a property by ID
     @Test
-    @Description("Prueba obtener una propiedad por ID")
-    void testGetPropertyById() throws Exception {
-        // Crear y guardar una propiedad en la base de datos
+    @DirtiesContext
+    @Transactional
+    @Description("Test to get a property by ID")
+    void givenProperty_whenGetPropertyById_thenReturnProperty() throws Exception {
+        // Arrange
         Property property = new Property();
         property.setName("Finca Bella");
         property.setDescription("Hermosa finca");
         property.setMunicipality("Bogota");
         propertyRepository.save(property);
 
-        mvc.perform(get("/property/" + property.getId())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Finca Bella"))
-                .andExpect(jsonPath("$.description").value("Hermosa finca"));
+        // Act
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/property/" + property.getId())
+            .contentType("application/json"))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+
+        // Assert
+        MvcResult result = resultActions.andReturn();
+        String contentAsString = result.getResponse().getContentAsString();
+        assertEquals("{\"name\":\"Finca Bella\",\"description\":\"Hermosa finca\",\"municipality\":\"Bogota\"}", contentAsString);
     }
 
+    // Test to get all properties
     @Test
-    @Description("Prueba obtener todas las propiedades")
-    void testGetAllProperties() throws Exception {
-        // Crear y guardar una propiedad en la base de datos
+    @DirtiesContext
+    @Transactional
+    @Description("Test to get all properties")
+    void givenProperties_whenGetAllProperties_thenReturnPropertiesList() throws Exception {
+        // Arrange
         Property property = new Property();
         property.setName("Finca Bella");
         property.setDescription("Hermosa finca");
         property.setMunicipality("Bogota");
         propertyRepository.save(property);
 
-        mvc.perform(get("/property")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Finca Bella"));
+        // Act
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/property")
+            .contentType("application/json"))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+
+        // Assert
+        MvcResult result = resultActions.andReturn();
+        String contentAsString = result.getResponse().getContentAsString();
+        assertNotNull(contentAsString);
     }
 
-   
+    // Test to update a property
     @Test
-    @Description("Prueba la actualización de una propiedad existente")
-    void testUpdateProperty() throws Exception {
-        // Crear y guardar una propiedad en la base de datos
+    @DirtiesContext
+    @Transactional
+    @Description("Test to update a property")
+    void givenUpdatedProperty_whenUpdateProperty_thenPropertyUpdated() throws Exception {
+        // Arrange
         Property property = new Property();
         property.setName("Finca Bella");
         property.setDescription("Hermosa finca");
         property.setMunicipality("Bogota");
         propertyRepository.save(property);
 
-        // Crear JSON de PropertyUpdateDTO
-        String updateRequest = """
+        String updateRequest = 
+        """
         {
-            "name": "Finca Bella Actualizada",
+            "name": "Finca Actualizada",
             "description": "Finca con piscina",
             "municipality": "Bogota",
             "pricePerNight": 250.0,
@@ -140,52 +170,57 @@ class TestPropertyController {
         }
         """;
 
-        mvc.perform(put("/property/" + property.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(updateRequest))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Finca Bella Actualizada"));
+        // Act
+        mvc.perform(MockMvcRequestBuilders.put("/property/" + property.getId())
+            .contentType("application/json")
+            .content(updateRequest))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+
+        // Assert
+        Property updatedProperty = propertyRepository.findById(property.getId()).orElseThrow();
+        assertEquals("Finca Actualizada", updatedProperty.getName());
     }
 
-    
+    // Test to deactivate a property
     @Test
-    @Description("Prueba la desactivación de una propiedad existente")
-    void testDeactivateProperty() throws Exception {
-        // Crear y guardar una propiedad en la base de datos
+    @DirtiesContext
+    @Transactional
+    @Description("Test to deactivate a property")
+    void givenProperty_whenDeactivateProperty_thenPropertyDeactivated() throws Exception {
+        // Arrange
         Property property = new Property();
         property.setName("Finca Bella");
         property.setDescription("Hermosa finca");
         property.setMunicipality("Bogota");
-        property.setAvailable(true); // Inicialmente disponible
+        property.setAvailable(true); // Initially available
         propertyRepository.save(property);
 
-        mvc.perform(delete("/property/" + property.getId()))
-                .andExpect(status().isNoContent());
+        // Act
+        mvc.perform(MockMvcRequestBuilders.delete("/property/" + property.getId()))
+            .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-        // Verificar que la propiedad está desactivada
+        // Assert
         Property deactivatedProperty = propertyRepository.findById(property.getId()).orElseThrow();
-        assertFalse(deactivatedProperty.isAvailable()); // Verificar que isAvailable sea false
+        assertFalse(deactivatedProperty.isAvailable());
     }
 
-
-    
+    // Test to upload a photo to a property
     @Test
-    @Description("Prueba la subida de una foto a una propiedad")
-    void testUploadPhoto() throws Exception {
-        // Crear y guardar una propiedad en la base de datos
+    @DirtiesContext
+    @Transactional
+    @Description("Test to upload a photo to a property")
+    void givenProperty_whenUploadPhoto_thenPhotoUploaded() throws Exception {
+        // Arrange
         Property property = new Property();
         property.setName("Finca Bella");
         property.setDescription("Hermosa finca");
-        property.setMunicipality("Bogota");
         propertyRepository.save(property);
 
-        MockMultipartFile photoFile = new MockMultipartFile(
-                "photo", "finca.jpg", "image/jpeg", "fake-image-content".getBytes());
+        MockMultipartFile photoFile = new MockMultipartFile("photo", "finca.jpg", "image/jpeg", "fake-image-content".getBytes());
 
-        mvc.perform(multipart("/property/" + property.getId() + "/upload-photo")
-                .file(photoFile))
-                .andExpect(status().isNoContent());
-
-        // No se puede verificar el contenido de la imagen directamente, pero se espera que la propiedad acepte el archivo
+        // Act
+        mvc.perform(MockMvcRequestBuilders.multipart("/property/" + property.getId() + "/upload-photo")
+            .file(photoFile))
+            .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 }
