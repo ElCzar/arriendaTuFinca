@@ -1,18 +1,27 @@
 package com.gossip.arrienda_tu_finca.controllers;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.gossip.arrienda_tu_finca.dto.PropertyCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyUpdateDTO;
-import com.gossip.arrienda_tu_finca.services.PropertyService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
+import com.gossip.arrienda_tu_finca.service.PropertyService;
 
 @RestController
-@RequestMapping("/properties")
+@RequestMapping("/property")
 public class PropertyController {
 
     @Autowired
@@ -49,10 +58,9 @@ public class PropertyController {
     // Desactivar una propiedad (Cambiar su estado a no disponible)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deactivateProperty(@PathVariable Long id) {
-    propertyService.deactivateProperty(id); // Desactiva la propiedad en lugar de eliminarla
-    return ResponseEntity.noContent().build(); 
+        propertyService.deactivateProperty(id); // Desactiva la propiedad en lugar de eliminarla
+        return ResponseEntity.noContent().build(); 
     }
-
 
     // Subir una foto para una propiedad
     @PostMapping("/{id}/upload-photo")
