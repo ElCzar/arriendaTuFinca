@@ -1,0 +1,114 @@
+package com.gossip.arrienda_tu_finca.services;
+
+import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
+import com.gossip.arrienda_tu_finca.entities.Property;
+import com.gossip.arrienda_tu_finca.exceptions.PropertyNotFoundException;
+import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class PropertyService {
+
+    @Autowired
+    private PropertyRepository propertyRepository;
+
+    public PropertyDTO getPropertyById(Long id) {
+        Property property = propertyRepository.findById(id)
+                .orElseThrow(() -> new PropertyNotFoundException("Property not found with id " + id));
+        return convertToDTO(property);
+    }
+
+    public List<PropertyDTO> getAllProperties() {
+        return propertyRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public PropertyDTO createProperty(PropertyDTO propertyDTO) {
+        Property property = convertToEntity(propertyDTO);
+        Property savedProperty = propertyRepository.save(property);
+        return convertToDTO(savedProperty);
+    }
+
+    public PropertyDTO updateProperty(Long id, PropertyDTO propertyDTO) {
+        Property property = propertyRepository.findById(id)
+                .orElseThrow(() -> new PropertyNotFoundException("Property not found with id " + id));
+        
+        property.setName(propertyDTO.getName());
+        property.setDescription(propertyDTO.getDescription());
+        property.setMunicipality(propertyDTO.getMunicipality());
+        property.setTypeOfEntrance(propertyDTO.getTypeOfEntrance());
+        property.setAddress(propertyDTO.getAddress());
+        property.setAvailable(propertyDTO.isAvailable());
+        property.setPricePerNight(propertyDTO.getPricePerNight());
+        property.setAmountOfRooms(propertyDTO.getAmountOfRooms());
+        property.setAmountOfBathrooms(propertyDTO.getAmountOfBathrooms());
+        property.setPetFriendly(propertyDTO.isPetFriendly());
+        property.setHasPool(propertyDTO.isHasPool());
+        property.setHasGril(propertyDTO.isHasGril());
+
+        Property updatedProperty = propertyRepository.save(property);
+        return convertToDTO(updatedProperty);
+    }
+
+    public void deactivateProperty(Long id) {
+        Property property = propertyRepository.findById(id)
+                .orElseThrow(() -> new PropertyNotFoundException("Property not found with id " + id));
+        property.setAvailable(false);
+        propertyRepository.save(property);
+    }
+
+    public void uploadPhoto(Long id, MultipartFile photo) {
+        Property property = propertyRepository.findById(id)
+                .orElseThrow(() -> new PropertyNotFoundException("Property not found with id " + id));
+        try {
+            property.setPhoto(photo.getBytes());
+            propertyRepository.save(property);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload photo", e);
+        }
+    }
+
+    private PropertyDTO convertToDTO(Property property) {
+        return new PropertyDTO(
+                property.getId(),
+                property.getName(),
+                property.getDescription(),
+                property.getMunicipality(),
+                property.getTypeOfEntrance(),
+                property.getAddress(),
+                property.isAvailable(),
+                property.getPricePerNight(),
+                property.getAmountOfRooms(),
+                property.getAmountOfBathrooms(),
+                property.isPetFriendly(),
+                property.isHasPool(),
+                property.isHasGril(),
+                property.getOwner().getEmail()
+        );
+    }
+
+    private Property convertToEntity(PropertyDTO propertyDTO) {
+        Property property = new Property();
+        property.setName(propertyDTO.getName());
+        property.setDescription(propertyDTO.getDescription());
+        property.setMunicipality(propertyDTO.getMunicipality());
+        property.setTypeOfEntrance(propertyDTO.getTypeOfEntrance());
+        property.setAddress(propertyDTO.getAddress());
+        property.setAvailable(propertyDTO.isAvailable());
+        property.setPricePerNight(propertyDTO.getPricePerNight());
+        property.setAmountOfRooms(propertyDTO.getAmountOfRooms());
+        property.setAmountOfBathrooms(propertyDTO.getAmountOfBathrooms());
+        property.setPetFriendly(propertyDTO.isPetFriendly());
+        property.setHasPool(propertyDTO.isHasPool());
+        property.setHasGril(propertyDTO.isHasGril());
+        // Assuming owner is fetched somewhere else and set here
+        return property;
+    }
+}

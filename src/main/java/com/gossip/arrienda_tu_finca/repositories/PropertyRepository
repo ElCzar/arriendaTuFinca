@@ -1,0 +1,7 @@
+package com.gossip.arrienda_tu_finca.repositories;
+
+import com.gossip.arrienda_tu_finca.entities.Property;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PropertyRepository extends JpaRepository<Property, Long> {
+}

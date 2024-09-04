@@ -1,0 +1,49 @@
+package com.gossip.arrienda_tu_finca.controllers;
+
+import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
+import com.gossip.arrienda_tu_finca.services.PropertyService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/properties")
+public class PropertyController {
+
+    @Autowired
+    private PropertyService propertyService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PropertyDTO> getPropertyById(@PathVariable Long id) {
+        return ResponseEntity.ok(propertyService.getPropertyById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PropertyDTO>> getAllProperties() {
+        return ResponseEntity.ok(propertyService.getAllProperties());
+    }
+
+    @PostMapping
+    public ResponseEntity<PropertyDTO> createProperty(@RequestBody PropertyDTO propertyDTO) {
+        return ResponseEntity.ok(propertyService.createProperty(propertyDTO));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PropertyDTO> updateProperty(@PathVariable Long id, @RequestBody PropertyDTO propertyDTO) {
+        return ResponseEntity.ok(propertyService.updateProperty(id, propertyDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deactivateProperty(@PathVariable Long id) {
+        propertyService.deactivateProperty(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/upload-photo")
+    public ResponseEntity<Void> uploadPhoto(@PathVariable Long id, @RequestParam("photo") MultipartFile photo) {
+        propertyService.uploadPhoto(id, photo);
+        return ResponseEntity.noContent().build();
+    }
+}
