@@ -101,16 +101,16 @@ public class RentalRequestService {
     }
 
     public RentalRequest payRequest(Long requestId) {
-    Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
-    if (optionalRequest.isPresent()) {
-        RentalRequest request = optionalRequest.get();
-        request.setPaid(true);
-        rentalRequestRepository.save(request);
-        return request;
-    } else {
-        throw new RentalRequestNotFoundException("Solicitud de arriendo no encontrada");
+        Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
+        if (optionalRequest.isPresent()) {
+            RentalRequest request = optionalRequest.get();
+            request.setPaid(true);
+            rentalRequestRepository.save(request);
+            return request;
+        } else {
+            throw new RentalRequestNotFoundException("Solicitud de arriendo no encontrada");
+        }
     }
-}
 
     
 }

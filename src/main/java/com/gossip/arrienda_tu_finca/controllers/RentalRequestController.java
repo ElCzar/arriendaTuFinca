@@ -16,6 +16,7 @@ import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
 import com.gossip.arrienda_tu_finca.entities.RentalRequest;
 import com.gossip.arrienda_tu_finca.services.RentalRequestService;
 import com.gossip.arrienda_tu_finca.mapper.RentalRequestMapper;
+import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
 
 import lombok.AllArgsConstructor;
 
@@ -74,24 +75,23 @@ public class RentalRequestController {
         return new ResponseEntity<>("Solicitud de arriendo rechazada", HttpStatus.OK);
     }
 
-        @PutMapping("/{requestId}/approve")
-    public ResponseEntity<String> approveRequest(@PathVariable Long requestId) {
+    @PutMapping("/{requestId}/approve")
+public ResponseEntity<String> approveRequest(@PathVariable Long requestId) {
+    try {
         RentalRequest rentalRequest = rentalRequestService.approveRequest(requestId);
-        if (rentalRequest == null) {
-            return new ResponseEntity<>("Solicitud de arriendo no encontrada", HttpStatus.BAD_REQUEST);
-        }
         return new ResponseEntity<>("Solicitud de arriendo aprobada", HttpStatus.OK);
+    } catch (RentalRequestNotFoundException e) {
+        return new ResponseEntity<>("Solicitud de arriendo no encontrada", HttpStatus.NOT_FOUND);
     }
-    
-    @PutMapping("/{requestId}/pay")
-    public ResponseEntity<String> payRequest(@PathVariable Long requestId) {
+}
+
+@PutMapping("/{requestId}/pay")
+public ResponseEntity<String> payRequest(@PathVariable Long requestId) {
+    try {
         RentalRequest rentalRequest = rentalRequestService.payRequest(requestId);
-        if (rentalRequest == null) {
-            return new ResponseEntity<>("Solicitud de arriendo no encontrada", HttpStatus.BAD_REQUEST);
-        }
         return new ResponseEntity<>("Solicitud de arriendo pagada", HttpStatus.OK);
+    } catch (RentalRequestNotFoundException e) {
+        return new ResponseEntity<>("Solicitud de arriendo no encontrada", HttpStatus.NOT_FOUND);
     }
-    
-
-
+}
 }

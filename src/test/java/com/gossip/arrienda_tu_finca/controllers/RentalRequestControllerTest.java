@@ -2,6 +2,7 @@ package com.gossip.arrienda_tu_finca.controllers;
 
 import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.entities.RentalRequest;
+import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
 import com.gossip.arrienda_tu_finca.entities.User;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
 import com.gossip.arrienda_tu_finca.services.RentalRequestService;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.doThrow;
 
  class RentalRequestControllerTest {
 
@@ -150,23 +152,37 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         assertEquals("Solicitud de arriendo pagada", response.getBody());
     }
 
-    // prueba sin solicitudes de arriendo
-        @Test
+       @Test
+    void testApproveRequestWithNullRequest() throws Exception {
+        Long requestId = 1L;
+    
+        // Mock del servicio para lanzar la excepción
+        doThrow(new RentalRequestNotFoundException("Solicitud de arriendo no encontrada"))
+            .when(rentalRequestService).approveRequest(requestId);
+    
+        // Llamar al método del controlador
+        ResponseEntity<String> response = rentalRequestController.approveRequest(requestId);
+    
+        // Verificar que la respuesta tenga el estado HTTP adecuado y el mensaje de error
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Solicitud de arriendo no encontrada", response.getBody());
+    }
+    
+    @Test
     void testPayRequestWithNullRequest() throws Exception {
         Long requestId = 1L;
     
-        // Mock del servicio para devolver null
-        when(rentalRequestService.payRequest(requestId)).thenReturn(null);
+        // Mock del servicio para lanzar la excepción
+        doThrow(new RentalRequestNotFoundException("Solicitud de arriendo no encontrada"))
+            .when(rentalRequestService).payRequest(requestId);
     
         // Llamar al método del controlador
         ResponseEntity<String> response = rentalRequestController.payRequest(requestId);
     
         // Verificar que la respuesta tenga el estado HTTP adecuado y el mensaje de error
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertEquals("Solicitud de arriendo no encontrada", response.getBody());
     }
-    
-
 
 
 }
