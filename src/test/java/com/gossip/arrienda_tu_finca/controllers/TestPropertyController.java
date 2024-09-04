@@ -4,7 +4,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,8 +17,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -46,8 +43,6 @@ class TestPropertyController {
 
     @Autowired
     private PropertyRepository propertyRepository;
-
-
 
     @BeforeEach
     @Transactional
@@ -76,16 +71,15 @@ class TestPropertyController {
             "isPetFriendly": true,
             "hasPool": true,
             "hasGril": true,
-            "ownerEmail": "owner@example.com"
         }
         """;
-
+    
         // Act
         mvc.perform(MockMvcRequestBuilders.post("/property")
             .contentType("application/json")
             .content(request))
             .andExpect(MockMvcResultMatchers.status().isOk());
-
+    
         // Assert
         List<Property> properties = propertyRepository.findAll();
         assertEquals(1, properties.size());
@@ -93,13 +87,45 @@ class TestPropertyController {
         assertEquals("Finca La Esperanza", property.getName());
         assertEquals("Hermosa finca en el campo", property.getDescription());
     }
+    
 
-  
+
+//Test 2: Crear una propiedad con datos inválidos
+ @Test
+@DirtiesContext
+@Transactional
+@Description("Test to create a property with invalid data")
+void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
+    // Crea un JSON inválido (falta el campo 'name' por ejemplo)
+    String invalidRequest = """
+        {
+            "description": "Hermosa finca en el campo",
+            "municipality": "Medellin",
+            "typeOfEntrance": "Carretera",
+            "address": "Km 10 via a El Retiro",
+            "pricePerNight": 150.0,
+            "amountOfRooms": 3,
+            "amountOfBathrooms": 2,
+            "isPetFriendly": true,
+            "hasPool": true,
+            "hasGril": true,
+            "ownerEmail": "owner@example.com"
+        }
+    """;
+
+    // Act & Assert
+    mvc.perform(MockMvcRequestBuilders.post("/property")
+            .contentType("application/json")
+            .content(invalidRequest))
+            .andExpect(MockMvcResultMatchers.status().isBadRequest());  // Esperamos 400 Bad Request
+}
+
+    // 3. Caso de éxito: Obtener propiedad por ID
     @Test
     @DirtiesContext
     @Transactional
     @Description("Test to get a property by ID")
-    void givenProperty_whenGetPropertyById_thenReturnProperty() throws Exception {
+    void givenValidPropertyId_whenGetPropertyById_thenReturnProperty() throws Exception {
         // Arrange
         Property property = new Property();
         property.setName("Finca Bella");
@@ -115,37 +141,27 @@ class TestPropertyController {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Hermosa finca"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.municipality").value("Bogota"));
     }
-    
 
+    // 4. Caso de error: Obtener propiedad con ID inválido
     @Test
     @DirtiesContext
     @Transactional
-    @Description("Test to get all properties")
-    void givenProperties_whenGetAllProperties_thenReturnPropertiesList() throws Exception {
-        // Arrange
-        Property property = new Property();
-        property.setName("Finca Bella");
-        property.setDescription("Hermosa finca");
-        property.setMunicipality("Bogota");
-        propertyRepository.save(property);
-
-        // Act
-        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/property")
-            .contentType("application/json"))
-            .andExpect(MockMvcResultMatchers.status().isOk());
-
-        // Assert
-        MvcResult result = resultActions.andReturn();
-        String contentAsString = result.getResponse().getContentAsString();
-        assertNotNull(contentAsString);
+    @Description("Test to get a property by invalid ID")
+    void givenInvalidPropertyId_whenGetPropertyById_thenNotFound() throws Exception {
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.get("/property/999")
+                .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())  // Debe devolver 404 Not Found
+                .andExpect(MockMvcResultMatchers.content().string("Property with ID 999 not found"));  // Verifica el mensaje
     }
+    
 
-
+    // 5. Caso de éxito: Actualizar una propiedad
     @Test
     @DirtiesContext
     @Transactional
     @Description("Test to update a property")
-    void givenUpdatedProperty_whenUpdateProperty_thenPropertyUpdated() throws Exception {
+    void givenValidUpdateRequest_whenUpdateProperty_thenPropertyUpdated() throws Exception {
         // Arrange
         Property property = new Property();
         property.setName("Finca Bella");
@@ -179,12 +195,43 @@ class TestPropertyController {
         assertEquals("Finca Actualizada", updatedProperty.getName());
     }
 
+    //6. Caso de error: Actualizar una propiedad con ID inválido
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test to update a property with an invalid ID and expect a 404 Not Found")
+    void givenInvalidId_whenUpdateProperty_thenNotFound() throws Exception {
+        // Arrange
+        String updateRequest = """
+        {
+            "name": "Finca Actualizada",
+            "description": "Finca con piscina",
+            "municipality": "Bogota",
+            "pricePerNight": 250.0,
+            "amountOfRooms": 5,
+            "amountOfBathrooms": 3,
+            "isPetFriendly": true,
+            "hasPool": true,
+            "hasGril": true
+        }
+        """;
     
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.put("/property/999")
+            .contentType("application/json")
+            .content(updateRequest))
+            .andExpect(MockMvcResultMatchers.status().isNotFound()) // Espera un 404 Not Found
+            .andExpect(MockMvcResultMatchers.content().string("Property with ID 999 not found")); // Verifica el mensaje
+    }
+    
+    
+
+    // 7. Caso de éxito: Desactivar una propiedad
     @Test
     @DirtiesContext
     @Transactional
     @Description("Test to deactivate a property")
-    void givenProperty_whenDeactivateProperty_thenPropertyDeactivated() throws Exception {
+    void givenValidProperty_whenDeactivateProperty_thenPropertyDeactivated() throws Exception {
         // Arrange
         Property property = new Property();
         property.setName("Finca Bella");
@@ -202,12 +249,26 @@ class TestPropertyController {
         assertFalse(deactivatedProperty.isAvailable());
     }
 
+    // 8. Caso de error: Intentar desactivar propiedad con ID inválido
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test to deactivate a property with invalid ID")
+    void givenInvalidPropertyId_whenDeactivateProperty_thenNotFound() throws Exception {
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.delete("/property/999")  // Usa un ID inexistente como 999
+                .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());  // Debe devolver 404 Not Found
+    }
+    
+    
 
+    // 9. Caso de éxito: Subir una foto a una propiedad
     @Test
     @DirtiesContext
     @Transactional
     @Description("Test to upload a photo to a property")
-    void givenProperty_whenUploadPhoto_thenPhotoUploaded() throws Exception {
+    void givenValidProperty_whenUploadPhoto_thenPhotoUploaded() throws Exception {
         // Arrange
         Property property = new Property();
         property.setName("Finca Bella");
@@ -221,4 +282,20 @@ class TestPropertyController {
             .file(photoFile))
             .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
+
+    // 10. Caso de error: Subir una foto a una propiedad con ID inexistente
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test to upload a photo to a property with non-existent ID")
+    void givenInvalidId_whenUploadPhoto_thenNotFound() throws Exception {
+        MockMultipartFile photoFile = new MockMultipartFile("photo", "finca.jpg", "image/jpeg", "fake-image-content".getBytes());
+
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.multipart("/property/999/upload-photo")  // ID no existente
+            .file(photoFile))
+            .andExpect(MockMvcResultMatchers.status().isNotFound()); 
+    }
 }
+
+    

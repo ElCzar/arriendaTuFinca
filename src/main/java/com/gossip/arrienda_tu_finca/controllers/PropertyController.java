@@ -20,6 +20,8 @@ import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyUpdateDTO;
 import com.gossip.arrienda_tu_finca.services.PropertyService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/property")
 public class PropertyController {
@@ -43,7 +45,7 @@ public class PropertyController {
 
     // Crear una propiedad (Usa PropertyCreateDTO)
     @PostMapping
-    public ResponseEntity<PropertyDTO> createProperty(@RequestBody PropertyCreateDTO propertyCreateDTO) {
+    public ResponseEntity<PropertyDTO> createProperty(@Valid @RequestBody PropertyCreateDTO propertyCreateDTO) {
         PropertyDTO createdProperty = propertyService.createProperty(propertyCreateDTO);
         return ResponseEntity.ok(createdProperty);
     }
