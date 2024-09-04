@@ -55,7 +55,7 @@ class TestPropertyController {
         propertyRepository.deleteAllInBatch();
     }
 
-    // Test the property creation endpoint
+
     @Test
     @DirtiesContext
     @Transactional
@@ -94,7 +94,7 @@ class TestPropertyController {
         assertEquals("Hermosa finca en el campo", property.getDescription());
     }
 
-    // Test to get a property by ID
+  
     @Test
     @DirtiesContext
     @Transactional
@@ -117,7 +117,6 @@ class TestPropertyController {
     }
     
 
-    // Test to get all properties
     @Test
     @DirtiesContext
     @Transactional
@@ -141,7 +140,7 @@ class TestPropertyController {
         assertNotNull(contentAsString);
     }
 
-    // Test to update a property
+
     @Test
     @DirtiesContext
     @Transactional
@@ -180,7 +179,7 @@ class TestPropertyController {
         assertEquals("Finca Actualizada", updatedProperty.getName());
     }
 
-    // Test to deactivate a property
+    
     @Test
     @DirtiesContext
     @Transactional
@@ -203,7 +202,7 @@ class TestPropertyController {
         assertFalse(deactivatedProperty.isAvailable());
     }
 
-    // Test to upload a photo to a property
+
     @Test
     @DirtiesContext
     @Transactional

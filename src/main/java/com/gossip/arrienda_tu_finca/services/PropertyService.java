@@ -1,9 +1,9 @@
-package com.gossip.arrienda_tu_finca.service;
+package com.gossip.arrienda_tu_finca.services;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,114 +17,56 @@ import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 @Service
 public class PropertyService {
 
-    private final PropertyRepository propertyRepository;
+    @Autowired
+    private PropertyRepository propertyRepository;
 
     @Autowired
-    public PropertyService(PropertyRepository propertyRepository) {
-        this.propertyRepository = propertyRepository;
-    }
+    private ModelMapper modelMapper;  
 
-    // Crear una propiedad
+    // Crear propiedad
     public PropertyDTO createProperty(PropertyCreateDTO propertyCreateDTO) {
-        Property property = new Property();
-        mapCreateDTOToEntity(propertyCreateDTO, property);
-        property.setAvailable(true); // Propiedad disponible por defecto
-
+        Property property = modelMapper.map(propertyCreateDTO, Property.class); 
+        property.setAvailable(true); 
         Property savedProperty = propertyRepository.save(property);
-        return mapToDTO(savedProperty);
+        return modelMapper.map(savedProperty, PropertyDTO.class); 
     }
 
     // Obtener una propiedad por ID
     public PropertyDTO getPropertyById(Long id) {
         Property property = propertyRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Property not found"));
-        return mapToDTO(property);
+            .orElseThrow(() -> new RuntimeException("Property not found"));
+        return modelMapper.map(property, PropertyDTO.class); 
     }
 
     // Obtener todas las propiedades
     public List<PropertyDTO> getAllProperties() {
-        return propertyRepository.findAll().stream()
-                .map(this::mapToDTO)
+        List<Property> properties = propertyRepository.findAll();
+        return properties.stream()
+                .map(property -> modelMapper.map(property, PropertyDTO.class)) // Mapea cada entidad a DTO
                 .collect(Collectors.toList());
     }
 
-    // Actualizar una propiedad
+    // Actualizar propiedad
     public PropertyDTO updateProperty(Long id, PropertyUpdateDTO propertyUpdateDTO) {
         Property property = propertyRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Property not found"));
-        mapUpdateDTOToEntity(propertyUpdateDTO, property);
+            .orElseThrow(() -> new RuntimeException("Property not found"));
+        modelMapper.map(propertyUpdateDTO, property); // Actualiza la entidad con los datos del DTO
         Property updatedProperty = propertyRepository.save(property);
-        return mapToDTO(updatedProperty);
+        return modelMapper.map(updatedProperty, PropertyDTO.class); // Devuelve la entidad actualizada mapeada a DTO
     }
 
-    // Desactivar una propiedad
+    // Desactivar propiedad (no eliminar)
     public void deactivateProperty(Long id) {
         Property property = propertyRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Property not found"));
-        property.setAvailable(false); // Cambiar a no disponible
+            .orElseThrow(() -> new RuntimeException("Property not found"));
+        property.setAvailable(false); 
         propertyRepository.save(property);
     }
 
-    // Subir una foto
+    // Subir foto (lógica de almacenamiento omitida)
     public void uploadPhoto(Long id, MultipartFile photo) {
         Property property = propertyRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Property not found"));
-        try {
-            byte[] photoBytes = photo.getBytes();
-            // Aquí puedes guardar los bytes de la foto en la entidad o manejarlo de otra forma
-            // property.setPhoto(photoBytes); // Si tienes un campo photo en Property
-            propertyRepository.save(property);
-        } catch (IOException e) {
-            throw new RuntimeException("Error al subir la foto", e);
-        }
-    }
-
-    // Mapea PropertyCreateDTO a una entidad Property
-    private void mapCreateDTOToEntity(PropertyCreateDTO dto, Property property) {
-        property.setName(dto.getName());
-        property.setDescription(dto.getDescription());
-        property.setMunicipality(dto.getMunicipality());
-        property.setTypeOfEntrance(dto.getTypeOfEntrance());
-        property.setAddress(dto.getAddress());
-        property.setPricePerNight(dto.getPricePerNight());
-        property.setAmountOfRooms(dto.getAmountOfRooms());
-        property.setAmountOfBathrooms(dto.getAmountOfBathrooms());
-        property.setPetFriendly(dto.isPetFriendly());
-        property.setHasPool(dto.isHasPool());
-        property.setHasGril(dto.isHasGril());
-    }
-
-    // Mapea PropertyUpdateDTO a una entidad Property
-    private void mapUpdateDTOToEntity(PropertyUpdateDTO dto, Property property) {
-        property.setName(dto.getName());
-        property.setDescription(dto.getDescription());
-        property.setMunicipality(dto.getMunicipality());
-        property.setTypeOfEntrance(dto.getTypeOfEntrance());
-        property.setAddress(dto.getAddress());
-        property.setPricePerNight(dto.getPricePerNight());
-        property.setAmountOfRooms(dto.getAmountOfRooms());
-        property.setAmountOfBathrooms(dto.getAmountOfBathrooms());
-        property.setPetFriendly(dto.isPetFriendly());
-        property.setHasPool(dto.isHasPool());
-        property.setHasGril(dto.isHasGril());
-    }
-
-    // Convierte una entidad Property en PropertyDTO
-    private PropertyDTO mapToDTO(Property property) {
-        PropertyDTO dto = new PropertyDTO();
-        dto.setId(property.getId());
-        dto.setName(property.getName());
-        dto.setDescription(property.getDescription());
-        dto.setMunicipality(property.getMunicipality());
-        dto.setTypeOfEntrance(property.getTypeOfEntrance());
-        dto.setAddress(property.getAddress());
-        dto.setPricePerNight(property.getPricePerNight());
-        dto.setAmountOfRooms(property.getAmountOfRooms());
-        dto.setAmountOfBathrooms(property.getAmountOfBathrooms());
-        dto.setPetFriendly(property.isPetFriendly());
-        dto.setHasPool(property.isHasPool());
-        dto.setHasGril(property.isHasGril());
-        dto.setAvailable(property.isAvailable());
-        return dto;
+            .orElseThrow(() -> new RuntimeException("Property not found"));
+        //aqui almaceno
     }
 }

@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.gossip.arrienda_tu_finca.dto.PropertyCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyUpdateDTO;
-import com.gossip.arrienda_tu_finca.service.PropertyService;
+import com.gossip.arrienda_tu_finca.services.PropertyService;
 
 @RestController
 @RequestMapping("/property")
