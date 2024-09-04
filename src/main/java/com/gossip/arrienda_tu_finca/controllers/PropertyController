@@ -21,25 +21,29 @@ public class PropertyController {
     // Obtener una propiedad por ID
     @GetMapping("/{id}")
     public ResponseEntity<PropertyDTO> getPropertyById(@PathVariable Long id) {
-        return ResponseEntity.ok(propertyService.getPropertyById(id));
+        PropertyDTO propertyDTO = propertyService.getPropertyById(id);
+        return ResponseEntity.ok(propertyDTO);
     }
 
     // Obtener todas las propiedades
     @GetMapping
     public ResponseEntity<List<PropertyDTO>> getAllProperties() {
-        return ResponseEntity.ok(propertyService.getAllProperties());
+        List<PropertyDTO> properties = propertyService.getAllProperties();
+        return ResponseEntity.ok(properties);
     }
 
     // Crear una propiedad (Usa PropertyCreateDTO)
     @PostMapping
     public ResponseEntity<PropertyDTO> createProperty(@RequestBody PropertyCreateDTO propertyCreateDTO) {
-        return ResponseEntity.ok(propertyService.createProperty(propertyCreateDTO));
+        PropertyDTO createdProperty = propertyService.createProperty(propertyCreateDTO);
+        return ResponseEntity.ok(createdProperty);
     }
 
     // Actualizar una propiedad (Usa PropertyUpdateDTO)
     @PutMapping("/{id}")
     public ResponseEntity<PropertyDTO> updateProperty(@PathVariable Long id, @RequestBody PropertyUpdateDTO propertyUpdateDTO) {
-        return ResponseEntity.ok(propertyService.updateProperty(id, propertyUpdateDTO));
+        PropertyDTO updatedProperty = propertyService.updateProperty(id, propertyUpdateDTO);
+        return ResponseEntity.ok(updatedProperty);
     }
 
     // Desactivar una propiedad (Cambiar su estado a no disponible)

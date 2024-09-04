@@ -1,13 +1,18 @@
 package com.gossip.arrienda_tu_finca.repositories;
 
-import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
-import com.gossip.arrienda_tu_finca.entities.Property;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
 import java.util.List;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
+import com.gossip.arrienda_tu_finca.entities.Property;
+
+@Repository // Añadir esta anotación para asegurarte de que Spring la detecte como un repositorio
 public interface PropertyRepository extends JpaRepository<Property, Long> {
 
     // Encuentra todas las propiedades que pertenecen a un usuario específico (por su email)
@@ -32,6 +37,8 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
 
     // Modifica el estado de disponibilidad de una propiedad por su ID
     @Modifying
+    @Transactional // Importante para los métodos que modifican la base de datos
     @Query("UPDATE Property p SET p.isAvailable = false WHERE p.id = :propertyId")
     void deactivatePropertyById(@Param("propertyId") Long propertyId);
 }
+
