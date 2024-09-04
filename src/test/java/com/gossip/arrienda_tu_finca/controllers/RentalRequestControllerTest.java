@@ -150,6 +150,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         assertEquals("Solicitud de arriendo pagada", response.getBody());
     }
 
+    // prueba sin solicitudes de arriendo
+        @Test
+    void testPayRequestWithNullRequest() throws Exception {
+        Long requestId = 1L;
+    
+        // Mock del servicio para devolver null
+        when(rentalRequestService.payRequest(requestId)).thenReturn(null);
+    
+        // Llamar al método del controlador
+        ResponseEntity<String> response = rentalRequestController.payRequest(requestId);
+    
+        // Verificar que la respuesta tenga el estado HTTP adecuado y el mensaje de error
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Solicitud de arriendo no encontrada", response.getBody());
+    }
+    
+
 
 
 }

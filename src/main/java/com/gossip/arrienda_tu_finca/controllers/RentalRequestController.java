@@ -7,11 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
+import com.gossip.arrienda_tu_finca.entities.RentalRequest;
 import com.gossip.arrienda_tu_finca.services.RentalRequestService;
 import com.gossip.arrienda_tu_finca.mapper.RentalRequestMapper;
 
@@ -72,17 +74,24 @@ public class RentalRequestController {
         return new ResponseEntity<>("Solicitud de arriendo rechazada", HttpStatus.OK);
     }
 
-    @PutMapping("/{requestId}/approve")
+        @PutMapping("/{requestId}/approve")
     public ResponseEntity<String> approveRequest(@PathVariable Long requestId) {
-        rentalRequestService.approveRequest(requestId);
+        RentalRequest rentalRequest = rentalRequestService.approveRequest(requestId);
+        if (rentalRequest == null) {
+            return new ResponseEntity<>("Solicitud de arriendo no encontrada", HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>("Solicitud de arriendo aprobada", HttpStatus.OK);
     }
-
+    
     @PutMapping("/{requestId}/pay")
     public ResponseEntity<String> payRequest(@PathVariable Long requestId) {
-        rentalRequestService.payRequest(requestId);
+        RentalRequest rentalRequest = rentalRequestService.payRequest(requestId);
+        if (rentalRequest == null) {
+            return new ResponseEntity<>("Solicitud de arriendo no encontrada", HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>("Solicitud de arriendo pagada", HttpStatus.OK);
     }
+    
 
 
 }
