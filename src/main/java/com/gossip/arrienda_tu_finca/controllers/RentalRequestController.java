@@ -1,6 +1,8 @@
 package com.gossip.arrienda_tu_finca.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,8 +11,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gossip.arrienda_tu_finca.entities.RentalRequest;
+import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
 import com.gossip.arrienda_tu_finca.services.RentalRequestService;
+import com.gossip.arrienda_tu_finca.mapper.RentalRequestMapper;
 
 import lombok.AllArgsConstructor;
 
@@ -22,14 +25,20 @@ public class RentalRequestController {
     private final RentalRequestService rentalRequestService;
 
     @GetMapping("/owner/{email}")
-    public ResponseEntity<List<RentalRequest>> getRequestsByOwner(@PathVariable String email) {
-        List<RentalRequest> requests = rentalRequestService.getRequestsByOwner(email);
+    public ResponseEntity<List<RentalRequestDto>> getRequestsByOwner(@PathVariable String email) {
+        List<RentalRequestDto> requests = rentalRequestService.getRequestsByOwner(email)
+            .stream()
+            .map(RentalRequestMapper::toDTO)
+            .collect(Collectors.toList());
         return new ResponseEntity<>(requests, HttpStatus.OK);
     }
 
     @GetMapping("/property/{propertyId}")
-    public ResponseEntity<List<RentalRequest>> getRequestsByProperty(@PathVariable Long propertyId) {
-        List<RentalRequest> requests = rentalRequestService.getRequestsByProperty(propertyId);
+    public ResponseEntity<List<RentalRequestDto>> getRequestsByProperty(@PathVariable Long propertyId) {
+        List<RentalRequestDto> requests = rentalRequestService.getRequestsByProperty(propertyId)
+            .stream()
+            .map(RentalRequestMapper::toDTO)
+            .collect(Collectors.toList());
         return new ResponseEntity<>(requests, HttpStatus.OK);
     }
 
@@ -63,10 +72,17 @@ public class RentalRequestController {
         return new ResponseEntity<>("Solicitud de arriendo rechazada", HttpStatus.OK);
     }
 
-    // New method
     @PutMapping("/{requestId}/approve")
     public ResponseEntity<String> approveRequest(@PathVariable Long requestId) {
         rentalRequestService.approveRequest(requestId);
         return new ResponseEntity<>("Solicitud de arriendo aprobada", HttpStatus.OK);
     }
+
+    @PutMapping("/{requestId}/pay")
+    public ResponseEntity<String> payRequest(@PathVariable Long requestId) {
+        rentalRequestService.payRequest(requestId);
+        return new ResponseEntity<>("Solicitud de arriendo pagada", HttpStatus.OK);
+    }
+
+
 }
