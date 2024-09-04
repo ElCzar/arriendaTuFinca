@@ -72,8 +72,7 @@ public class UserService {
             throw new UserNotValidException("Email or password is incorrect");
         }
 
-        User uesrRepository = userRepository.findByEmail(user.getEmail());
-        return uesrRepository.getId();
+        return userRepository.findIdByEmail(user.getEmail());
     }
 
     /**
@@ -172,6 +171,12 @@ public class UserService {
     public void deleteUser(LoginDTO loginDTO, Long userId) {
         User user = modelMapper.map(loginDTO, User.class);
 
+        Optional<LoginDTO> optionalUserFromDB = Optional.ofNullable(userRepository.findLoginDTOById(userId));
+
+        if (optionalUserFromDB.isEmpty()) {
+            throw new UserNotFoundException("User for delete not found by id: " + userId);
+        }
+
         if (user == null) {
             throw new UserNotValidException("User has no information for delete");
         }
@@ -182,13 +187,12 @@ public class UserService {
             throw new UserNotValidException("Password is null or empty for delete");
         }
 
-        LoginDTO userFromDB = userRepository.findLoginDTOById(userId);
-
-        if (userFromDB == null) {
-            throw new UserNotFoundException("User for delete not found by id: " + userId);
+        LoginDTO userFromDB = optionalUserFromDB.get();
+        if (!userFromDB.getEmail().equals(user.getEmail())) {
+            throw new UserNotValidException("Email is incorrect for delete");
         }
         if (!passwordEncryptionService.checkPassword(user.getPassword(), userFromDB.getPassword())) {
-            throw new UserNotValidException("Email or password is incorrect for delete");
+            throw new UserNotValidException("Password is incorrect for delete");
         }
 
         userRepository.deleteById(userId);

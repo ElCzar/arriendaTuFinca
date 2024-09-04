@@ -21,6 +21,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT new com.gossip.arrienda_tu_finca.dto.LoginDTO(u.email, u.password) FROM User u WHERE u.email = :email")
     LoginDTO findLoginDTOByEmail(@Param("email") String email);
+    
+    @Query("SELECT u.id FROM User u WHERE u.email = :email")
+    Long findIdByEmail(@Param("email") String email);
 
     @Query("SELECT new com.gossip.arrienda_tu_finca.dto.LoginDTO(u.email, u.password) FROM User u WHERE u.id = :userId")
     LoginDTO findLoginDTOById(@Param("userId") Long userId);

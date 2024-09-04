@@ -655,4 +655,243 @@ class TestUserController {
         """
         );
     }
+
+    // Test user update password endpoint
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test the user update password with correct information")
+    void givenCorrectPassword_whenUpdatePassword_thenPasswordUpdated() throws Exception {
+        // Arrange
+        // Creates an user
+        User user = new User();
+        user.setEmail("johnDoe@gmail.com");
+        user.setName("John");
+        user.setSurname("Doe");
+        user.setPassword(passwordEncryptionService.encryptPassword("Password123$"));
+        user.setPhone("123456789");
+        user.setHost(true);
+        user.setRenter(false);
+        user.setId(1L);
+        List<Property> properties = List.of(new Property());
+        user.setProperties(properties);
+        userRepository.save(user);
+
+        // Creates a json string
+        String request =
+        """
+        {
+            "email": "johnDoe@gmail.com",
+            "oldPassword": "Password123$",
+            "newPassword": "NewPassword123$"
+        }
+        """;
+
+        // Act
+        // Perform a request to the endpoint and expect an OK status
+        mvc.perform(MockMvcRequestBuilders.put("/api/user/update/1/password")
+            .contentType("application/json")
+            .content(request))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+
+        // Assert
+        // Check if the user password is updated correctly
+        User updatedUser = userRepository.findById(1L).get();
+        assertEquals("John", updatedUser.getName());
+        assertEquals("Doe", updatedUser.getSurname());
+        assertEquals("123456789", updatedUser.getPhone());
+        assertEquals(true, updatedUser.isHost());
+        assertEquals(false, updatedUser.isRenter());
+        assertEquals(1, updatedUser.getProperties().size());
+        assertEquals(true, passwordEncryptionService.checkPassword("NewPassword123$", updatedUser.getPassword()));
+        assertEquals(1, updatedUser.getId());
+    }
+
+    @ParameterizedTest
+    @DirtiesContext
+    @Transactional
+    @MethodSource("provideNotValidUpdatePasswordStream")
+    @Description("Test the user update password with different invalid information")
+    void givenInvalidPassword_whenUpdatePassword_thenPasswordNotUpdated(String jsonPayload) throws Exception {
+        // Arrange
+        // Creates an user
+        User user = new User();
+        user.setEmail("johnDoe@gmail.com");
+        user.setName("John");
+        user.setSurname("Doe");
+        user.setPassword(passwordEncryptionService.encryptPassword("Password123$"));
+        user.setPhone("123456789");
+        user.setHost(true);
+        user.setRenter(false);
+        user.setId(1L);
+        List<Property> properties = List.of(new Property());
+        user.setProperties(properties);
+        userRepository.save(user);
+
+        // Creates a json string
+        String request = jsonPayload;
+
+        // Act
+        // Perform a request to the endpoint and expect a bad request status
+        mvc.perform(MockMvcRequestBuilders.put("/api/user/update/1/password")
+            .contentType("application/json")
+            .content(request))
+            .andExpect(MockMvcResultMatchers.status().isBadRequest());
+
+        // Assert
+        // Check if the user password is not updated
+        User updatedUser = userRepository.findById(1L).get();
+        assertEquals("John", updatedUser.getName());
+        assertEquals("Doe", updatedUser.getSurname());
+        assertEquals("123456789", updatedUser.getPhone());
+        assertEquals(true, updatedUser.isHost());
+        assertEquals(false, updatedUser.isRenter());
+        assertEquals(1, updatedUser.getProperties().size());
+        assertEquals(true, passwordEncryptionService.checkPassword("Password123$", updatedUser.getPassword()));
+        assertEquals(1, updatedUser.getId());
+    }
+
+    private static Stream<String> provideNotValidUpdatePasswordStream() {
+        return Stream.of(
+        """
+        {
+            "email": null,
+            "oldPassword": "Password123$",
+            "newPassword": "NewPassword123$"
+        }
+        """,
+        """
+        {
+            "email": "johnDoe@gmail.com",
+            "oldPassword": null,
+            "newPassword": null
+        }
+        """,
+        """
+        {
+            "email": "johnDoe@gmail.com",
+            "oldPassword": "NotPassword123$",
+            "newPassword": "NewPassword123$"
+        }
+        """,
+        """
+        {
+            "email": "johnNotDoe@gmail.com",
+            "oldPassword": "Password123$",
+            "newPassword": "NewPassword123$"
+        }
+        """,
+        """
+        {
+            "email": "johnDoe@gmail.com",
+            "oldPassword": "Password123$",
+            "newPassword": "weakpassword"
+        }
+        """,
+        """
+        {}     
+        """
+        );
+    }
+
+    // Test user delete endpoint
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test the user delete with correct information")
+    void givenCorrectUserInfo_whenDeleteUser_thenUserDeleted() throws Exception {
+        // Arrange
+        // Creates an user
+        User user = new User();
+        user.setEmail("johnDoe@gmail.com");
+        user.setPassword(passwordEncryptionService.encryptPassword("Password123$"));
+        user.setId(1L);
+        userRepository.save(user);
+
+        // Json string for loginDTO
+        String request = 
+        """
+        {
+            "email": "johnDoe@gmail.com",
+            "password": "Password123$"
+        }
+        """;
+
+        // Act
+        // Perform a request to the endpoint and expect an OK status
+        mvc.perform(MockMvcRequestBuilders.post("/api/user/delete/1")
+            .contentType("application/json")
+            .content(request))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+
+        // Assert
+        // Check if the user is deleted
+        List<User> users = userRepository.findAll();
+        assertEquals(0, users.size());
+    }
+
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test user delete on an user that does not exist")
+    void givenNotCreatedUser_whenDeleteUser_thenUserNotDeleted() throws Exception {
+        // Arrange
+        // User that should not be deleted
+        User user = new User();
+        user.setEmail("johnDoe@gmail.com");
+        user.setPassword(passwordEncryptionService.encryptPassword("Password123$"));
+        user.setId(1L);
+        userRepository.save(user);
+
+        // Json string for loginDTO
+        String request = 
+        """
+        {
+            "email": "johnNotDoe@gmail.com",
+            "password": "Password123$"
+        }
+        """;
+        
+        // Act
+        // Perform a request to the endpoint and expect a not found status
+        mvc.perform(MockMvcRequestBuilders.post("/api/user/delete/2")
+            .contentType("application/json")
+            .content(request))
+            .andExpect(MockMvcResultMatchers.status().isNotFound());
+
+        // Assert
+        // Check if the user is not deleted
+        List<User> users = userRepository.findAll();
+        assertEquals(1, users.size());
+    }
+
+    @ParameterizedTest
+    @DirtiesContext
+    @Transactional
+    @MethodSource("provideNotValidLogInStream")
+    @Description("Test the user delete with different invalid information")
+    void givenInvalidUserInfo_whenDeleteUser_thenUserNotDeleted(String jsonPayload) throws Exception {
+        // Arrange
+        // Creates an user
+        User user = new User();
+        user.setEmail("johnDoe@gmail.com");
+        user.setPassword(passwordEncryptionService.encryptPassword("Password123$"));
+        user.setId(1L);
+        userRepository.save(user);
+
+        // Json string for loginDTO
+        String request = jsonPayload;
+        
+        // Act
+        // Perform a request to the endpoint and expect a bad request status
+        mvc.perform(MockMvcRequestBuilders.post("/api/user/delete/1")
+            .contentType("application/json")
+            .content(request))
+            .andExpect(MockMvcResultMatchers.status().isBadRequest());
+
+        // Assert
+        // Check if the user is not deleted
+        List<User> users = userRepository.findAll();
+        assertEquals(1, users.size());
+    }
 } 
