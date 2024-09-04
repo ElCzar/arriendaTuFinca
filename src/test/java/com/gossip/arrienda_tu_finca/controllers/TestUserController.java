@@ -14,10 +14,13 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.ClassOrderer.OrderAnnotation;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Description;
@@ -51,6 +54,7 @@ import jakarta.transaction.Transactional;
 @TestPropertySource(
     locations = "classpath:application-test.properties"
 )
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 class TestUserController {
     @Autowired
     private MockMvc mvc;
@@ -66,6 +70,7 @@ class TestUserController {
 
     // Test the user creation endpoint
     @Test
+	@DirtiesContext
     @Transactional
     @Description("Test the user creation where all the fields are valid")
     void givenCorrectUser_whenCreateUser_thenUserCreated() throws Exception {
@@ -107,6 +112,7 @@ class TestUserController {
     }
 
     @ParameterizedTest
+	@DirtiesContext
     @Transactional
     @MethodSource("provideNotValidUsersStream")
     @Description("Test the user creation where different invalid users are provided")
@@ -190,6 +196,7 @@ class TestUserController {
     }
 
     @Test
+	@DirtiesContext
     @Transactional
     @Description("Test the user creation where the email is already in use")
     void givenEmailInUse_whenCreateUser_thenUserNotCreated() throws Exception {
@@ -249,6 +256,7 @@ class TestUserController {
     }
 
     @Test
+	@DirtiesContext
     @Transactional
     @Description("Test the user creation is giving out different user ids")
     void givenDifferentUsers_whenCreateUser_thenDifferentUserIds() throws Exception {
@@ -316,6 +324,7 @@ class TestUserController {
 
     // Test user information endpoint
     @Test
+	@DirtiesContext
     @Transactional
     @Description("Test if user is created the information is retrieved correctly")
     void givenCreatedUser_whenGetUserInfo_thenUserInfoRetrieved() throws Exception {
@@ -345,6 +354,7 @@ class TestUserController {
     }
 
     @Test
+	@DirtiesContext
     @Transactional
     @Description("Test if user is not created the information is not retrieved")
     void givenNotCreatedUser_whenGetUserInfo_thenUserInfoNotRetrieved() throws Exception {
@@ -355,6 +365,7 @@ class TestUserController {
     }
 
     @Test
+	@DirtiesContext
     @Transactional
     @Description("Test if user is created but another id provided the information is not retrieved")
     void givenCreatedUser_whenGetUserInfoWithDifferentId_thenUserInfoNotRetrieved() throws Exception {
@@ -379,6 +390,7 @@ class TestUserController {
 
     // Test user login endpoint
     @Test
+	@DirtiesContext
     @Transactional
     @Description("Test the user login with correct credentials")
     void givenCorrectCredentials_whenLogin_thenLoginSuccessful() throws Exception {
@@ -419,6 +431,7 @@ class TestUserController {
     }
 
     @ParameterizedTest
+	@DirtiesContext
     @Transactional
     @MethodSource("provideNotValidLogInStream")
     @Description("Test the user login with different invalid credentials")
@@ -482,6 +495,7 @@ class TestUserController {
 
     // Test user update endpoint
     @Test
+	@DirtiesContext
     @Transactional
     @Description("Test the user update with correct information")
     void givenCorrectUserInfo_whenUpdateUser_thenUserUpdated() throws Exception {
@@ -534,6 +548,7 @@ class TestUserController {
     }
 
     @ParameterizedTest
+	@DirtiesContext
     @Transactional
     @MethodSource("provideNotValidUpdateStream")
     @Description("Test the user update with different invalid information")
