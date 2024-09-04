@@ -52,6 +52,7 @@ public class RentalRequest {
     private boolean reviewed;
     private boolean completed;
     private boolean approved;
+    
 
     public RentalRequest(Long id, Property property, User requester, LocalDateTime requestDateTime, LocalDate arrivalDate, LocalDate departureDate, Double amount, boolean accepted, boolean rejected, boolean canceled, boolean paid, boolean reviewed, boolean completed, boolean approved) {
         this.id = id;

@@ -19,6 +19,9 @@ public class RentalRequestDto {
 	private boolean completed;
 	private boolean approved;
 
+	public RentalRequestDto() {
+	}
+
 	// Constructor
 	public RentalRequestDto(Long id, Long propertyId, String requesterEmail, LocalDateTime requestDateTime, LocalDate arrivalDate, LocalDate departureDate, Double amount, boolean accepted, boolean rejected, boolean canceled, boolean paid, boolean reviewed, boolean completed, boolean approved) {
 		this.id = id;
@@ -36,6 +39,8 @@ public class RentalRequestDto {
 		this.completed = completed;
 		this.approved = approved;
 	}
+
+
 
 	// Getters y Setters
 	public Long getId() {
@@ -149,4 +154,6 @@ public class RentalRequestDto {
 	public void setApproved(boolean approved) {
 		this.approved = approved;
 	}
+
+	
 }
