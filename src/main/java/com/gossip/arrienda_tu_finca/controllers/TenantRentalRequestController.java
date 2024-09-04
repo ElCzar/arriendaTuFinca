@@ -44,23 +44,12 @@ public class TenantRentalRequestController {
 
     @PutMapping("/{id}")
     public ResponseEntity<TenantRentalRequest> updateRentalRequest(@PathVariable Long id, @RequestBody RequestARentalDTO requestDTO) {
-        try {
-            TenantRentalRequest updatedRequest = tenantRentalRequestService.updateRentalRequest(id, requestDTO);
-            return ResponseEntity.ok(updatedRequest);
-        } catch (InvalidStartDateException | InvalidEndDateException | InvalidPeopleNumberException e) {
-            return ResponseEntity.badRequest().body(null);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+        
+        TenantRentalRequest updatedRequest = tenantRentalRequestService.updateRentalRequest(id, requestDTO);
+        return ResponseEntity.ok(updatedRequest);
     }
     
     // Pagar
-
-    
-
-
-
-
 
     // Calificar finca
 
