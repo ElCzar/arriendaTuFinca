@@ -11,13 +11,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "properties")
+@ToString
+@Table(name = "property")
 public class Property {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,8 +38,7 @@ public class Property {
     private boolean hasPool;
     private boolean hasGril;
 
-    // ManyToOne relationship with User
     @ManyToOne
-    @JoinColumn(name = "owner_email", referencedColumnName = "email")
+    @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
 }
