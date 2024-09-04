@@ -106,17 +106,16 @@ class TestPropertyController {
         property.setDescription("Hermosa finca");
         property.setMunicipality("Bogota");
         propertyRepository.save(property);
-
-        // Act
-        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.get("/property/" + property.getId())
-            .contentType("application/json"))
-            .andExpect(MockMvcResultMatchers.status().isOk());
-
-        // Assert
-        MvcResult result = resultActions.andReturn();
-        String contentAsString = result.getResponse().getContentAsString();
-        assertEquals("{\"name\":\"Finca Bella\",\"description\":\"Hermosa finca\",\"municipality\":\"Bogota\"}", contentAsString);
+    
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.get("/property/" + property.getId())
+                .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Finca Bella"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description").value("Hermosa finca"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.municipality").value("Bogota"));
     }
+    
 
     // Test to get all properties
     @Test
