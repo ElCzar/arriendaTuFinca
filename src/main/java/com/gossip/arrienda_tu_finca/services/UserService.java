@@ -16,8 +16,6 @@ import com.gossip.arrienda_tu_finca.exceptions.UserNotFoundException;
 import com.gossip.arrienda_tu_finca.exceptions.UserNotValidException;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
 
-import jakarta.transaction.Transactional;
-
 @Service
 public class UserService {
     private final UserRepository userRepository;
