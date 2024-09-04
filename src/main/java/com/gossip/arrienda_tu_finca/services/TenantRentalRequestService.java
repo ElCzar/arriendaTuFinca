@@ -3,7 +3,13 @@ package com.gossip.arrienda_tu_finca.services;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.stereotype.Service;
+import org.modelmapper.ModelMapper;
 
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 import com.gossip.arrienda_tu_finca.repositories.TenantRentalRequestRepository;
@@ -21,9 +27,14 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class TenantRentalRequestService {
-    
+
+    @Autowired
     private final TenantRentalRequestRepository rentalRequestRepository;
 
+    @Autowired
+    private ModelMapper modelMapper;  
+
+    //Llenar formulario de arrendamiento
     public TenantRentalRequest updateRentalRequest(Long id, RequestARentalDTO requestDTO) {
         TenantRentalRequest rentalRequest = rentalRequestRepository.findById(id)
                 .orElseThrow(() -> new RentalRequestNotFoundException("Rentall Request not found"));
@@ -38,7 +49,7 @@ public class TenantRentalRequestService {
         return rentalRequestRepository.save(rentalRequest);
     }
 
-    private void validateDates(LocalDate startDate, LocalDate endDate) {
+    private void validateDates(LocalDate startDate, LocalDate endDate) { // Validación de las fechas de inicio y final de la renta
         LocalDate today = LocalDate.now();
 
         if (startDate.isBefore(today)) {
@@ -50,7 +61,7 @@ public class TenantRentalRequestService {
         }
     }
 
-    private void validatePeopleNumber(Integer requestedPeople, Integer maxPeople) {
+    private void validatePeopleNumber(Integer requestedPeople, Integer maxPeople) { // Validación del numero de personas de la renta
         if (requestedPeople > maxPeople) {
             throw new InvalidPeopleNumberException("Invalid people number");
         }
@@ -80,6 +91,14 @@ public class TenantRentalRequestService {
         } else {
             throw new RentalRequestNotFoundException("Rental request not found");
         }
+    }
+
+    // Mostrar solicitudes de renta del arrendatario
+    public List<RequestARentalDTO> getAllRequestsByTenant(String email) {
+        List<TenantRentalRequest> tRentalRequests = rentalRequestRepository.findAllRentalRequestsByEmail(email);
+        return tRentalRequests.stream()
+                .map(tenantRentalRequest -> modelMapper.map(tenantRentalRequest, RequestARentalDTO.class))
+                .collect(Collectors.toList());          
     }
 
     // Convierte una entidad Property en PropertyDTO

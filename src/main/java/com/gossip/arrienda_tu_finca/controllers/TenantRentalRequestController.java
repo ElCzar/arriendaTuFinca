@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gossip.arrienda_tu_finca.entities.TenantRentalRequest;
@@ -31,7 +32,13 @@ public class TenantRentalRequestController {
 
     private final TenantRentalRequestService tenantRentalRequestService;
 
-    // Ver solicitud de arriendo
+    // Ver solicitudes de arriendo
+
+    @GetMapping
+    public ResponseEntity<List<RequestARentalDTO>> getAllRentalsRequests(@RequestParam String email) {
+        List<RequestARentalDTO> rentalRequests = tenantRentalRequestService.getAllRequestsByTenant(email);
+        return ResponseEntity.ok(rentalRequests);
+    }
 
     // Solicitar arriendo
 
@@ -46,8 +53,14 @@ public class TenantRentalRequestController {
             return ResponseEntity.notFound().build();
         }
     }
-
+    
     // Pagar
+
+    
+
+
+
+
 
     // Calificar finca
 
