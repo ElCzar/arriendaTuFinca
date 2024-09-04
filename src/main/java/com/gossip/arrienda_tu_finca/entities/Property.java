@@ -27,6 +27,7 @@ public class Property {
     private String description;
     private String municipality;
     private String typeOfEntrance;
+    private String peopleNumber;
     private String address;
     private boolean isAvailable;
     private Double pricePerNight;
