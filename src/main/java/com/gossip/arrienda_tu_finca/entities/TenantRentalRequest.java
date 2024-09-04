@@ -1,5 +1,8 @@
 package com.gossip.arrienda_tu_finca.entities;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Payment {
+public class TenantRentalRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,10 +27,23 @@ public class Payment {
 
     @ManyToOne
     @JoinColumn(name = "user_email", referencedColumnName = "email")
-    private User tenant;
+    private User requester;
 
+    private LocalDateTime requestDateTime;  
+    private LocalDate arrivalDate; 
+    private LocalDate departureDate;  
+    private Integer peopleNumber;
+    private Double amount;  
+    private boolean accepted;
+    private boolean rejected;
+    private boolean canceled;
+    private boolean paid;
+    private boolean landlordReviewed;
+    private boolean propertyReviewed;
+    private boolean completed;
+    private boolean approved;
     private Double rentalPrice;
     private String bank;
     private Integer accountNumber;
-    
+
 }

@@ -1,4 +1,4 @@
-package com.gossip.arrienda_tu_finca.service;
+package com.gossip.arrienda_tu_finca.services;
 
 import java.io.IOException;
 import java.util.List;

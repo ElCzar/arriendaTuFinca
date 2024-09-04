@@ -3,7 +3,7 @@ package com.gossip.arrienda_tu_finca.dto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class RentalRequestDTO {
+public class TenantRentalRequestDTO {
 
     private Long id;
 	private Long propertyId;
@@ -11,30 +11,34 @@ public class RentalRequestDTO {
 	private LocalDateTime requestDateTime;
 	private LocalDate arrivalDate;
 	private LocalDate departureDate;
+	private Integer peopleNumber;
 	private Double amount;
 	private boolean accepted;
 	private boolean rejected;
 	private boolean canceled;
 	private boolean paid;
-	private boolean reviewed;
+	private boolean landlordReviewed;
+    private boolean propertyReviewed;
 	private boolean completed;
 	private boolean approved;
 
 	// Constructor
     
-	public RentalRequestDTO(Long id, Long propertyId, String requesterEmail, LocalDateTime requestDateTime, LocalDate arrivalDate, LocalDate departureDate, Double amount, boolean accepted, boolean rejected, boolean canceled, boolean paid, boolean reviewed, boolean completed, boolean approved) {
+	public TenantRentalRequestDTO(Long id, Long propertyId, String requesterEmail, LocalDateTime requestDateTime, LocalDate arrivalDate, LocalDate departureDate, Integer peopleNumber, Double amount, boolean accepted, boolean rejected, boolean canceled, boolean paid, boolean landlordReviewed, boolean propertyReviewed, boolean completed, boolean approved) {
 		this.id = id;
 		this.propertyId = propertyId;
 		this.requesterEmail = requesterEmail;
 		this.requestDateTime = requestDateTime;
 		this.arrivalDate = arrivalDate;
 		this.departureDate = departureDate;
+		this.peopleNumber = peopleNumber;
 		this.amount = amount;
 		this.accepted = accepted;
 		this.rejected = rejected;
 		this.canceled = canceled;
 		this.paid = paid;
-		this.reviewed = reviewed;
+		this.landlordReviewed = landlordReviewed;
+		this.propertyReviewed = propertyReviewed;
 		this.completed = completed;
 		this.approved = approved;
 	}
@@ -89,6 +93,14 @@ public class RentalRequestDTO {
 		this.departureDate = departureDate;
 	}
 
+	public Integer getPeopleNumber(){
+		return peopleNumber;
+	}
+
+	public void setPeopleNumber(Integer peopleNumber){
+		this.peopleNumber = peopleNumber;
+	}
+
 	public Double getAmount() {
 		return amount;
 	}
@@ -129,12 +141,20 @@ public class RentalRequestDTO {
 		this.paid = paid;
 	}
 
-	public boolean isReviewed() {
-		return reviewed;
+	public boolean isLandlordReviewed() {
+		return landlordReviewed;
 	}
 
-	public void setReviewed(boolean reviewed) {
-		this.reviewed = reviewed;
+	public void setLandlordReviewed(boolean landlordReviewed) {
+		this.landlordReviewed = landlordReviewed;
+	}
+
+	public boolean isPropertyReviewed() {
+		return propertyReviewed;
+	}
+
+	public void setPropertyReviewed(boolean propertyReviewed) {
+		this.propertyReviewed = propertyReviewed;
 	}
 
 	public boolean isCompleted() {
