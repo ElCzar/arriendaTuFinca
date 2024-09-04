@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Description;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -19,12 +20,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.gossip.arrienda_tu_finca.ArriendaTuFincaApplication;
 import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 
+import jakarta.transaction.Transactional;
+
+
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+    classes = ArriendaTuFincaApplication.class
+)
 @AutoConfigureMockMvc
+@TestPropertySource(
+    locations = "classpath:application-test.properties"
+)
 class TestPropertyController {
 
     @Autowired
@@ -41,6 +52,7 @@ class TestPropertyController {
 
 
     @Test
+    @Transactional
     @Description("Prueba la creación de una propiedad válida")
     void testCreateProperty() throws Exception {
         // Crear JSON de PropertyCreateDTO
