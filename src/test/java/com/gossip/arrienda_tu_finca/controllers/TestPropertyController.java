@@ -1,4 +1,5 @@
 package com.gossip.arrienda_tu_finca.controllers;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,7 +61,7 @@ class TestPropertyController {
         }
         """;
 
-        mvc.perform(post("/properties")
+        mvc.perform(post("/property")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(request))
                 .andExpect(status().isOk())
@@ -78,7 +79,7 @@ class TestPropertyController {
         property.setMunicipality("Bogota");
         propertyRepository.save(property);
 
-        mvc.perform(get("/properties/" + property.getId())
+        mvc.perform(get("/property/" + property.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Finca Bella"))
@@ -95,7 +96,7 @@ class TestPropertyController {
         property.setMunicipality("Bogota");
         propertyRepository.save(property);
 
-        mvc.perform(get("/properties")
+        mvc.perform(get("/property")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Finca Bella"));
@@ -127,7 +128,7 @@ class TestPropertyController {
         }
         """;
 
-        mvc.perform(put("/properties/" + property.getId())
+        mvc.perform(put("/property/" + property.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateRequest))
                 .andExpect(status().isOk())
@@ -143,15 +144,17 @@ class TestPropertyController {
         property.setName("Finca Bella");
         property.setDescription("Hermosa finca");
         property.setMunicipality("Bogota");
+        property.setAvailable(true); // Inicialmente disponible
         propertyRepository.save(property);
 
-        mvc.perform(delete("/properties/" + property.getId()))
+        mvc.perform(delete("/property/" + property.getId()))
                 .andExpect(status().isNoContent());
 
         // Verificar que la propiedad está desactivada
         Property deactivatedProperty = propertyRepository.findById(property.getId()).orElseThrow();
-        assert !deactivatedProperty.isAvailable();
+        assertFalse(deactivatedProperty.isAvailable()); // Verificar que isAvailable sea false
     }
+
 
     
     @Test
@@ -167,7 +170,7 @@ class TestPropertyController {
         MockMultipartFile photoFile = new MockMultipartFile(
                 "photo", "finca.jpg", "image/jpeg", "fake-image-content".getBytes());
 
-        mvc.perform(multipart("/properties/" + property.getId() + "/upload-photo")
+        mvc.perform(multipart("/property/" + property.getId() + "/upload-photo")
                 .file(photoFile))
                 .andExpect(status().isNoContent());
 

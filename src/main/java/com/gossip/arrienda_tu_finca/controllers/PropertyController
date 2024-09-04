@@ -49,9 +49,10 @@ public class PropertyController {
     // Desactivar una propiedad (Cambiar su estado a no disponible)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deactivateProperty(@PathVariable Long id) {
-        propertyService.deactivateProperty(id);
-        return ResponseEntity.noContent().build();
+    propertyService.deactivateProperty(id); // Desactiva la propiedad en lugar de eliminarla
+    return ResponseEntity.noContent().build(); 
     }
+
 
     // Subir una foto para una propiedad
     @PostMapping("/{id}/upload-photo")

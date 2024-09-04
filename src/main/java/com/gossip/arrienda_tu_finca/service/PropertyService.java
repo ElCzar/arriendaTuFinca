@@ -71,4 +71,6 @@ public class PropertyService {
         propertyDTO.setAvailable(property.isAvailable());
         return propertyDTO;
     }
+
+    
 }
