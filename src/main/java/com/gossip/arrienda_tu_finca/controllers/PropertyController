@@ -1,10 +1,13 @@
 package com.gossip.arrienda_tu_finca.controllers;
 
+import com.gossip.arrienda_tu_finca.dto.PropertyCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
+import com.gossip.arrienda_tu_finca.dto.PropertyUpdateDTO;
 import com.gossip.arrienda_tu_finca.services.PropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,32 +18,38 @@ public class PropertyController {
     @Autowired
     private PropertyService propertyService;
 
+    // Obtener una propiedad por ID
     @GetMapping("/{id}")
     public ResponseEntity<PropertyDTO> getPropertyById(@PathVariable Long id) {
         return ResponseEntity.ok(propertyService.getPropertyById(id));
     }
 
+    // Obtener todas las propiedades
     @GetMapping
     public ResponseEntity<List<PropertyDTO>> getAllProperties() {
         return ResponseEntity.ok(propertyService.getAllProperties());
     }
 
+    // Crear una propiedad (Usa PropertyCreateDTO)
     @PostMapping
-    public ResponseEntity<PropertyDTO> createProperty(@RequestBody PropertyDTO propertyDTO) {
-        return ResponseEntity.ok(propertyService.createProperty(propertyDTO));
+    public ResponseEntity<PropertyDTO> createProperty(@RequestBody PropertyCreateDTO propertyCreateDTO) {
+        return ResponseEntity.ok(propertyService.createProperty(propertyCreateDTO));
     }
 
+    // Actualizar una propiedad (Usa PropertyUpdateDTO)
     @PutMapping("/{id}")
-    public ResponseEntity<PropertyDTO> updateProperty(@PathVariable Long id, @RequestBody PropertyDTO propertyDTO) {
-        return ResponseEntity.ok(propertyService.updateProperty(id, propertyDTO));
+    public ResponseEntity<PropertyDTO> updateProperty(@PathVariable Long id, @RequestBody PropertyUpdateDTO propertyUpdateDTO) {
+        return ResponseEntity.ok(propertyService.updateProperty(id, propertyUpdateDTO));
     }
 
+    // Desactivar una propiedad (Cambiar su estado a no disponible)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deactivateProperty(@PathVariable Long id) {
         propertyService.deactivateProperty(id);
         return ResponseEntity.noContent().build();
     }
 
+    // Subir una foto para una propiedad
     @PostMapping("/{id}/upload-photo")
     public ResponseEntity<Void> uploadPhoto(@PathVariable Long id, @RequestParam("photo") MultipartFile photo) {
         propertyService.uploadPhoto(id, photo);

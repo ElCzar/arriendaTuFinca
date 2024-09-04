@@ -23,3 +23,4 @@ public class PropertyDTO {
     private boolean hasGril;
     private String ownerEmail;
 }
+
