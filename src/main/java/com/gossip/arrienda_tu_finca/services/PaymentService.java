@@ -6,33 +6,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gossip.arrienda_tu_finca.dto.PaymentDTO;
-import com.gossip.arrienda_tu_finca.dto.RequestARentalDTO;
 import com.gossip.arrienda_tu_finca.entities.Payment;
 import com.gossip.arrienda_tu_finca.entities.TenantRentalRequest;
 import com.gossip.arrienda_tu_finca.exceptions.PaymentNotFoundException;
-import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
 import com.gossip.arrienda_tu_finca.repositories.PaymentRepository;
 
-import lombok.AllArgsConstructor;
-
 @Service
-@AllArgsConstructor
 public class PaymentService {
-
-    @Autowired
     private final PaymentRepository paymentRepository;
 
+    @Autowired
+    public PaymentService(PaymentRepository paymentRepository) {
+        this.paymentRepository = paymentRepository;
+    }
+
     //Obtener precio de renta
-    public Double getRentalPrice(Long Id) {
-        return paymentRepository.findById(Id)
+    public Double getRentalPrice(Long id) {
+        return paymentRepository.findById(id)
                 .map(Payment::getRentalPrice)
-                .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
+                .orElseThrow(() -> new PaymentNotFoundException("Payment not found by id"));
     }
 
     //Llenar formulario de pago
     public Payment updatePayment(Long id, PaymentDTO paymentDTO) {
         Payment payment = paymentRepository.findById(id)
-                .orElseThrow(() -> new PaymentNotFoundException("Payment not found"));
+                .orElseThrow(() -> new PaymentNotFoundException("Payment to update not found by id"));
 
         Double rentalPrice = getRentalPrice(id);
         
@@ -56,6 +54,6 @@ public class PaymentService {
     //Obtener pago de una renta
     public Payment getPaymentByRentalRequestId(Long rentalRequestId) {
         return paymentRepository.findByRentalRequestId(rentalRequestId)
-                .orElseThrow(() -> new PaymentNotFoundException("Payment not found "));
+                .orElseThrow(() -> new PaymentNotFoundException("Payment not found by rental request id"));
     }
 }

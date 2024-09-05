@@ -1,9 +1,7 @@
 package com.gossip.arrienda_tu_finca.controllers;
 
-import java.util.stream.Collectors;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,12 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gossip.arrienda_tu_finca.entities.TenantRentalRequest;
-import com.gossip.arrienda_tu_finca.exceptions.InvalidEndDateException;
-import com.gossip.arrienda_tu_finca.exceptions.InvalidPeopleNumberException;
-import com.gossip.arrienda_tu_finca.exceptions.InvalidStartDateException;
-import com.gossip.arrienda_tu_finca.services.PropertyService;
 import com.gossip.arrienda_tu_finca.services.TenantRentalRequestService;
-import com.gossip.arrienda_tu_finca.dto.PropertyListDTO;
 import com.gossip.arrienda_tu_finca.dto.RequestARentalDTO;
 import com.gossip.arrienda_tu_finca.dto.TenantRentalRequestDTO;
 

@@ -1,14 +1,10 @@
 package com.gossip.arrienda_tu_finca.services;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import com.gossip.arrienda_tu_finca.dto.PropertyListDTO;
-import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.exceptions.PropertyNotFoundException;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 import java.util.Random;
@@ -30,7 +26,7 @@ public class PropertyService {
         String randomMunicipality = municipalities.get(random.nextInt(municipalities.size()));
         List<PropertyListDTO> properties = propertyRepository.findAllPropertyDTOByMunicipality(randomMunicipality);
         if (properties.isEmpty()) {
-            throw new PropertyNotFoundException("Property not found");
+            throw new PropertyNotFoundException("Property by random municipality not found");
         }
         return properties;
     }
@@ -39,7 +35,7 @@ public class PropertyService {
     public PropertyListDTO getPropertyByName(String name) {
         PropertyListDTO propertyDTO = propertyRepository.findPropertyDTOByName(name);
         if (propertyDTO == null) {
-            throw new PropertyNotFoundException("Property not found");
+            throw new PropertyNotFoundException("Property by name not found");
         }
         return propertyDTO;
     }
@@ -48,7 +44,7 @@ public class PropertyService {
     public PropertyListDTO getPropertyByMunicipality(String municipality) {
         PropertyListDTO propertyDTO = propertyRepository.findPropertyDTOByMunicipality(municipality);
         if (propertyDTO == null) {
-            throw new PropertyNotFoundException("Property not found");
+            throw new PropertyNotFoundException("Property by municipality not found");
         }
         return propertyDTO;
     }
@@ -57,22 +53,9 @@ public class PropertyService {
     public PropertyListDTO getPropertyByPeopleNumber(Integer peopleNumber) {
         PropertyListDTO propertyDTO = propertyRepository.findPropertyDTOByPeopleNumber(peopleNumber);
         if (propertyDTO == null) {
-            throw new PropertyNotFoundException("Property not found");
+            throw new PropertyNotFoundException("Property by number of people not found");
         }
         return propertyDTO;
-    }
-
-    // Convierte una entidad Property en PropertyDTO
-    private PropertyListDTO mapToDTO(Property property) {
-        PropertyListDTO dto = new PropertyListDTO();
-        dto.setId(property.getId());
-        dto.setName(property.getName());
-        dto.setMunicipality(property.getMunicipality());
-        dto.setDepartment(property.getDepartment());
-        dto.setPeopleNumber(property.getPeopleNumber());
-        dto.setPropertyLink(property.getPropertyLink());
-        dto.setPhotos(property.getPhotos());
-        return dto;
     }
 }
 

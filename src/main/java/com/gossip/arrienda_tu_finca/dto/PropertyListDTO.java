@@ -1,12 +1,13 @@
 package com.gossip.arrienda_tu_finca.dto;
-
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class PropertyListDTO {
 
     private Long id;

@@ -7,38 +7,32 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.stereotype.Service;
 import org.modelmapper.ModelMapper;
 
-import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 import com.gossip.arrienda_tu_finca.repositories.TenantRentalRequestRepository;
-import com.gossip.arrienda_tu_finca.dto.PaymentDTO;
-import com.gossip.arrienda_tu_finca.dto.PropertyListDTO;
 import com.gossip.arrienda_tu_finca.dto.RequestARentalDTO;
 import com.gossip.arrienda_tu_finca.dto.TenantRentalRequestDTO;
-import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.entities.TenantRentalRequest;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidEndDateException;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidPeopleNumberException;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidStartDateException;
 import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class TenantRentalRequestService {
-
-    @Autowired
     private final TenantRentalRequestRepository rentalRequestRepository;
+    private ModelMapper modelMapper;
 
     @Autowired
-    private ModelMapper modelMapper;  
+    public TenantRentalRequestService(TenantRentalRequestRepository rentalRequestRepository, ModelMapper modelMapper) {
+        this.rentalRequestRepository = rentalRequestRepository;
+        this.modelMapper = modelMapper;
+    }
 
     //Llenar formulario de arrendamiento
     public TenantRentalRequest updateRentalRequest(Long id, RequestARentalDTO requestDTO) {
         TenantRentalRequest rentalRequest = rentalRequestRepository.findById(id)
-                .orElseThrow(() -> new RentalRequestNotFoundException("Rentall Request not found"));
+                .orElseThrow(() -> new RentalRequestNotFoundException("Rentall Request not found by id"));
 
         validateDates(requestDTO.getStartDate(), requestDTO.getEndDate());
         validatePeopleNumber(requestDTO.getPeopleNumber(), rentalRequest.getProperty().getPeopleNumber());
@@ -77,7 +71,7 @@ public class TenantRentalRequestService {
             request.setLandlordReviewed(true);
             rentalRequestRepository.save(request);
         } else {
-            throw new RentalRequestNotFoundException("Rental request not found");
+            throw new RentalRequestNotFoundException("Rental request for landlord review not found by request id");
         }
     }
 
@@ -90,7 +84,7 @@ public class TenantRentalRequestService {
             request.setPropertyReviewed(true);
             rentalRequestRepository.save(request);
         } else {
-            throw new RentalRequestNotFoundException("Rental request not found");
+            throw new RentalRequestNotFoundException("Rental request for property review not found by request id");
         }
     }
 
@@ -98,7 +92,7 @@ public class TenantRentalRequestService {
     public List<TenantRentalRequestDTO> getAllRequestsByTenant(String email) {
         List<TenantRentalRequest> tRentalRequests = rentalRequestRepository.findAllRentalRequestsByEmail(email);
         if (tRentalRequests.isEmpty()) {
-            throw new RentalRequestNotFoundException("Rental request not found");
+            throw new RentalRequestNotFoundException("Rental queries not found by tenant email");
         }
         return tRentalRequests.stream()
                 .map(tenantRentalRequest -> modelMapper.map(tenantRentalRequest, TenantRentalRequestDTO.class))
