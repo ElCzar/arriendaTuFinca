@@ -18,8 +18,13 @@ public class PropertyService {
     @Autowired
     public PropertyService(PropertyRepository propertyRepository) {
         this.propertyRepository = propertyRepository;
+        this.random = new Random();  
     }
 
+    public void setRandom(Random random) {
+        this.random = random;
+    }
+    
     // Obtener las propiedades de un municipio aleatorio
     public List<PropertyListDTO> getPropertiesByRandomMunicipality() {
         List<String> municipalities = propertyRepository.findAllMunicipalities();
