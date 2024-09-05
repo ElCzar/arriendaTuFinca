@@ -14,8 +14,9 @@ import org.modelmapper.ModelMapper;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 import com.gossip.arrienda_tu_finca.repositories.TenantRentalRequestRepository;
 import com.gossip.arrienda_tu_finca.dto.PaymentDTO;
-import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
+import com.gossip.arrienda_tu_finca.dto.PropertyListDTO;
 import com.gossip.arrienda_tu_finca.dto.RequestARentalDTO;
+import com.gossip.arrienda_tu_finca.dto.TenantRentalRequestDTO;
 import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.entities.TenantRentalRequest;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidEndDateException;
@@ -94,30 +95,12 @@ public class TenantRentalRequestService {
     }
 
     // Mostrar solicitudes de renta del arrendatario
-    public List<RequestARentalDTO> getAllRequestsByTenant(String email) {
+    public List<TenantRentalRequestDTO> getAllRequestsByTenant(String email) {
         List<TenantRentalRequest> tRentalRequests = rentalRequestRepository.findAllRentalRequestsByEmail(email);
         return tRentalRequests.stream()
-                .map(tenantRentalRequest -> modelMapper.map(tenantRentalRequest, RequestARentalDTO.class))
+                .map(tenantRentalRequest -> modelMapper.map(tenantRentalRequest, TenantRentalRequestDTO.class))
                 .collect(Collectors.toList());          
     }
 
-    // Convierte una entidad Property en PropertyDTO
-    private PropertyDTO mapToDTO(Property property) {
-        PropertyDTO dto = new PropertyDTO();
-        dto.setId(property.getId());
-        dto.setName(property.getName());
-        dto.setDescription(property.getDescription());
-        dto.setMunicipality(property.getMunicipality());
-        dto.setTypeOfEntrance(property.getTypeOfEntrance());
-        dto.setPeopleNumber(property.getPeopleNumber());
-        dto.setAddress(property.getAddress());
-        dto.setPricePerNight(property.getPricePerNight());
-        dto.setAmountOfRooms(property.getAmountOfRooms());
-        dto.setAmountOfBathrooms(property.getAmountOfBathrooms());
-        dto.setPetFriendly(property.isPetFriendly());
-        dto.setHasPool(property.isHasPool());
-        dto.setHasGril(property.isHasGril());
-        dto.setAvailable(property.isAvailable());
-        return dto;
-    }
+
 }

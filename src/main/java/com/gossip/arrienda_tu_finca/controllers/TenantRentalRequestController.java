@@ -20,8 +20,9 @@ import com.gossip.arrienda_tu_finca.exceptions.InvalidPeopleNumberException;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidStartDateException;
 import com.gossip.arrienda_tu_finca.services.PropertyService;
 import com.gossip.arrienda_tu_finca.services.TenantRentalRequestService;
-import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
+import com.gossip.arrienda_tu_finca.dto.PropertyListDTO;
 import com.gossip.arrienda_tu_finca.dto.RequestARentalDTO;
+import com.gossip.arrienda_tu_finca.dto.TenantRentalRequestDTO;
 
 import lombok.AllArgsConstructor;
 
@@ -35,8 +36,8 @@ public class TenantRentalRequestController {
     // Ver solicitudes de arriendo
 
     @GetMapping
-    public ResponseEntity<List<RequestARentalDTO>> getAllRentalsRequests(@RequestParam String email) {
-        List<RequestARentalDTO> rentalRequests = tenantRentalRequestService.getAllRequestsByTenant(email);
+    public ResponseEntity<List<TenantRentalRequestDTO>> getAllRentalsRequests(@RequestParam String email) {
+        List<TenantRentalRequestDTO> rentalRequests = tenantRentalRequestService.getAllRequestsByTenant(email);
         return ResponseEntity.ok(rentalRequests);
     }
 
@@ -48,8 +49,6 @@ public class TenantRentalRequestController {
         TenantRentalRequest updatedRequest = tenantRentalRequestService.updateRentalRequest(id, requestDTO);
         return ResponseEntity.ok(updatedRequest);
     }
-    
-    // Pagar
 
     // Calificar finca
 

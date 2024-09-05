@@ -42,8 +42,5 @@ public class TenantRentalRequest {
     private boolean propertyReviewed;
     private boolean completed;
     private boolean approved;
-    private Double rentalPrice;
-    private String bank;
-    private Integer accountNumber;
 
 }

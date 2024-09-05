@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
+import com.gossip.arrienda_tu_finca.dto.PropertyListDTO;
 import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.exceptions.PropertyNotFoundException;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
@@ -25,7 +25,7 @@ public class PropertyService {
     }
 
     // Obtener las propiedades de un municipio aleatorio
-    public List<PropertyDTO> getPropertiesByRandomMunicipality() {
+    public List<PropertyListDTO> getPropertiesByRandomMunicipality() {
         List<String> municipalities = propertyRepository.findAllMunicipalities();
         // Seleccionar un municipio al azar
         String randomMunicipality = municipalities.get(random.nextInt(municipalities.size()));
@@ -34,8 +34,8 @@ public class PropertyService {
     }
 
     // Obtener una propiedad por nombre
-    public PropertyDTO getPropertyByName(String name) {
-        PropertyDTO propertyDTO = propertyRepository.findPropertyDTOByName(name);
+    public PropertyListDTO getPropertyByName(String name) {
+        PropertyListDTO propertyDTO = propertyRepository.findPropertyDTOByName(name);
         if (propertyDTO == null) {
             throw new PropertyNotFoundException("Property not found");
         }
@@ -43,76 +43,33 @@ public class PropertyService {
     }
 
     // Obtener una propiedad por municipio
-    public PropertyDTO getPropertyByMunicipality(String municipality) {
-        PropertyDTO propertyDTO = propertyRepository.findPropertyDTOByMunicipality(municipality);
+    public PropertyListDTO getPropertyByMunicipality(String municipality) {
+        PropertyListDTO propertyDTO = propertyRepository.findPropertyDTOByMunicipality(municipality);
         if (propertyDTO == null) {
             throw new PropertyNotFoundException("Property not found");
         }
         return propertyDTO;
     }
 
-    // Obtener una propiedad por nombre
-    public PropertyDTO getPropertyByPeopleNumber(Integer peopleNumber) {
-        PropertyDTO propertyDTO = propertyRepository.findPropertyDTOByPeopleNumber(peopleNumber);
+    // Obtener una propiedad por numero de personas
+    public PropertyListDTO getPropertyByPeopleNumber(Integer peopleNumber) {
+        PropertyListDTO propertyDTO = propertyRepository.findPropertyDTOByPeopleNumber(peopleNumber);
         if (propertyDTO == null) {
             throw new PropertyNotFoundException("Property not found");
         }
         return propertyDTO;
-    }
-
-    // Obtener una propiedad por ID
-    public PropertyDTO getPropertyById(Long id) {
-        Property property = propertyRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Property not found"));
-        return mapToDTO(property);
-    }
-
-    // Obtener todas las propiedades
-    public List<PropertyDTO> getAllProperties() {
-        return propertyRepository.findAll().stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
-    }
-
-    // Desactivar una propiedad
-    public void deactivateProperty(Long id) {
-        Property property = propertyRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Property not found"));
-        property.setAvailable(false); // Cambiar a no disponible
-        propertyRepository.save(property);
-    }
-
-    // Subir una foto
-    public void uploadPhoto(Long id, MultipartFile photo) {
-        Property property = propertyRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Property not found"));
-        try {
-            byte[] photoBytes = photo.getBytes();
-            // Aquí puedes guardar los bytes de la foto en la entidad o manejarlo de otra forma
-            // property.setPhoto(photoBytes); // Si tienes un campo photo en Property
-            propertyRepository.save(property);
-        } catch (IOException e) {
-            throw new RuntimeException("Error al subir la foto", e);
-        }
     }
 
     // Convierte una entidad Property en PropertyDTO
-    private PropertyDTO mapToDTO(Property property) {
-        PropertyDTO dto = new PropertyDTO();
+    private PropertyListDTO mapToDTO(Property property) {
+        PropertyListDTO dto = new PropertyListDTO();
         dto.setId(property.getId());
         dto.setName(property.getName());
-        dto.setDescription(property.getDescription());
         dto.setMunicipality(property.getMunicipality());
-        dto.setTypeOfEntrance(property.getTypeOfEntrance());
+        dto.setDepartment(property.getDepartment());
         dto.setPeopleNumber(property.getPeopleNumber());
-        dto.setAddress(property.getAddress());
-        dto.setPricePerNight(property.getPricePerNight());
-        dto.setAmountOfRooms(property.getAmountOfRooms());
-        dto.setAmountOfBathrooms(property.getAmountOfBathrooms());
-        dto.setPetFriendly(property.isPetFriendly());
-        dto.setHasPool(property.isHasPool());
-        dto.setHasGril(property.isHasGril());
-        dto.setAvailable(property.isAvailable());
+        dto.setPropertyLink(property.getPropertyLink());
+        dto.setPhotos(property.getPhotos());
         return dto;
     }
 }

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
+import com.gossip.arrienda_tu_finca.dto.PropertyListDTO;
 import com.gossip.arrienda_tu_finca.services.PropertyService;
 
 @RestController
@@ -28,26 +28,26 @@ public class PropertyController {
       // Buscar propiedad
 
       @GetMapping("/random-municipality") //Obtener propiedades de un municipio aleatorio
-      public ResponseEntity<List<PropertyDTO>> getPropertiesByRandomMunicipality() {
-          List<PropertyDTO> properties = propertyService.getPropertiesByRandomMunicipality();
+      public ResponseEntity<List<PropertyListDTO>> getPropertiesByRandomMunicipality() {
+          List<PropertyListDTO> properties = propertyService.getPropertiesByRandomMunicipality();
           return ResponseEntity.ok(properties);
       }
   
       @GetMapping("/{name}")  // Obtener una propiedad por nombre
-      public ResponseEntity<PropertyDTO> getPropertyByName(@PathVariable String name) {
-          PropertyDTO propertyDTO = propertyService.getPropertyByName(name);
+      public ResponseEntity<PropertyListDTO> getPropertyByName(@PathVariable String name) {
+          PropertyListDTO propertyDTO = propertyService.getPropertyByName(name);
           return ResponseEntity.ok(propertyDTO);
       }
   
       @GetMapping("/{municipality}")  // Obtener una propiedad por municipio
-      public ResponseEntity<PropertyDTO> getPropertyByMunicipality(@PathVariable String municipality) {
-          PropertyDTO propertyDTO = propertyService.getPropertyByMunicipality(municipality);
+      public ResponseEntity<PropertyListDTO> getPropertyByMunicipality(@PathVariable String municipality) {
+          PropertyListDTO propertyDTO = propertyService.getPropertyByMunicipality(municipality);
           return ResponseEntity.ok(propertyDTO);
       }
   
       @GetMapping("/{peopleNumber}")  // Obtener una propiedad por cantidad de personas
-      public ResponseEntity<PropertyDTO> getPropertyByPeopleNumber(@PathVariable Integer peopleNumber) {
-          PropertyDTO propertyDTO = propertyService.getPropertyByPeopleNumber(peopleNumber);
+      public ResponseEntity<PropertyListDTO> getPropertyByPeopleNumber(@PathVariable Integer peopleNumber) {
+          PropertyListDTO propertyDTO = propertyService.getPropertyByPeopleNumber(peopleNumber);
           return ResponseEntity.ok(propertyDTO);
       }
 }
