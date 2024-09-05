@@ -3,35 +3,37 @@ package com.gossip.arrienda_tu_finca.controllers;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
-import com.gossip.arrienda_tu_finca.entities.RentalRequest;
 import com.gossip.arrienda_tu_finca.services.RentalRequestService;
-import com.gossip.arrienda_tu_finca.mapper.RentalRequestMapper;
 import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
-
-import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/rental-requests")
-@AllArgsConstructor
 public class RentalRequestController {
-
     private final RentalRequestService rentalRequestService;
+    private final ModelMapper modelMapper;
+
+    @Autowired
+    public RentalRequestController(RentalRequestService rentalRequestService, ModelMapper modelMapper) {
+        this.rentalRequestService = rentalRequestService;
+        this.modelMapper = modelMapper;
+    }
 
     @GetMapping("/owner/{email}")
     public ResponseEntity<List<RentalRequestDto>> getRequestsByOwner(@PathVariable String email) {
         List<RentalRequestDto> requests = rentalRequestService.getRequestsByOwner(email)
             .stream()
-            .map(RentalRequestMapper::toDTO)
+            .map( request -> modelMapper.map(request, RentalRequestDto.class))
             .collect(Collectors.toList());
         return new ResponseEntity<>(requests, HttpStatus.OK);
     }
@@ -40,7 +42,7 @@ public class RentalRequestController {
     public ResponseEntity<List<RentalRequestDto>> getRequestsByProperty(@PathVariable Long propertyId) {
         List<RentalRequestDto> requests = rentalRequestService.getRequestsByProperty(propertyId)
             .stream()
-            .map(RentalRequestMapper::toDTO)
+            .map( request -> modelMapper.map(request, RentalRequestDto.class))
             .collect(Collectors.toList());
         return new ResponseEntity<>(requests, HttpStatus.OK);
     }
@@ -76,22 +78,22 @@ public class RentalRequestController {
     }
 
     @PutMapping("/{requestId}/approve")
-public ResponseEntity<String> approveRequest(@PathVariable Long requestId) {
-    try {
-        RentalRequest rentalRequest = rentalRequestService.approveRequest(requestId);
-        return new ResponseEntity<>("Solicitud de arriendo aprobada", HttpStatus.OK);
-    } catch (RentalRequestNotFoundException e) {
-        return new ResponseEntity<>("Solicitud de arriendo no encontrada", HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> approveRequest(@PathVariable Long requestId) {
+        try {
+            rentalRequestService.approveRequest(requestId);
+            return new ResponseEntity<>("Solicitud de arriendo aprobada", HttpStatus.OK);
+        } catch (RentalRequestNotFoundException e) {
+            return new ResponseEntity<>("Solicitud de arriendo no encontrada", HttpStatus.NOT_FOUND);
+        }
     }
-}
 
-@PutMapping("/{requestId}/pay")
-public ResponseEntity<String> payRequest(@PathVariable Long requestId) {
-    try {
-        RentalRequest rentalRequest = rentalRequestService.payRequest(requestId);
-        return new ResponseEntity<>("Solicitud de arriendo pagada", HttpStatus.OK);
-    } catch (RentalRequestNotFoundException e) {
-        return new ResponseEntity<>("Solicitud de arriendo no encontrada", HttpStatus.NOT_FOUND);
+    @PutMapping("/{requestId}/pay")
+    public ResponseEntity<String> payRequest(@PathVariable Long requestId) {
+        try {
+            rentalRequestService.payRequest(requestId);
+            return new ResponseEntity<>("Solicitud de arriendo pagada", HttpStatus.OK);
+        } catch (RentalRequestNotFoundException e) {
+            return new ResponseEntity<>("Solicitud de arriendo no encontrada", HttpStatus.NOT_FOUND);
+        }
     }
-}
 }

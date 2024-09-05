@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 public class RentalRequestService {
     
     private final RentalRequestRepository rentalRequestRepository;
+    private static final String RENTAL_REQUEST_NOT_FOUND = "Solicitud de arriendo no encontrada";
 
     
     public List<RentalRequest> getRequestsByProperty(Long propertyId) {
@@ -36,7 +37,7 @@ public class RentalRequestService {
             request.setAccepted(true);
             rentalRequestRepository.save(request);
         } else {
-            throw new RentalRequestNotFoundException("Solicitud de arriendo no encontrada");
+            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
         }
     }
 
@@ -49,7 +50,7 @@ public class RentalRequestService {
             request.setCanceled(true);
             rentalRequestRepository.save(request);
         } else {
-            throw new RentalRequestNotFoundException("Solicitud de arriendo no encontrada");
+            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
         }
     }
 
@@ -62,7 +63,7 @@ public class RentalRequestService {
             request.setReviewed(true);
             rentalRequestRepository.save(request);
         } else {
-            throw new RentalRequestNotFoundException("Solicitud de arriendo no encontrada");
+            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
         }
     }
 
@@ -73,7 +74,7 @@ public class RentalRequestService {
             request.setCompleted(true);
             rentalRequestRepository.save(request);
         } else {
-            throw new RentalRequestNotFoundException("Solicitud de arriendo no encontrada");
+            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
         }
     }
 
@@ -84,7 +85,7 @@ public class RentalRequestService {
             request.setRejected(true);
             rentalRequestRepository.save(request);
         } else {
-            throw new RentalRequestNotFoundException("Solicitud de arriendo no encontrada");
+            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
         }
     }
 
@@ -96,7 +97,7 @@ public class RentalRequestService {
             rentalRequestRepository.save(request);
             return request;
         } else {
-            throw new RentalRequestNotFoundException("Solicitud de arriendo no encontrada");
+            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
         }
     }
 
@@ -108,7 +109,7 @@ public class RentalRequestService {
             rentalRequestRepository.save(request);
             return request;
         } else {
-            throw new RentalRequestNotFoundException("Solicitud de arriendo no encontrada");
+            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
         }
     }
 

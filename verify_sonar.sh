@@ -6,8 +6,6 @@ sops --decrypt --age $(cat $SOPS_AGE_KEY_FILE | grep -oP "public key: \K(.*)") .
 # Get the SONAR_KEY
 SONAR_KEY=$(cat .decrypted.env | grep -oP "SONAR_KEY=\K.*")
 
-echo "SONAR_KEY: $SONAR_KEY"
-
 # Remove the decrypted file
 rm .decrypted.env
 

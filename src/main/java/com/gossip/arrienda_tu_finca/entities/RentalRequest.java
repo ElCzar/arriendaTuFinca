@@ -1,7 +1,5 @@
 package com.gossip.arrienda_tu_finca.entities;
 
-import org.springframework.cglib.core.Local;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,7 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -28,11 +26,7 @@ public class RentalRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
  
-    
-
-    
     @ManyToOne
     @JoinColumn(name = "property_id", referencedColumnName = "id")
     private Property property;
@@ -52,25 +46,5 @@ public class RentalRequest {
     private boolean reviewed;
     private boolean completed;
     private boolean approved;
-    
-
-    public RentalRequest(Long id, Property property, User requester, LocalDateTime requestDateTime, LocalDate arrivalDate, LocalDate departureDate, Double amount, boolean accepted, boolean rejected, boolean canceled, boolean paid, boolean reviewed, boolean completed, boolean approved) {
-        this.id = id;
-        this.property = property;
-        this.requester = requester;
-        this.requestDateTime = requestDateTime;
-        this.arrivalDate = arrivalDate;
-        this.departureDate = departureDate;
-        this.amount = amount;
-        this.accepted = accepted;
-        this.rejected = rejected;
-        this.canceled = canceled;
-        this.paid = paid;
-        this.reviewed = reviewed;
-        this.completed = completed;
-        this.approved = approved;
-    }
-
-    
 }
 

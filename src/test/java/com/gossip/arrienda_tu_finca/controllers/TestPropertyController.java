@@ -310,6 +310,35 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
             .file(photoFile))
             .andExpect(MockMvcResultMatchers.status().isNotFound()); 
     }
+    
+    
+    
+    // 11. Caso de éxito: Obtener todas las propiedades
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test to get all properties")
+    void testGetAllProperties() throws Exception {
+        // Arrange
+        Property property1 = new Property();
+        property1.setName("Finca Bella");
+        property1.setDescription("Hermosa finca");
+        property1.setMunicipality("Bogota");
+        propertyRepository.save(property1);
+
+        Property property2 = new Property();
+        property2.setName("Finca La Esperanza");
+        property2.setDescription("Finca en el campo");
+        property2.setMunicipality("Medellin");
+        propertyRepository.save(property2);
+
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.get("/property")
+                .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value("Finca Bella"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].name").value("Finca La Esperanza"));
+    }
 }
 
     

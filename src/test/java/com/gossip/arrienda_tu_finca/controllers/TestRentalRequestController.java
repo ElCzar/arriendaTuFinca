@@ -41,7 +41,7 @@ import com.gossip.arrienda_tu_finca.services.RentalRequestService;
     locations = "classpath:application-test.properties"
 )
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-class RentalRequestControllerTest {
+class TestRentalRequestController {
 
     private MockMvc mockMvc;
 
