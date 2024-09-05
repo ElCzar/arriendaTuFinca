@@ -97,6 +97,9 @@ public class TenantRentalRequestService {
     // Mostrar solicitudes de renta del arrendatario
     public List<TenantRentalRequestDTO> getAllRequestsByTenant(String email) {
         List<TenantRentalRequest> tRentalRequests = rentalRequestRepository.findAllRentalRequestsByEmail(email);
+        if (tRentalRequests.isEmpty()) {
+            throw new RentalRequestNotFoundException("Rental request not found");
+        }
         return tRentalRequests.stream()
                 .map(tenantRentalRequest -> modelMapper.map(tenantRentalRequest, TenantRentalRequestDTO.class))
                 .collect(Collectors.toList());          

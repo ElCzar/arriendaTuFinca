@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.http.MediaType;
 import java.util.Collections;
 
-
 @SpringBootTest
 @AutoConfigureMockMvc
 public class PropertyControllerTest {
