@@ -8,7 +8,6 @@ import com.gossip.arrienda_tu_finca.dto.TenantRentalRequestDTO;
 import com.gossip.arrienda_tu_finca.entities.TenantRentalRequest;
 import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidEndDateException;
-import com.gossip.arrienda_tu_finca.exceptions.InvalidPeopleNumberException;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidStartDateException;
 import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
 import com.gossip.arrienda_tu_finca.repositories.TenantRentalRequestRepository;

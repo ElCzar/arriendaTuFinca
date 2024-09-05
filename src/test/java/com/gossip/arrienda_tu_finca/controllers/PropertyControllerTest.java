@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.gossip.arrienda_tu_finca.dto.PropertyListDTO;
-import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.exceptions.PropertyNotFoundException;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 import com.gossip.arrienda_tu_finca.services.PropertyService;
@@ -16,8 +15,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Random;
 
 class PropertyControllerTest {
 
