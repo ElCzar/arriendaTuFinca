@@ -1,23 +1,27 @@
 package com.gossip.arrienda_tu_finca.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "properties")
+@ToString
+@Table(name = "property")
 public class Property {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,8 +40,10 @@ public class Property {
     private boolean hasPool;
     private boolean hasGril;
 
-    // ManyToOne relationship with User
-    @ManyToOne
-    @JoinColumn(name = "owner_email", referencedColumnName = "email")
+    @Lob
+    private byte[] photo;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
 }
