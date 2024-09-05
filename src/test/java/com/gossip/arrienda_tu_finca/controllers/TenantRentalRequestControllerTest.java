@@ -1,159 +1,173 @@
 package com.gossip.arrienda_tu_finca.controllers;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-import org.apache.naming.java.javaURLContextFactory;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import com.gossip.arrienda_tu_finca.dto.TenantRentalRequestDTO;
-import com.gossip.arrienda_tu_finca.entities.Property;
-import com.gossip.arrienda_tu_finca.entities.TenantRentalRequest;
-import com.gossip.arrienda_tu_finca.entities.User;
-import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gossip.arrienda_tu_finca.dto.RequestARentalDTO;
+import com.gossip.arrienda_tu_finca.dto.TenantRentalRequestDTO;
+import com.gossip.arrienda_tu_finca.entities.TenantRentalRequest;
+import com.gossip.arrienda_tu_finca.entities.Property;
+import com.gossip.arrienda_tu_finca.exceptions.InvalidEndDateException;
+import com.gossip.arrienda_tu_finca.exceptions.InvalidPeopleNumberException;
+import com.gossip.arrienda_tu_finca.exceptions.InvalidStartDateException;
+import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
+import com.gossip.arrienda_tu_finca.repositories.TenantRentalRequestRepository;
 import com.gossip.arrienda_tu_finca.services.TenantRentalRequestService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.modelmapper.ModelMapper;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import org.springframework.http.MediaType;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content; // Para usar content()
-
-@SpringBootTest
-@AutoConfigureMockMvc
-public class TenantRentalRequestControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
+class TenantRentalRequestControllerTest {
 
     @Mock
+    private TenantRentalRequestRepository rentalRequestRepository;
+
+    @Mock
+    private ModelMapper modelMapper;
+
+    @InjectMocks
     private TenantRentalRequestService tenantRentalRequestService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     // Test No. 1: getAllRentalsRequests
 
     @Test // Test 1.1. Exito: Mostrar las solicitudes de renta del arrendatario
-    public void testGetAllRentalRequestsSuccess() throws Exception {
-        String email = "katyperry@gmail.com";
-        List<TenantRentalRequestDTO> rentalRequests = Arrays.asList(
-            new TenantRentalRequestDTO(1L, 2L, email, LocalDateTime.now(), LocalDate.now(), LocalDate.now().plusDays(2), 4, 800000.0, true, false, false, true, false, false, true, true)
-        );
-    
-        Mockito.when(tenantRentalRequestService.getAllRequestsByTenant(email)).thenReturn(rentalRequests);
-    
-        mockMvc.perform(MockMvcRequestBuilders.get("/tenant")
-                        .param("email", email)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1)) 
-                .andExpect(jsonPath("$[0].requesterEmail").value(email));
+    void testGetAllRequestsByTenantSuccess() {
+        String email = "tenant@example.com";
+        TenantRentalRequest rentalRequest = new TenantRentalRequest();
+        when(rentalRequestRepository.findAllRentalRequestsByEmail(email)).thenReturn(List.of(rentalRequest));
+
+        List<TenantRentalRequestDTO> result = tenantRentalRequestService.getAllRequestsByTenant(email);
+
+        assertFalse(result.isEmpty());
+        verify(rentalRequestRepository, times(1)).findAllRentalRequestsByEmail(email);
     }
 
     @Test // Test 1.2. Fallo: Lanzar una excepción cuando no se encontraron solicitudes de renta del arrendatario
-    public void testGetAllRentalsRequestsFailure() throws Exception {
-        String email = "javeriana@gmail.com";
-        
-        Mockito.when(tenantRentalRequestService.getAllRequestsByTenant(email))
-               .thenThrow(new RentalRequestNotFoundException("Rental request not found"));
-        
-        mockMvc.perform(MockMvcRequestBuilders.get("/tenant")
-                        .param("email", email)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());  
+    void testGetAllRequestsByTenantNotFound() {
+        String email = "tenant@example.com";
+        when(rentalRequestRepository.findAllRentalRequestsByEmail(email)).thenReturn(List.of());
+
+        assertThrows(RentalRequestNotFoundException.class, () -> tenantRentalRequestService.getAllRequestsByTenant(email));
     }
 
     // Test No. 2: updateRentalRequest
 
     @Test // Test 2.1. Exito: Actualizar los datos de una solicitud de renta
-    public void testUpdateRentalRequestSuccess() throws Exception {
-        Long requestId = 1L;
-        RequestARentalDTO requestDTO = new RequestARentalDTO(1L, 2L, "katyperry@gmail.com", LocalDate.now(), LocalDate.now().plusDays(2), 4);
-        TenantRentalRequest updatedRequest = new TenantRentalRequest(1L, new Property(), new User(), LocalDateTime.now(), LocalDate.now(), LocalDate.now().plusDays(2), 4, 800000.0, true, false, false, true, false, false, true, true);
-    
-        Mockito.when(tenantRentalRequestService.updateRentalRequest(requestId, requestDTO)).thenReturn(updatedRequest);
-    
-        mockMvc.perform(MockMvcRequestBuilders.put("/tenant/{id}", requestId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(requestDTO)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.peopleNumber").value(4));  
+    void testUpdateRentalRequestSuccess() {
+        Long id = 1L;
+        RequestARentalDTO requestDTO = new RequestARentalDTO();
+        requestDTO.setStartDate(LocalDate.now().plusDays(1));
+        requestDTO.setEndDate(LocalDate.now().plusDays(3));
+        requestDTO.setPeopleNumber(4);
+
+        Property property = new Property();
+        property.setPeopleNumber(5); 
+
+        TenantRentalRequest rentalRequest = new TenantRentalRequest();
+        rentalRequest.setProperty(property);
+
+        when(rentalRequestRepository.findById(id)).thenReturn(Optional.of(rentalRequest));
+
+        tenantRentalRequestService.updateRentalRequest(id, requestDTO);
+
+        verify(rentalRequestRepository, times(1)).save(rentalRequest);
+
+        assertEquals(requestDTO.getStartDate(), rentalRequest.getArrivalDate());
+        assertEquals(requestDTO.getEndDate(), rentalRequest.getDepartureDate());
+        assertEquals(requestDTO.getPeopleNumber(), rentalRequest.getPeopleNumber());
     }
 
     @Test // Test 2.2. Fallo: Lanzar una excepción cuando no se encuentra una solicitud de renta con el ID del arrendatario
-    public void testUpdateRentalRequestFailure() throws Exception {
-        Long requestId = 99L;
-        RequestARentalDTO requestDTO = new RequestARentalDTO(99L, 2L, "katyperry@gmail.com", LocalDate.now(), LocalDate.now().plusDays(2), 4);
-    
-        Mockito.when(tenantRentalRequestService.updateRentalRequest(requestId, requestDTO))
-               .thenThrow(new RentalRequestNotFoundException("Rental request not found"));
-    
-        mockMvc.perform(MockMvcRequestBuilders.put("/tenant/{id}", requestId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(requestDTO)))
-                .andExpect(status().isNotFound());  
+    void testUpdateRentalRequestNotFound() {
+        Long id = 1L;
+        RequestARentalDTO requestDTO = new RequestARentalDTO();
+        when(rentalRequestRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(RentalRequestNotFoundException.class, () -> tenantRentalRequestService.updateRentalRequest(id, requestDTO));
     }
 
-    // Test No. 3: reviewProperty
+    
 
-    @Test // Test 3.1. Exito: Calificar correctamente una propiedad
-    public void testReviewPropertySuccess() throws Exception {
+    @Test // Test 2.3. Fallo: Lanzar una excepción cuando cuando se proporciona una fecha de inicio inválida (anterior a la fecha actual).
+    void testUpdateRentalRequestInvalidStartDate() {
+        Long id = 1L;
+        RequestARentalDTO requestDTO = new RequestARentalDTO();
+        requestDTO.setStartDate(LocalDate.now().minusDays(1));  // Fecha de inicio inválida
+        requestDTO.setEndDate(LocalDate.now().plusDays(1));
+
+        TenantRentalRequest rentalRequest = new TenantRentalRequest();
+        when(rentalRequestRepository.findById(id)).thenReturn(Optional.of(rentalRequest));
+
+        assertThrows(InvalidStartDateException.class, () -> tenantRentalRequestService.updateRentalRequest(id, requestDTO));
+    }
+
+
+    @Test // Test 2.4. Fallo: Lanzar una excepción cuando cuando se proporciona una fecha de fin inválida (la misma que la fecha de inicio).
+    void testUpdateRentalRequestInvalidEndDate() {
+        Long id = 1L;
+        RequestARentalDTO requestDTO = new RequestARentalDTO();
+        requestDTO.setStartDate(LocalDate.now().plusDays(1));
+        requestDTO.setEndDate(LocalDate.now().plusDays(1));  // Fecha de fin inválida
+
+        TenantRentalRequest rentalRequest = new TenantRentalRequest();
+        when(rentalRequestRepository.findById(id)).thenReturn(Optional.of(rentalRequest));
+
+        assertThrows(InvalidEndDateException.class, () -> tenantRentalRequestService.updateRentalRequest(id, requestDTO));
+    }
+ 
+    // Test No. 5: reviewProperty
+
+    @Test // Test 5.1. Exito: Calificar correctamente una propiedad
+    void testReviewPropertySuccess() {
         Long requestId = 1L;
-    
-        Mockito.doNothing().when(tenantRentalRequestService).reviewProperty(requestId);
-    
-        mockMvc.perform(MockMvcRequestBuilders.put("/tenant/{requestId}/propertyReview", requestId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Propiedad calificada"));  // Verifica que se muestra el mensaje esperado
+        TenantRentalRequest rentalRequest = new TenantRentalRequest();
+        when(rentalRequestRepository.findById(requestId)).thenReturn(Optional.of(rentalRequest));
+
+        tenantRentalRequestService.reviewProperty(requestId);
+
+        assertTrue(rentalRequest.isPropertyReviewed());
+        verify(rentalRequestRepository, times(1)).save(rentalRequest);
     }
 
-    @Test // Test 3.2. Fallo: Lanzar una excepción cuando no se encuentra la solicitud de arrendamiento al intentar calificar una propiedad
-    public void testReviewPropertyFailure() throws Exception {
-        Long requestId = 99L;
-    
-        Mockito.doThrow(new RentalRequestNotFoundException("Rental request not found"))
-               .when(tenantRentalRequestService).reviewProperty(requestId);
-    
-        mockMvc.perform(MockMvcRequestBuilders.put("/tenant/{requestId}/propertyReview", requestId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
-
-    // Test No. 4: reviewLandlord
-
-    @Test // Test 4.1. Exito: Calificar correctamente un arrendador
-    public void testReviewLandlordSuccess() throws Exception {
+    @Test // Test 5.2. Fallo: Lanzar una excepción cuando no se encuentra la solicitud de arrendamiento al intentar calificar una propiedad
+    void testReviewPropertyNotFound() {
         Long requestId = 1L;
-    
-        Mockito.doNothing().when(tenantRentalRequestService).reviewLandlord(requestId);
-    
-        mockMvc.perform(MockMvcRequestBuilders.put("/tenant/{requestId}/landlordReview", requestId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Arrendador calificado")); 
+        when(rentalRequestRepository.findById(requestId)).thenReturn(Optional.empty());
+
+        assertThrows(RentalRequestNotFoundException.class, () -> tenantRentalRequestService.reviewProperty(requestId));
     }
 
-    @Test  // Test 4.2. Fallo: Lanzar una excepción cuando no se encuentra la solicitud de arrendamiento al intentar calificar un arrendador
-    public void testReviewLandlordFailure() throws Exception {
-        Long requestId = 99L;
-    
-        Mockito.doThrow(new RentalRequestNotFoundException("Rental request not found"))
-               .when(tenantRentalRequestService).reviewLandlord(requestId);
-    
-        mockMvc.perform(MockMvcRequestBuilders.put("/tenant/{requestId}/landlordReview", requestId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+    // Test No. 6: reviewLandlord
+
+    @Test // Test 6.1. Exito: Calificar correctamente un arrendador
+    void testReviewLandlordSuccess() {
+        Long requestId = 1L;
+        TenantRentalRequest rentalRequest = new TenantRentalRequest();
+        when(rentalRequestRepository.findById(requestId)).thenReturn(Optional.of(rentalRequest));
+
+        tenantRentalRequestService.reviewLandlord(requestId);
+
+        assertTrue(rentalRequest.isLandlordReviewed());
+        verify(rentalRequestRepository, times(1)).save(rentalRequest);
+    }
+
+    @Test // Test 6.2. Fallo: Lanzar una excepción cuando no se encuentra la solicitud de arrendamiento al intentar calificar un arrendador
+    void testReviewLandlordNotFound() {
+        Long requestId = 1L;
+        when(rentalRequestRepository.findById(requestId)).thenReturn(Optional.empty());
+
+        assertThrows(RentalRequestNotFoundException.class, () -> tenantRentalRequestService.reviewLandlord(requestId));
     }
 }
