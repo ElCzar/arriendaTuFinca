@@ -9,40 +9,19 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-
-import com.gossip.arrienda_tu_finca.dto.PropertyListDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
 import com.gossip.arrienda_tu_finca.entities.Property;
 
 @Repository // Añadir esta anotación para asegurarte de que Spring la detecte como un repositorio
 public interface PropertyRepository extends JpaRepository<Property, Long> {
-    // Busqueda de todos los municipios diferentes disponibles en la base de datos
-    @Query("SELECT DISTINCT p.municipality FROM Property p")
-    List<String> findAllMunicipalities();
-
-    //Busqueda de todas las propiedades de un municipio
-    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyDTO(p.id, p.name, p.municipality, p.department, p.peopleNumber, p.propertyLink, p.photos, p.ownerEmail) FROM Property p WHERE p.municipality = :municipality")
-    List<PropertyListDTO> findAllPropertyDTOByMunicipality(@Param("municipality") String municipality);
-
-    // Busqueda de una propiedad por su nombre
-    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyDTO(p.id, p.name, p.municipality, p.department, p.peopleNumber, p.propertyLink, p.photos, p.ownerEmail) FROM Property p WHERE p.name = :name")
-    PropertyListDTO findPropertyDTOByName(@Param("name") String name);
-    
-    // Busqueda de una propiedad por su municipio
-    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyDTO(p.id, p.name, p.municipality, p.department, p.peopleNumber, p.propertyLink, p.photos, p.ownerEmail) FROM Property p WHERE p.municipality = :municipality")
-    PropertyListDTO findPropertyDTOByMunicipality(@Param("municipality") String municipality);
-
-    // Busqueda de una propiedad por su cantidad de personas
-    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyDTO(p.id, p.name, p.municipality, p.department, p.peopleNumber, p.propertyLink, p.photos, p.ownerEmail) FROM Property p WHERE p.peopleNumber = :peopleNumber")
-    PropertyListDTO findPropertyDTOByPeopleNumber(@Param("peopleNumber") Integer peopleNumber);
 
     // Encuentra todas las propiedades que pertenecen a un usuario específico (por su email)
     @Query("SELECT p FROM Property p WHERE p.owner.email = :email")
     List<Property> findAllByOwnerEmail(@Param("email") String ownerEmail);
 
     // Consulta personalizada para obtener una propiedad como DTO usando su ID
-    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyDTO(p.id, p.name, p.description, p.municipality, p.typeOfEntrance, p.peopleNumber, p.address, p.isAvailable, p.pricePerNight, p.amountOfRooms, p.amountOfBathrooms, p.isPetFriendly, p.hasPool, p.hasGril, p.owner.email) FROM Property p WHERE p.id = :propertyId")
-    PropertyListDTO findPropertyDTOById(@Param("propertyId") Long propertyId);
+    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyDTO(p.id, p.name, p.description, p.municipality, p.typeOfEntrance, p.address, p.isAvailable, p.pricePerNight, p.amountOfRooms, p.amountOfBathrooms, p.isPetFriendly, p.hasPool, p.hasGril, p.owner.email) FROM Property p WHERE p.id = :propertyId")
+    PropertyDTO findPropertyDTOById(@Param("propertyId") Long propertyId);
 
     // Encuentra todas las propiedades disponibles (activas)
     @Query("SELECT p FROM Property p WHERE p.isAvailable = true")

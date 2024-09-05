@@ -16,21 +16,18 @@ import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.exceptions.PropertyNotFoundException;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
-import java.util.Random;
 
 @Service
 public class PropertyService {
     private PropertyRepository propertyRepository;
     private ModelMapper modelMapper;
-    private UserRepository userRepository;
-    private Random random;
+    private UserRepository userRepository;  
 
     @Autowired
     public PropertyService(PropertyRepository propertyRepository, ModelMapper modelMapper, UserRepository userRepository) {
         this.propertyRepository = propertyRepository;
         this.modelMapper = modelMapper; 
         this.userRepository = userRepository;
-        this.random = new Random();  
     }
 
     // Crear propiedad
@@ -90,47 +87,5 @@ public class PropertyService {
         byte[] photoBytes;
         photoBytes = photo.getBytes();
         property.setPhoto(photoBytes);
-    }
-  
-  public void setRandom(Random random) {
-        this.random = random;
-    }
-    
-    // Obtener las propiedades de un municipio aleatorio
-    public List<PropertyListDTO> getPropertiesByRandomMunicipality() {
-        List<String> municipalities = propertyRepository.findAllMunicipalities();
-        String randomMunicipality = municipalities.get(random.nextInt(municipalities.size()));
-        List<PropertyListDTO> properties = propertyRepository.findAllPropertyDTOByMunicipality(randomMunicipality);
-        if (properties.isEmpty()) {
-            throw new PropertyNotFoundException("Property by random municipality not found");
-        }
-        return properties;
-    }
-
-    // Obtener una propiedad por nombre
-    public PropertyListDTO getPropertyByName(String name) {
-        PropertyListDTO propertyDTO = propertyRepository.findPropertyDTOByName(name);
-        if (propertyDTO == null) {
-            throw new PropertyNotFoundException("Property by name not found");
-        }
-        return propertyDTO;
-    }
-
-    // Obtener una propiedad por municipio
-    public PropertyListDTO getPropertyByMunicipality(String municipality) {
-        PropertyListDTO propertyDTO = propertyRepository.findPropertyDTOByMunicipality(municipality);
-        if (propertyDTO == null) {
-            throw new PropertyNotFoundException("Property by municipality not found");
-        }
-        return propertyDTO;
-    }
-
-    // Obtener una propiedad por numero de personas
-    public PropertyListDTO getPropertyByPeopleNumber(Integer peopleNumber) {
-        PropertyListDTO propertyDTO = propertyRepository.findPropertyDTOByPeopleNumber(peopleNumber);
-        if (propertyDTO == null) {
-            throw new PropertyNotFoundException("Property by number of people not found");
-        }
-        return propertyDTO;
     }
 }
