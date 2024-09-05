@@ -22,7 +22,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.gossip.arrienda_tu_finca.ArriendaTuFincaApplication;
 import com.gossip.arrienda_tu_finca.entities.Property;
+import com.gossip.arrienda_tu_finca.entities.User;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
+import com.gossip.arrienda_tu_finca.repositories.UserRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -44,10 +46,14 @@ class TestPropertyController {
     @Autowired
     private PropertyRepository propertyRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @BeforeEach
     @Transactional
     void setUp() {
         propertyRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
     }
 
 
@@ -71,9 +77,17 @@ class TestPropertyController {
             "isPetFriendly": true,
             "hasPool": true,
             "hasGril": true,
+            "ownerEmail": "johnDoe@gmail.com"
         }
         """;
     
+        // Create user with same email
+        User user = new User();
+        user.setEmail("johnDoe@gmail.com");
+        user.setPassword("password");
+        user.setId(1L);
+        userRepository.save(user);
+
         // Act
         mvc.perform(MockMvcRequestBuilders.post("/property")
             .contentType("application/json")

@@ -1,6 +1,7 @@
 package com.gossip.arrienda_tu_finca.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -40,7 +41,7 @@ public class Property {
     @Lob
     private byte[] photo;
 
-    @ManyToOne
-    @JoinColumn(name = "owner_email", referencedColumnName = "email")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
 }

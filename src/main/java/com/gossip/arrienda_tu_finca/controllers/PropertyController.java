@@ -1,5 +1,6 @@
 package com.gossip.arrienda_tu_finca.controllers;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,11 @@ public class PropertyController {
     // Subir una foto para una propiedad
     @PostMapping("/{id}/upload-photo")
     public ResponseEntity<Void> uploadPhoto(@PathVariable Long id, @RequestParam("photo") MultipartFile photo) {
-        propertyService.uploadPhoto(id, photo);
+        try {
+            propertyService.uploadPhoto(id, photo);
+        } catch (IOException e) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.noContent().build();
     }
 }
