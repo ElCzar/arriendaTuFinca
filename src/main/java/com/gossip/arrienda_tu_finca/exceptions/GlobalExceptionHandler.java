@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(RentalRequestNotFoundException.class)
+    public ResponseEntity<String> handleRentalRequestNotFoundException(RentalRequestNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+  
     @ExceptionHandler(PropertyNotFoundException.class)
     public ResponseEntity<String> handlePropertyNotFoundException(PropertyNotFoundException ex) {
         // Retorna 404 Not Found con el mensaje de la excepción
