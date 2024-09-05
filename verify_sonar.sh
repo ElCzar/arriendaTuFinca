@@ -1,13 +1,15 @@
 #!/bin/bash
 
 # Decrypt the .env file
-sops --decrypt --age $(cat $SOPS_AGE_KEY_FILE | grep -oP "public key: \K(.*)") -i .env
+sops --decrypt --age $(cat $SOPS_AGE_KEY_FILE | grep -oP "public key: \K(.*)") .env > .decrypted.env
 
 # Get the SONAR_KEY
-SONAR_KEY=$(cat .env | grep -oP "SONAR_KEY=\K.*")
+SONAR_KEY=$(cat .decrypted.env | grep -oP "SONAR_KEY=\K.*")
 
-# Encrypt the .env file
-sops --encrypt --age $(cat $SOPS_AGE_KEY_FILE | grep -oP "public key: \K(.*)") -i .env
+echo "SONAR_KEY: $SONAR_KEY"
+
+# Remove the decrypted file
+rm .decrypted.env
 
 # Run Maven clean verify and sonar
 mvn clean verify sonar:sonar -DSONAR_KEY=$SONAR_KEY

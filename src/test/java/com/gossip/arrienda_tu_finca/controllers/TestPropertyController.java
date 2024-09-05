@@ -166,7 +166,7 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/property/999")
                 .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())  // Debe devolver 404 Not Found
-                .andExpect(MockMvcResultMatchers.content().string("Property with ID 999 not found"));  // Verifica el mensaje
+                .andExpect(MockMvcResultMatchers.content().string("Property with ID 999 not found for fetching"));  // Verifica el mensaje
     }
     
 
@@ -235,7 +235,7 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
             .contentType("application/json")
             .content(updateRequest))
             .andExpect(MockMvcResultMatchers.status().isNotFound()) // Espera un 404 Not Found
-            .andExpect(MockMvcResultMatchers.content().string("Property with ID 999 not found")); // Verifica el mensaje
+            .andExpect(MockMvcResultMatchers.content().string("To update property with ID 999 not found")); // Verifica el mensaje
     }
     
     

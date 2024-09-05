@@ -2,7 +2,6 @@ package com.gossip.arrienda_tu_finca.services;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -39,7 +38,7 @@ public class PropertyService {
         Long userId = userRepository.findIdByEmail(propertyCreateDTO.getOwnerEmail());
 
         if (userId == null) {
-            throw new PropertyNotFoundException("User with email " + propertyCreateDTO.getOwnerEmail() + " not found");
+            throw new PropertyNotFoundException("User with email " + propertyCreateDTO.getOwnerEmail() + " not found when creating property");
         }
 
         property.setOwner(userRepository.findById(userId).get());
@@ -50,7 +49,7 @@ public class PropertyService {
 
     public PropertyDTO getPropertyById(Long id) {
         Property property = propertyRepository.findById(id)
-            .orElseThrow(() -> new PropertyNotFoundException("Property with ID " + id + " not found"));
+            .orElseThrow(() -> new PropertyNotFoundException("Property with ID " + id + " not found for fetching"));
         return modelMapper.map(property, PropertyDTO.class);
     }
 
@@ -65,7 +64,7 @@ public class PropertyService {
     // Actualizar propiedad
     public PropertyDTO updateProperty(Long id, PropertyUpdateDTO propertyUpdateDTO) {
         Property property = propertyRepository.findById(id)
-            .orElseThrow(() -> new PropertyNotFoundException("Property with ID " + id + " not found"));
+            .orElseThrow(() -> new PropertyNotFoundException("To update property with ID " + id + " not found"));
         modelMapper.map(propertyUpdateDTO, property); 
         Property updatedProperty = propertyRepository.save(property);
         return modelMapper.map(updatedProperty, PropertyDTO.class);
@@ -75,7 +74,7 @@ public class PropertyService {
     // Desactivar propiedad (no eliminar)
     public void deactivateProperty(Long id) {
         Property property = propertyRepository.findById(id)
-            .orElseThrow(() -> new PropertyNotFoundException("Property with ID " + id + " not found"));
+            .orElseThrow(() -> new PropertyNotFoundException("Property to deactivate with ID " + id + " not found"));
         property.setAvailable(false);
         propertyRepository.save(property);
     }

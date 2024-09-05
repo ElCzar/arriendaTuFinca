@@ -26,9 +26,12 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/property")
 public class PropertyController {
+    private PropertyService propertyService;
 
     @Autowired
-    private PropertyService propertyService;
+    public PropertyController(PropertyService propertyService) {
+        this.propertyService = propertyService;
+    }
 
     // Obtener una propiedad por ID
     @GetMapping("/{id}")
