@@ -27,10 +27,12 @@ public class PropertyService {
     // Obtener las propiedades de un municipio aleatorio
     public List<PropertyListDTO> getPropertiesByRandomMunicipality() {
         List<String> municipalities = propertyRepository.findAllMunicipalities();
-        // Seleccionar un municipio al azar
         String randomMunicipality = municipalities.get(random.nextInt(municipalities.size()));
-        // Obtener las propiedades del municipio seleccionado
-        return propertyRepository.findAllPropertyDTOByMunicipality(randomMunicipality);
+        List<PropertyListDTO> properties = propertyRepository.findAllPropertyDTOByMunicipality(randomMunicipality);
+        if (properties.isEmpty()) {
+            throw new PropertyNotFoundException("Property not found");
+        }
+        return properties;
     }
 
     // Obtener una propiedad por nombre
