@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +28,12 @@ public class RentalRequestController {
     public RentalRequestController(RentalRequestService rentalRequestService, ModelMapper modelMapper) {
         this.rentalRequestService = rentalRequestService;
         this.modelMapper = modelMapper;
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<String> createRequest(RentalRequestDto rentalRequest) {
+        rentalRequestService.createRequest(rentalRequest);
+        return new ResponseEntity<>("Solicitud de arriendo creada", HttpStatus.OK);
     }
 
     @GetMapping("/owner/{email}")

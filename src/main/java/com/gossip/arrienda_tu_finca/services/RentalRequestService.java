@@ -2,19 +2,33 @@ package com.gossip.arrienda_tu_finca.services;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.gossip.arrienda_tu_finca.repositories.RentalRequestRepository;
+
+import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
 import com.gossip.arrienda_tu_finca.entities.RentalRequest;
 import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class RentalRequestService {
-    
+
     private final RentalRequestRepository rentalRequestRepository;
+    private final ModelMapper modelMapper;
     private static final String RENTAL_REQUEST_NOT_FOUND = "Solicitud de arriendo no encontrada";
 
+    @Autowired
+    public RentalRequestService(RentalRequestRepository rentalRequestRepository, ModelMapper modelMapper) {
+        this.rentalRequestRepository = rentalRequestRepository;
+        this.modelMapper = modelMapper;
+    }
+
+    public void createRequest(RentalRequestDto rentalRequest) {
+        RentalRequest request = modelMapper.map(rentalRequest, RentalRequest.class);
+        rentalRequestRepository.save(request);
+    }
     
     public List<RentalRequest> getRequestsByProperty(Long propertyId) {
         return rentalRequestRepository.findByPropertyId(propertyId);
@@ -28,7 +42,6 @@ public class RentalRequestService {
         return requests;
     }
 
-    
     public void acceptRequest(Long requestId) {
         Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
         if (optionalRequest.isPresent()) {
@@ -41,7 +54,6 @@ public class RentalRequestService {
         }
     }
 
-    
     public void cancelRequest(Long requestId) {
         Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
         if (optionalRequest.isPresent()) {
@@ -54,7 +66,6 @@ public class RentalRequestService {
         }
     }
 
-    
     public void reviewRenter(Long requestId) {
         Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
         if (optionalRequest.isPresent()) {
@@ -113,5 +124,4 @@ public class RentalRequestService {
         }
     }
 
-    
 }
