@@ -31,6 +31,7 @@ public class Property {
     private String description;
     private String municipality;
     private String typeOfEntrance;
+    private Integer peopleNumber;
     private String address;
     private boolean isAvailable;
     private Double pricePerNight;
@@ -39,6 +40,11 @@ public class Property {
     private boolean isPetFriendly;
     private boolean hasPool;
     private boolean hasGril;
+    private String propertyLink;
+    private String department;
+
+    @Lob
+    private byte[] photos;
 
     @Lob
     private byte[] photo;
