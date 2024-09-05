@@ -7,13 +7,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
+import com.gossip.arrienda_tu_finca.entities.RentalRequest;
 import com.gossip.arrienda_tu_finca.services.RentalRequestService;
 import com.gossip.arrienda_tu_finca.mapper.RentalRequestMapper;
+import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
 
 import lombok.AllArgsConstructor;
 
@@ -73,16 +76,22 @@ public class RentalRequestController {
     }
 
     @PutMapping("/{requestId}/approve")
-    public ResponseEntity<String> approveRequest(@PathVariable Long requestId) {
-        rentalRequestService.approveRequest(requestId);
+public ResponseEntity<String> approveRequest(@PathVariable Long requestId) {
+    try {
+        RentalRequest rentalRequest = rentalRequestService.approveRequest(requestId);
         return new ResponseEntity<>("Solicitud de arriendo aprobada", HttpStatus.OK);
+    } catch (RentalRequestNotFoundException e) {
+        return new ResponseEntity<>("Solicitud de arriendo no encontrada", HttpStatus.NOT_FOUND);
     }
+}
 
-    @PutMapping("/{requestId}/pay")
-    public ResponseEntity<String> payRequest(@PathVariable Long requestId) {
-        rentalRequestService.payRequest(requestId);
+@PutMapping("/{requestId}/pay")
+public ResponseEntity<String> payRequest(@PathVariable Long requestId) {
+    try {
+        RentalRequest rentalRequest = rentalRequestService.payRequest(requestId);
         return new ResponseEntity<>("Solicitud de arriendo pagada", HttpStatus.OK);
+    } catch (RentalRequestNotFoundException e) {
+        return new ResponseEntity<>("Solicitud de arriendo no encontrada", HttpStatus.NOT_FOUND);
     }
-
-
+}
 }
