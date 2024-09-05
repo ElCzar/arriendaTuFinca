@@ -1,30 +1,47 @@
 package com.gossip.arrienda_tu_finca.controllers;
 
-import com.gossip.arrienda_tu_finca.entities.Property;
-import com.gossip.arrienda_tu_finca.entities.RentalRequest;
-import com.gossip.arrienda_tu_finca.entities.User;
-import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
-import com.gossip.arrienda_tu_finca.services.RentalRequestService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.util.Arrays;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
- class RentalRequestControllerTest {
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import com.gossip.arrienda_tu_finca.ArriendaTuFincaApplication;
+import com.gossip.arrienda_tu_finca.entities.Property;
+import com.gossip.arrienda_tu_finca.entities.RentalRequest;
+import com.gossip.arrienda_tu_finca.entities.User;
+import com.gossip.arrienda_tu_finca.services.RentalRequestService;
+
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+    classes = ArriendaTuFincaApplication.class
+)
+@AutoConfigureMockMvc
+@TestPropertySource(
+    locations = "classpath:application-test.properties"
+)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+class RentalRequestControllerTest {
 
     private MockMvc mockMvc;
 
@@ -40,7 +57,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         this.mockMvc = MockMvcBuilders.standaloneSetup(rentalRequestController).build();
     }
 
-        @Test
+    @Test
     void testGetRequestsByOwner() throws Exception {
         String email = "owner@example.com";
         
@@ -149,7 +166,4 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Solicitud de arriendo pagada", response.getBody());
     }
-
-
-
 }
