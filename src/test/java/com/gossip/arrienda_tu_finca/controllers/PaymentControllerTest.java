@@ -118,7 +118,7 @@ public class PaymentControllerTest {
 
     // Test No. 3: getAllBanks
 
-    @Test // Test 3.1: Obtener 
+    @Test // Test 3.1: Obtener correctamente la lista de bancos 
     public void testGetAllBanksSuccess() throws Exception {
         List<String> banks = List.of("Banco de Bogotá", "Bancolombia", "BBVA");
     
