@@ -808,7 +808,7 @@ class TestUserController {
 
         // Act
         // Perform a request to the endpoint and expect an OK status
-        mvc.perform(MockMvcRequestBuilders.post("/api/user/delete/1")
+        mvc.perform(MockMvcRequestBuilders.delete("/api/user/delete/1")
             .contentType("application/json")
             .content(request))
             .andExpect(MockMvcResultMatchers.status().isOk());
@@ -843,7 +843,7 @@ class TestUserController {
         
         // Act
         // Perform a request to the endpoint and expect a not found status
-        mvc.perform(MockMvcRequestBuilders.post("/api/user/delete/2")
+        mvc.perform(MockMvcRequestBuilders.delete("/api/user/delete/2")
             .contentType("application/json")
             .content(request))
             .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -873,7 +873,7 @@ class TestUserController {
         
         // Act
         // Perform a request to the endpoint and expect a bad request status
-        mvc.perform(MockMvcRequestBuilders.post("/api/user/delete/1")
+        mvc.perform(MockMvcRequestBuilders.delete("/api/user/delete/1")
             .contentType("application/json")
             .content(request))
             .andExpect(MockMvcResultMatchers.status().isBadRequest());
