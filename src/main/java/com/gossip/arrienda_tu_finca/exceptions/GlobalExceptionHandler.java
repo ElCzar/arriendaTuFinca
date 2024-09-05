@@ -11,6 +11,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(PropertyNotFoundException.class)
+    public ResponseEntity<String> handlePropertyNotFoundException(PropertyNotFoundException ex) {
+        // Retorna 404 Not Found con el mensaje de la excepción
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(UserNotValidException.class)
     public ResponseEntity<ErrorMessage> handleUserNotValidException(UserNotValidException e) {
         ErrorMessage errorMessage = new ErrorMessage(
