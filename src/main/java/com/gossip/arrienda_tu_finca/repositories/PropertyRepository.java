@@ -9,12 +9,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import com.gossip.arrienda_tu_finca.dto.PropertyListDTO;
+import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
 import com.gossip.arrienda_tu_finca.entities.Property;
 
 @Repository // Añadir esta anotación para asegurarte de que Spring la detecte como un repositorio
 public interface PropertyRepository extends JpaRepository<Property, Long> {
- 
     // Busqueda de todos los municipios diferentes disponibles en la base de datos
     @Query("SELECT DISTINCT p.municipality FROM Property p")
     List<String> findAllMunicipalities();
@@ -61,3 +62,4 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
     @Query("UPDATE Property p SET p.isAvailable = false WHERE p.id = :propertyId")
     void deactivatePropertyById(@Param("propertyId") Long propertyId);
 }
+
