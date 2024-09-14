@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.gossip.arrienda_tu_finca.dto.PropertyCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
+import com.gossip.arrienda_tu_finca.dto.PropertyShowDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyUpdateDTO;
 import com.gossip.arrienda_tu_finca.services.PropertyService;
 
@@ -77,5 +78,35 @@ public class PropertyController {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.noContent().build();
+    }
+
+    // Arrendatario
+
+    // Obtener todas las propiedades de un municipio aleatorio
+    @GetMapping("/random-municipality")
+    public ResponseEntity<List<PropertyShowDTO>> findPropertiesByRandomMunicipality() {
+        List<PropertyShowDTO> properties = propertyService.findPropertiesByRandomMunicipality();
+        return ResponseEntity.ok(properties);
+    }
+
+    // Obtener todas las propiedades con un nombre especifico
+    @GetMapping("/name/{name}")
+    public ResponseEntity<List<PropertyShowDTO>> findPropertiesByName(@PathVariable String name) {
+        List<PropertyShowDTO> properties = propertyService.findPropertiesByName(name);
+        return ResponseEntity.ok(properties);
+    }
+
+    // Obtener todas las propiedades de un municipio especifico
+    @GetMapping("/municipality/{municipality}")
+    public ResponseEntity<List<PropertyShowDTO>> findPropertiesByMunicipality(@PathVariable String municipality) {
+        List<PropertyShowDTO> properties = propertyService.findPropertiesByMunicipality(municipality);
+        return ResponseEntity.ok(properties);
+    }
+
+    // Obtener todas las propiedades con una cantidad de residentes especifica
+    @GetMapping("/residents/{amountOfResidents}")
+    public ResponseEntity<List<PropertyShowDTO>> findPropertiesByAmountOfResidents(@PathVariable Integer amountOfResidents) {
+        List<PropertyShowDTO> properties = propertyService.findPropertiesByAmountOfResidents(amountOfResidents);
+        return ResponseEntity.ok(properties);
     }
 }

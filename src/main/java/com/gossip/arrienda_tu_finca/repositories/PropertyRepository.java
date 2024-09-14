@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
+import com.gossip.arrienda_tu_finca.dto.PropertyShowDTO;
 import com.gossip.arrienda_tu_finca.entities.Property;
 
 @Repository // Añadir esta anotación para asegurarte de que Spring la detecte como un repositorio
@@ -40,5 +41,24 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
     @Transactional // Importante para los métodos que modifican la base de datos
     @Query("UPDATE Property p SET p.isAvailable = false WHERE p.id = :propertyId")
     void deactivatePropertyById(@Param("propertyId") Long propertyId);
+
+    // Arrendatario
+
+    // Encuentra todas las propiedades que pertenecen a un municipio aleatorio
+    @Query("SELECT p.municipality FROM Property p ORDER BY RAND()")
+    String findRandomMunicipality();
+
+    // Encuentra todas las propiedades con un nombre especifico
+    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyShowDTO(p.photo, p.name, p.description, p.municipality, p.link) FROM Property p WHERE p.name = :name")
+    List<PropertyShowDTO> findPropertiesByName(@Param("name") String name);
+
+    // Encuentra todas las propiedades de un municipio especifico
+    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyShowDTO(p.photo, p.name, p.description, p.municipality, p.link) FROM Property p WHERE p.municipality = :municipality")
+    List<PropertyShowDTO> findPropertiesByMunicipality(@Param("municipality") String municipality);
+
+    // Encuentra todas las propiedades con una cantidad de residentes especifica
+    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyShowDTO(p.photo, p.name, p.description, p.municipality, p.link) FROM Property p WHERE p.amountOfResidents = :amountOfResidents")
+    List<PropertyShowDTO> findPropertiesByAmountOfResidents(@Param("amountOfResidents") Integer amountOfResidents);
+
 }
 
