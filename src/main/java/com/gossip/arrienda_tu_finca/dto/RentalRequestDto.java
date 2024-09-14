@@ -19,6 +19,7 @@ public class RentalRequestDto {
 	private LocalDateTime requestDateTime;
 	private LocalDate arrivalDate;
 	private LocalDate departureDate;
+	private Integer amountOfResidents;
 	private Double amount;
 	private boolean accepted;
 	private boolean rejected;

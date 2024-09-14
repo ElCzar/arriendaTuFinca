@@ -38,7 +38,7 @@ public class RentalRequest {
     private LocalDateTime requestDateTime;  
     private LocalDate arrivalDate; 
     private LocalDate departureDate;  
-    private Integer residents;
+    private Integer amountOfResidents;
     private Double amount;  
     private boolean accepted;
     private boolean rejected;

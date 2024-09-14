@@ -38,7 +38,7 @@ public class Property {
     private Double pricePerNight;
     private int amountOfRooms;
     private int amountOfBathrooms;
-    private int amountOfPeople;
+    private int amountOfResidents;
     private boolean isPetFriendly;
     private boolean hasPool;
     private boolean hasGril;
