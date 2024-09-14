@@ -26,6 +26,8 @@ public class RentalRequestDto {
 	private boolean canceled;
 	private boolean paid;
 	private boolean reviewed;
+	private boolean reviewedLessor;
+    private boolean reviewedProperty;
 	private boolean completed;
 	private boolean approved;
 }

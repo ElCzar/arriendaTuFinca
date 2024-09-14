@@ -124,4 +124,32 @@ public class RentalRequestService {
         }
     }
 
+    // Arrendatario
+
+    // Calificar arrendador
+    public void reviewLessor(Long requestId) {
+        Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
+        if (optionalRequest.isPresent()) {
+            RentalRequest request = optionalRequest.get();
+          
+            request.setReviewedLessor(true);
+            rentalRequestRepository.save(request);
+        } else {
+            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
+        }
+    }
+
+    // Calificar arrendatario
+    public void reviewProperty(Long requestId) {
+        Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
+        if (optionalRequest.isPresent()) {
+            RentalRequest request = optionalRequest.get();
+          
+            request.setReviewedProperty(true);
+            rentalRequestRepository.save(request);
+        } else {
+            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
+        }
+    }
+
 }

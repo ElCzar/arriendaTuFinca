@@ -103,4 +103,20 @@ public class RentalRequestController {
             return new ResponseEntity<>("Solicitud de arriendo no encontrada", HttpStatus.NOT_FOUND);
         }
     }
+
+    // Arrendatario
+
+    // Calificar arrendador
+    @PutMapping("/{requestId}/review")
+    public ResponseEntity<String> reviewLessor(@PathVariable Long requestId) {
+        rentalRequestService.reviewLessor(requestId);
+        return new ResponseEntity<>("Arrendador calificado", HttpStatus.OK);
+    }
+
+    // Calificar arrendatario
+    @PutMapping("/{requestId}/review")
+    public ResponseEntity<String> reviewProperty(@PathVariable Long requestId) {
+        rentalRequestService.reviewProperty(requestId);
+        return new ResponseEntity<>("Propiedad calificada", HttpStatus.OK);
+    }
 }
