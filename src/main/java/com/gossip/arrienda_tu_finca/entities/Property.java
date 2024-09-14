@@ -30,12 +30,15 @@ public class Property {
     private String name;
     private String description;
     private String municipality;
+    private String department;
     private String typeOfEntrance;
     private String address;
+    private String link;
     private boolean isAvailable;
     private Double pricePerNight;
     private int amountOfRooms;
     private int amountOfBathrooms;
+    private int amountOfPeople;
     private boolean isPetFriendly;
     private boolean hasPool;
     private boolean hasGril;

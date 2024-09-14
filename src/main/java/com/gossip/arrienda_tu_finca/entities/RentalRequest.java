@@ -38,6 +38,7 @@ public class RentalRequest {
     private LocalDateTime requestDateTime;  
     private LocalDate arrivalDate; 
     private LocalDate departureDate;  
+    private Integer residents;
     private Double amount;  
     private boolean accepted;
     private boolean rejected;
@@ -46,5 +47,7 @@ public class RentalRequest {
     private boolean reviewed;
     private boolean completed;
     private boolean approved;
+    private String bank;
+    private Integer accountNumber;
 }
 
