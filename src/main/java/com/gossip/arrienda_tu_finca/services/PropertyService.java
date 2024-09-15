@@ -95,7 +95,7 @@ public class PropertyService {
     // Obtener todas las propiedades de un municipio aleatorio
     public List<PropertyShowDTO> findPropertiesByRandomMunicipality() {
         String randomMunicipality = propertyRepository.findRandomMunicipality();
-        List<PropertyShowDTO> properties = propertyRepository.findPropertiesByMunicipality(randomMunicipality);
+        List<Property> properties = propertyRepository.findPropertiesByMunicipality(randomMunicipality);
         return properties.stream()
                 .map(property -> modelMapper.map(property, PropertyShowDTO.class)) 
                 .collect(Collectors.toList());
@@ -103,7 +103,7 @@ public class PropertyService {
 
     // Obtener todas las propiedades con un nombre especifico
     public List<PropertyShowDTO> findPropertiesByName(String name) {
-        List<PropertyShowDTO> properties = propertyRepository.findPropertiesByName(name);
+        List<Property> properties = propertyRepository.findPropertiesByName(name);
         return properties.stream()
                 .map(property -> modelMapper.map(property, PropertyShowDTO.class)) 
                 .collect(Collectors.toList());
@@ -111,7 +111,7 @@ public class PropertyService {
 
     // Obtener todas las propiedades de un municipio especifico
     public List<PropertyShowDTO> findPropertiesByMunicipality(String municipality) {
-        List<PropertyShowDTO> properties = propertyRepository.findPropertiesByMunicipality(municipality);
+        List<Property> properties = propertyRepository.findPropertiesByMunicipality(municipality);
         return properties.stream()
                 .map(property -> modelMapper.map(property, PropertyShowDTO.class)) 
                 .collect(Collectors.toList());
@@ -119,7 +119,7 @@ public class PropertyService {
 
     // Obtener todas las propiedades con una cantidad de residentes especifica
     public List<PropertyShowDTO> findPropertiesByAmountOfResidents(Integer amountOfResidents) {
-        List<PropertyShowDTO> properties = propertyRepository.findPropertiesByAmountOfResidents(amountOfResidents);
+        List<Property> properties = propertyRepository.findPropertiesByAmountOfResidents(amountOfResidents);
         return properties.stream()
                 .map(property -> modelMapper.map(property, PropertyShowDTO.class)) 
                 .collect(Collectors.toList());

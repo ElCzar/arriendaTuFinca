@@ -49,16 +49,16 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
     String findRandomMunicipality();
 
     // Encuentra todas las propiedades con un nombre especifico
-    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyShowDTO(p.photo, p.name, p.description, p.municipality, p.link) FROM Property p WHERE p.name = :name")
-    List<PropertyShowDTO> findPropertiesByName(@Param("name") String name);
-
+    @Query("SELECT p FROM Property p WHERE p.name = :name")
+    List<Property> findPropertiesByName(@Param("name") String name);
+    
     // Encuentra todas las propiedades de un municipio especifico
-    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyShowDTO(p.photo, p.name, p.description, p.municipality, p.link) FROM Property p WHERE p.municipality = :municipality")
-    List<PropertyShowDTO> findPropertiesByMunicipality(@Param("municipality") String municipality);
+    @Query("SELECT p FROM Property p WHERE p.municipality = :municipality")
+    List<Property> findPropertiesByMunicipality(@Param("municipality") String municipality);
 
     // Encuentra todas las propiedades con una cantidad de residentes especifica
-    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyShowDTO(p.photo, p.name, p.description, p.municipality, p.link) FROM Property p WHERE p.amountOfResidents = :amountOfResidents")
-    List<PropertyShowDTO> findPropertiesByAmountOfResidents(@Param("amountOfResidents") Integer amountOfResidents);
+    @Query("SELECT p FROM Property p WHERE p.amountOfResidents = :amountOfResidents")
+    List<Property> findPropertiesByAmountOfResidents(@Param("amountOfResidents") Integer amountOfResidents);
 
 }
 

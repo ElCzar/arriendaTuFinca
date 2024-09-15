@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gossip.arrienda_tu_finca.dto.RentalRequestCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
+import com.gossip.arrienda_tu_finca.dto.RentalRequestViewDTO;
 import com.gossip.arrienda_tu_finca.services.RentalRequestService;
 
 import jakarta.validation.Valid;
@@ -132,4 +133,13 @@ public class RentalRequestController {
         RentalRequestDto createdRentalRequest = rentalRequestService.createRentalRequest(propertyId, rentalRequestCreateDTO);
         return ResponseEntity.ok(createdRentalRequest);
     }
+
+    // Obtener todas las solicitudes de arriendo de un requester (email)
+    @GetMapping("/requester/{email}")
+    public ResponseEntity<List<RentalRequestViewDTO>> getRequestsByRequesterEmail(@PathVariable String email) {
+        List<RentalRequestViewDTO> rentalRequests = rentalRequestService.getRequestsByRequesterEmail(email);
+        return ResponseEntity.ok(rentalRequests);
+    }
+
+
 }

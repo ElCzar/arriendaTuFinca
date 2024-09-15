@@ -2,6 +2,7 @@ package com.gossip.arrienda_tu_finca.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import com.gossip.arrienda_tu_finca.dto.PropertyCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
+import com.gossip.arrienda_tu_finca.dto.RentalRequestViewDTO;
 import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.entities.RentalRequest;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidAmountOfResidentsException;
@@ -208,5 +210,26 @@ public class RentalRequestService {
         RentalRequest savedRentalRequest = rentalRequestRepository.save(rentalRequest);
         return modelMapper.map(savedRentalRequest, RentalRequestDto.class);
     }
+
+    // Obtener las solicitudes de arriendo de un requester (email)
+    public List<RentalRequestViewDTO> getRequestsByRequesterEmail(String requesterEmail) {
+        List<RentalRequest> rentalRequests = rentalRequestRepository.findByRequesterEmailOrderByRequestDateTime(requesterEmail);
+
+        if (rentalRequests.isEmpty()) {
+            throw new RentalRequestNotFoundException("No se encontraron solicitudes de arriendo para el arrendatario con email: "  + requesterEmail);
+        }
+
+        return rentalRequests.stream()
+            .map(request -> modelMapper.map(request, RentalRequestViewDTO.class)) // Mapea la entidad a DTO
+            .collect(Collectors.toList());
+    }
+
+    
+    
+
+
+
+
+
 
 }

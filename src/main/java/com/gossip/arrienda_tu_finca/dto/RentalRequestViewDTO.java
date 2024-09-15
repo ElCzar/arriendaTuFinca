@@ -19,6 +19,8 @@ public class RentalRequestViewDTO {
     private LocalDate arrivalDate; 
     private LocalDate departureDate; 
     private Double amount;  
-    private boolean status;
+    private boolean paid;
+    private boolean reviewedLessor;
+    private boolean reviewedProperty;
 
 }
