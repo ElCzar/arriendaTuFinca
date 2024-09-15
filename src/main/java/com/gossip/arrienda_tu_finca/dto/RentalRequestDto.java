@@ -30,6 +30,7 @@ public class RentalRequestDto {
     private boolean reviewedProperty;
 	private boolean completed;
 	private boolean approved;
+	private boolean expired;
 	private String bank;
     private Integer accountNumber;
 }

@@ -206,6 +206,7 @@ public class RentalRequestService {
         rentalRequest.setReviewedProperty(false);
         rentalRequest.setCompleted(false); 
         rentalRequest.setApproved(false);
+        rentalRequest.setExpired(false);
 
         RentalRequest savedRentalRequest = rentalRequestRepository.save(rentalRequest);
         return modelMapper.map(savedRentalRequest, RentalRequestDto.class);
