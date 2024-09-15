@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 import com.gossip.arrienda_tu_finca.repositories.RentalRequestRepository;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
+import com.gossip.arrienda_tu_finca.dto.PaymentDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestCreateDTO;
@@ -22,6 +23,7 @@ import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.entities.RentalRequest;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidAmountOfResidentsException;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidDateException;
+import com.gossip.arrienda_tu_finca.exceptions.InvalidPaymentException;
 import com.gossip.arrienda_tu_finca.exceptions.PropertyNotFoundException;
 import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
 import com.gossip.arrienda_tu_finca.exceptions.UserNotFoundException;
@@ -225,12 +227,24 @@ public class RentalRequestService {
             .collect(Collectors.toList());
     }
 
-    
-    
+    // Realizar el pago de una solicitud de arriendo
+    public RentalRequestDto payRequest(Long requestId, PaymentDTO paymentDTO) {
+        RentalRequest rentalRequest = rentalRequestRepository.findById(requestId)
+        .orElseThrow(() -> new RentalRequestNotFoundException("Solicitud de arriendo con ID" + requestId + " no fue encontrada"));
+         
+        if (!rentalRequest.isAccepted()) {
+           throw new InvalidPaymentException("La solicitud de arriendo no ha sido aceptada.");
+        }
+        if (rentalRequest.isPaid()) {
+           throw new InvalidPaymentException("La solicitud de arriendo ya ha sido pagada.");
+        }
+        if (rentalRequest.isExpired()) {
+            throw new InvalidPaymentException("La solicitud de arriendo ha expirado.");
+        }
 
-
-
-
-
-
+        rentalRequest.setPaid(true);
+        modelMapper.map(paymentDTO, rentalRequest); 
+        RentalRequest updatedRentalRequest = rentalRequestRepository.save(rentalRequest);
+        return modelMapper.map(updatedRentalRequest, RentalRequestDto.class);
+    }
 }
