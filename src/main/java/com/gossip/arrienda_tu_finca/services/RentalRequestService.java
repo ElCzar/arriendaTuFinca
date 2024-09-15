@@ -6,17 +6,31 @@ import java.util.Optional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.gossip.arrienda_tu_finca.repositories.RentalRequestRepository;
+import java.time.LocalDateTime;
+import java.time.LocalDate;
 
+import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
+import com.gossip.arrienda_tu_finca.repositories.RentalRequestRepository;
+import com.gossip.arrienda_tu_finca.repositories.UserRepository;
+import com.gossip.arrienda_tu_finca.dto.PropertyCreateDTO;
+import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
+import com.gossip.arrienda_tu_finca.dto.RentalRequestCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
+import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.entities.RentalRequest;
+import com.gossip.arrienda_tu_finca.exceptions.InvalidAmountOfResidentsException;
+import com.gossip.arrienda_tu_finca.exceptions.InvalidDateException;
+import com.gossip.arrienda_tu_finca.exceptions.PropertyNotFoundException;
 import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
+import com.gossip.arrienda_tu_finca.exceptions.UserNotFoundException;
 
 @Service
 public class RentalRequestService {
 
     private final RentalRequestRepository rentalRequestRepository;
     private final ModelMapper modelMapper;
+    private UserRepository userRepository;
+    private PropertyRepository propertyRepository;
     private static final String RENTAL_REQUEST_NOT_FOUND = "Solicitud de arriendo no encontrada";
 
     @Autowired
@@ -150,6 +164,49 @@ public class RentalRequestService {
         } else {
             throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
         }
+    }
+
+    // Crear solicitud de arriendo
+    public RentalRequestDto createRentalRequest(Long propertyId, RentalRequestCreateDTO rentalRequestCreateDTO) {
+
+        RentalRequest rentalRequest = modelMapper.map(rentalRequestCreateDTO,RentalRequest.class);
+  
+        Long userId = userRepository.findIdByEmail(rentalRequestCreateDTO.getRequesterEmail());
+
+        if (userId == null) {
+            throw new PropertyNotFoundException("Usuario con email " + rentalRequestCreateDTO.getRequesterEmail() + " mo fue encontrado");
+        }
+
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new PropertyNotFoundException("Propiedad con ID " + propertyId + " no fue encontrada"));
+
+        LocalDate today = LocalDate.now();
+        if (rentalRequestCreateDTO.getStartDate().isBefore(today)) {
+            throw new InvalidDateException("La fecha inicial no puede ser anterior a la fecha actual");
+        }
+        if (rentalRequestCreateDTO.getEndDate().isBefore(rentalRequestCreateDTO.getStartDate().plusDays(1))) {
+            throw new InvalidDateException("La fecha final no puede ser anterior a un día posterior a la fecha inicial");
+        }
+
+        if (rentalRequestCreateDTO.getAmountOfResidents() > property.getAmountOfResidents()) {
+            throw new InvalidAmountOfResidentsException("La cantidad de residentes no puede ser superior a la permitida en la propiedad");
+        }
+
+        rentalRequest.setProperty(property);
+        rentalRequest.setRequester(userRepository.findById(userId).get());
+        rentalRequest.setRequestDateTime(LocalDateTime.now()); 
+        rentalRequest.setAccepted(false); 
+        rentalRequest.setRejected(false);
+        rentalRequest.setCanceled(false); 
+        rentalRequest.setPaid(false);
+        rentalRequest.setReviewed(false); 
+        rentalRequest.setReviewedLessor(false);
+        rentalRequest.setReviewedProperty(false);
+        rentalRequest.setCompleted(false); 
+        rentalRequest.setApproved(false);
+
+        RentalRequest savedRentalRequest = rentalRequestRepository.save(rentalRequest);
+        return modelMapper.map(savedRentalRequest, RentalRequestDto.class);
     }
 
 }

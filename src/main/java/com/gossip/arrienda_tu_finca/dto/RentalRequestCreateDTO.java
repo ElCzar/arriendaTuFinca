@@ -1,6 +1,8 @@
 package com.gossip.arrienda_tu_finca.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,6 +17,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RentalRequestCreateDTO {
+
+    @NotBlank(message = "Requester email is required")
+    private String requesterEmail;  
 
     @NotBlank(message = "Start date is required")
     private LocalDate startDate;

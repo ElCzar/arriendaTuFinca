@@ -11,11 +11,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gossip.arrienda_tu_finca.dto.RentalRequestCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
 import com.gossip.arrienda_tu_finca.services.RentalRequestService;
+
+import jakarta.validation.Valid;
+
 import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
 
 @RestController
@@ -118,5 +123,13 @@ public class RentalRequestController {
     public ResponseEntity<String> reviewProperty(@PathVariable Long requestId) {
         rentalRequestService.reviewProperty(requestId);
         return new ResponseEntity<>("Propiedad calificada", HttpStatus.OK);
+    }
+
+    // Crear solicitud de arriendo (Usa RentalRequestCreateDTO)
+    @PostMapping("/create/{propertyId}")
+    public ResponseEntity<RentalRequestDto> createRentalRequest(@PathVariable Long propertyId, @Valid @RequestBody RentalRequestCreateDTO rentalRequestCreateDTO) {
+
+        RentalRequestDto createdRentalRequest = rentalRequestService.createRentalRequest(propertyId, rentalRequestCreateDTO);
+        return ResponseEntity.ok(createdRentalRequest);
     }
 }
