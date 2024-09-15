@@ -20,7 +20,7 @@ public class RentalRequestViewDTO {
     private LocalDate departureDate; 
     private Double amount;  
     private boolean paid;
-    private boolean reviewedLessor;
-    private boolean reviewedProperty;
+    private boolean isLessorReviewed;
+    private boolean isPropertyReviewed;
 
 }

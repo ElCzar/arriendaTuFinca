@@ -24,6 +24,7 @@ import com.gossip.arrienda_tu_finca.entities.RentalRequest;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidAmountOfResidentsException;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidDateException;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidPaymentException;
+import com.gossip.arrienda_tu_finca.exceptions.InvalidReviewException;
 import com.gossip.arrienda_tu_finca.exceptions.PropertyNotFoundException;
 import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
 import com.gossip.arrienda_tu_finca.exceptions.UserNotFoundException;
@@ -149,21 +150,29 @@ public class RentalRequestService {
         Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
         if (optionalRequest.isPresent()) {
             RentalRequest request = optionalRequest.get();
-          
-            request.setReviewedLessor(true);
+
+            if (request.isLessorReviewed()) {
+                throw new InvalidReviewException("La calificación del arrendador ya fue realizada.");
+            }
+
+            request.setLessorReviewed(true);
             rentalRequestRepository.save(request);
         } else {
             throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
         }
     }
 
-    // Calificar arrendatario
+    // Calificar propiedad
     public void reviewProperty(Long requestId) {
         Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
         if (optionalRequest.isPresent()) {
             RentalRequest request = optionalRequest.get();
+
+            if (request.isPropertyReviewed()) {
+                throw new InvalidReviewException("La calificación de la propiedad ya fue realizada.");
+            }
           
-            request.setReviewedProperty(true);
+            request.setPropertyReviewed(true);
             rentalRequestRepository.save(request);
         } else {
             throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
@@ -204,8 +213,8 @@ public class RentalRequestService {
         rentalRequest.setCanceled(false); 
         rentalRequest.setPaid(false);
         rentalRequest.setReviewed(false); 
-        rentalRequest.setReviewedLessor(false);
-        rentalRequest.setReviewedProperty(false);
+        rentalRequest.setLessorReviewed(false);
+        rentalRequest.setPropertyReviewed(false);
         rentalRequest.setCompleted(false); 
         rentalRequest.setApproved(false);
         rentalRequest.setExpired(false);
