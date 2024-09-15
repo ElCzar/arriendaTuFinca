@@ -49,5 +49,7 @@ public class RentalRequest {
     private boolean reviewedProperty;
     private boolean completed;
     private boolean approved;
+    private String bank;
+    private Integer accountNumber;
 }
 
