@@ -13,11 +13,9 @@ import java.time.LocalDate;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 import com.gossip.arrienda_tu_finca.repositories.RentalRequestRepository;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
-import com.gossip.arrienda_tu_finca.dto.PaymentDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
-import com.gossip.arrienda_tu_finca.dto.RentalRequestViewDTO;
 import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.entities.RentalRequest;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidAmountOfResidentsException;
@@ -165,6 +163,15 @@ public class RentalRequestService {
         Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
         if (optionalRequest.isPresent()) {
             RentalRequest request = optionalRequest.get();
+            if (!request.isAccepted()) {
+                throw new InvalidPaymentException("La solicitud de arriendo no ha sido aceptada.");
+             }
+             if (request.isPaid()) {
+                throw new InvalidPaymentException("La solicitud de arriendo ya ha sido pagada.");
+             }
+             if (request.isExpired()) {
+                 throw new InvalidPaymentException("La solicitud de arriendo ha expirado.");
+             }
             request.setPaid(true);
             rentalRequestRepository.save(request);
             return request;
@@ -220,26 +227,5 @@ public class RentalRequestService {
         return rentalRequests.stream()
             .map(request -> modelMapper.map(request, RentalRequestDto.class)) // Mapea la entidad a DTO
             .collect(Collectors.toList());
-    }
-
-    // Realizar el pago de una solicitud de arriendo
-    public RentalRequestDto payRequest(Long requestId, PaymentDTO paymentDTO) {
-        RentalRequest rentalRequest = rentalRequestRepository.findById(requestId)
-        .orElseThrow(() -> new RentalRequestNotFoundException("Solicitud de arriendo con ID" + requestId + " no fue encontrada"));
-         
-        if (!rentalRequest.isAccepted()) {
-           throw new InvalidPaymentException("La solicitud de arriendo no ha sido aceptada.");
-        }
-        if (rentalRequest.isPaid()) {
-           throw new InvalidPaymentException("La solicitud de arriendo ya ha sido pagada.");
-        }
-        if (rentalRequest.isExpired()) {
-            throw new InvalidPaymentException("La solicitud de arriendo ha expirado.");
-        }
-
-        rentalRequest.setPaid(true);
-        modelMapper.map(paymentDTO, rentalRequest); 
-        RentalRequest updatedRentalRequest = rentalRequestRepository.save(rentalRequest);
-        return modelMapper.map(updatedRentalRequest, RentalRequestDto.class);
     }
 }

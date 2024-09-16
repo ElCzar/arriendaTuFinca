@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gossip.arrienda_tu_finca.dto.PaymentDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
-import com.gossip.arrienda_tu_finca.dto.RentalRequestViewDTO;
 import com.gossip.arrienda_tu_finca.services.RentalRequestService;
 
 import jakarta.validation.Valid;
@@ -131,12 +129,5 @@ public class RentalRequestController {
     public ResponseEntity<List<RentalRequestDto>> getRequestsByRequesterEmail(@PathVariable String email) {
         List<RentalRequestDto> rentalRequests = rentalRequestService.getRequestsByRequesterEmail(email);
         return ResponseEntity.ok(rentalRequests);
-    }
-
-    // Pagar solicitud de arriendo
-    @PostMapping("/{requestId}/pay")
-    public ResponseEntity<RentalRequestDto> payRequest(@PathVariable Long requestId, @Valid @RequestBody PaymentDTO paymentDTO) {
-        RentalRequestDto updatedRentalRequest = rentalRequestService.payRequest(requestId, paymentDTO);
-        return ResponseEntity.ok(updatedRentalRequest); 
     }
 }
