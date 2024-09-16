@@ -166,4 +166,50 @@ class TestRentalRequestController {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Solicitud de arriendo pagada", response.getBody());
     }
+
+    // Arrendatario
+
+    @Test
+    void testReviewLessor() throws Exception {
+        Long requestId = 1L;
+
+        mockMvc.perform(put("/rental-requests/{requestId}/reviewLessor", requestId))
+                .andExpect(status().isOk());
+
+        ResponseEntity<String> response = rentalRequestController.reviewLessor(requestId);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Arrendador calificado", response.getBody());
+    }
+ 
+    @Test
+    void testReviewProperty() throws Exception {
+        Long requestId = 1L;
+
+        mockMvc.perform(put("/rental-requests/{requestId}/reviewProperty", requestId))
+                .andExpect(status().isOk());
+
+        ResponseEntity<String> response = rentalRequestController.reviewProperty(requestId);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Propiedad calificada", response.getBody());
+    }
+
+    @Test
+    void testGetRequestsByRequesterEmail() throws Exception {
+        String email = "requester@example.com";
+        
+        // Crear una propiedad y asignarla a RentalRequest
+        Property property = new Property();
+        property.setId(1L); // Asignar un ID a la propiedad
+        
+        RentalRequest rentalRequest = new RentalRequest();
+        rentalRequest.setProperty(property); // Asignar la propiedad a RentalRequest
+        
+        List<RentalRequest> rentalRequests = Arrays.asList(rentalRequest);
+    
+        // Mock del servicio para devolver una lista de RentalRequest
+        when(rentalRequestService.getRequestsByRequesterEmail(email)).thenReturn(rentalRequests);
+    
+        mockMvc.perform(get("/rental-requests/requester/{email}", email))
+                .andExpect(status().isOk());
+    }
 }

@@ -217,15 +217,11 @@ public class RentalRequestService {
     }
 
     // Obtener las solicitudes de arriendo de un requester (email)
-    public List<RentalRequestDto> getRequestsByRequesterEmail(String requesterEmail) {
-        List<RentalRequest> rentalRequests = rentalRequestRepository.findByRequesterEmailOrderByRequestDateTime(requesterEmail);
-
-        if (rentalRequests.isEmpty()) {
-            throw new RentalRequestNotFoundException("No se encontraron solicitudes de arriendo para el arrendatario con email: "  + requesterEmail);
+    public List<RentalRequest> getRequestsByRequesterEmail(String requesterEmail) {
+        List<RentalRequest> requests = rentalRequestRepository.findByRequesterEmailOrderByRequestDateTime(requesterEmail);
+        if (requests.isEmpty()) {
+            throw new RentalRequestNotFoundException("No se encontraron solicitudes de arriendo para el propietario con email: " + requesterEmail);
         }
-
-        return rentalRequests.stream()
-            .map(request -> modelMapper.map(request, RentalRequestDto.class)) // Mapea la entidad a DTO
-            .collect(Collectors.toList());
+        return requests;
     }
 }

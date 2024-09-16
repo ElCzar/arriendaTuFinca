@@ -111,14 +111,14 @@ public class RentalRequestController {
     // Arrendatario
 
     // Calificar arrendador
-    @PutMapping("/{requestId}/review")
+    @PutMapping("/{requestId}/reviewLessor")
     public ResponseEntity<String> reviewLessor(@PathVariable Long requestId) {
         rentalRequestService.reviewLessor(requestId);
         return new ResponseEntity<>("Arrendador calificado", HttpStatus.OK);
     }
 
     // Calificar arrendatario
-    @PutMapping("/{requestId}/review")
+    @PutMapping("/{requestId}/reviewProperty")
     public ResponseEntity<String> reviewProperty(@PathVariable Long requestId) {
         rentalRequestService.reviewProperty(requestId);
         return new ResponseEntity<>("Propiedad calificada", HttpStatus.OK);
@@ -127,7 +127,11 @@ public class RentalRequestController {
     // Obtener todas las solicitudes de arriendo de un requester (email)
     @GetMapping("/requester/{email}")
     public ResponseEntity<List<RentalRequestDto>> getRequestsByRequesterEmail(@PathVariable String email) {
-        List<RentalRequestDto> rentalRequests = rentalRequestService.getRequestsByRequesterEmail(email);
-        return ResponseEntity.ok(rentalRequests);
+        List<RentalRequestDto> requests = rentalRequestService.getRequestsByRequesterEmail(email)
+            .stream()
+            .map( request -> modelMapper.map(request, RentalRequestDto.class))
+            .collect(Collectors.toList());
+        return new ResponseEntity<>(requests, HttpStatus.OK);
     }
+
 }
