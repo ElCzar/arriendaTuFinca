@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
-import com.gossip.arrienda_tu_finca.dto.PropertyShowDTO;
 import com.gossip.arrienda_tu_finca.entities.Property;
 
 @Repository // Añadir esta anotación para asegurarte de que Spring la detecte como un repositorio

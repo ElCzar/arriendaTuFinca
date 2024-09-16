@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.gossip.arrienda_tu_finca.dto.PropertyCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
-import com.gossip.arrienda_tu_finca.dto.PropertyShowDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyUpdateDTO;
 import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.exceptions.PropertyNotFoundException;
@@ -93,35 +92,35 @@ public class PropertyService {
     // Arrendatario
 
     // Obtener todas las propiedades de un municipio aleatorio
-    public List<PropertyShowDTO> findPropertiesByRandomMunicipality() {
+    public List<PropertyDTO> findPropertiesByRandomMunicipality() {
         String randomMunicipality = propertyRepository.findRandomMunicipality();
         List<Property> properties = propertyRepository.findPropertiesByMunicipality(randomMunicipality);
         return properties.stream()
-                .map(property -> modelMapper.map(property, PropertyShowDTO.class)) 
+                .map(property -> modelMapper.map(property, PropertyDTO.class)) 
                 .collect(Collectors.toList());
     }
 
     // Obtener todas las propiedades con un nombre especifico
-    public List<PropertyShowDTO> findPropertiesByName(String name) {
+    public List<PropertyDTO> findPropertiesByName(String name) {
         List<Property> properties = propertyRepository.findPropertiesByName(name);
         return properties.stream()
-                .map(property -> modelMapper.map(property, PropertyShowDTO.class)) 
+                .map(property -> modelMapper.map(property, PropertyDTO.class)) 
                 .collect(Collectors.toList());
     }
 
     // Obtener todas las propiedades de un municipio especifico
-    public List<PropertyShowDTO> findPropertiesByMunicipality(String municipality) {
+    public List<PropertyDTO> findPropertiesByMunicipality(String municipality) {
         List<Property> properties = propertyRepository.findPropertiesByMunicipality(municipality);
         return properties.stream()
-                .map(property -> modelMapper.map(property, PropertyShowDTO.class)) 
+                .map(property -> modelMapper.map(property, PropertyDTO.class)) 
                 .collect(Collectors.toList());
     }
 
     // Obtener todas las propiedades con una cantidad de residentes especifica
-    public List<PropertyShowDTO> findPropertiesByAmountOfResidents(Integer amountOfResidents) {
+    public List<PropertyDTO> findPropertiesByAmountOfResidents(Integer amountOfResidents) {
         List<Property> properties = propertyRepository.findPropertiesByAmountOfResidents(amountOfResidents);
         return properties.stream()
-                .map(property -> modelMapper.map(property, PropertyShowDTO.class)) 
+                .map(property -> modelMapper.map(property, PropertyDTO.class)) 
                 .collect(Collectors.toList());
     }
 }
