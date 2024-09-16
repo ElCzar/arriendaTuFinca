@@ -210,7 +210,7 @@ public class RentalRequestService {
     }
 
     // Obtener las solicitudes de arriendo de un requester (email)
-    public List<RentalRequestViewDTO> getRequestsByRequesterEmail(String requesterEmail) {
+    public List<RentalRequestDto> getRequestsByRequesterEmail(String requesterEmail) {
         List<RentalRequest> rentalRequests = rentalRequestRepository.findByRequesterEmailOrderByRequestDateTime(requesterEmail);
 
         if (rentalRequests.isEmpty()) {
@@ -218,7 +218,7 @@ public class RentalRequestService {
         }
 
         return rentalRequests.stream()
-            .map(request -> modelMapper.map(request, RentalRequestViewDTO.class)) // Mapea la entidad a DTO
+            .map(request -> modelMapper.map(request, RentalRequestDto.class)) // Mapea la entidad a DTO
             .collect(Collectors.toList());
     }
 

@@ -128,8 +128,8 @@ public class RentalRequestController {
 
     // Obtener todas las solicitudes de arriendo de un requester (email)
     @GetMapping("/requester/{email}")
-    public ResponseEntity<List<RentalRequestViewDTO>> getRequestsByRequesterEmail(@PathVariable String email) {
-        List<RentalRequestViewDTO> rentalRequests = rentalRequestService.getRequestsByRequesterEmail(email);
+    public ResponseEntity<List<RentalRequestDto>> getRequestsByRequesterEmail(@PathVariable String email) {
+        List<RentalRequestDto> rentalRequests = rentalRequestService.getRequestsByRequesterEmail(email);
         return ResponseEntity.ok(rentalRequests);
     }
 
