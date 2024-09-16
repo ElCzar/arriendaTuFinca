@@ -16,7 +16,6 @@ import com.gossip.arrienda_tu_finca.repositories.UserRepository;
 import com.gossip.arrienda_tu_finca.dto.PaymentDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
-import com.gossip.arrienda_tu_finca.dto.RentalRequestCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestViewDTO;
 import com.gossip.arrienda_tu_finca.entities.Property;
@@ -44,9 +43,40 @@ public class RentalRequestService {
         this.modelMapper = modelMapper;
     }
 
-    public void createRequest(RentalRequestDto rentalRequest) {
+    public void createRequest(Long propertyId, RentalRequestDto rentalRequest) {
         RentalRequest request = modelMapper.map(rentalRequest, RentalRequest.class);
+        Long userId = userRepository.findIdByEmail(rentalRequest.getRequesterEmail());
+        if (userId == null) {
+            throw new PropertyNotFoundException("Usuario con email " + rentalRequest.getRequesterEmail() + " mo fue encontrado");
+        }
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new PropertyNotFoundException("Propiedad con ID " + propertyId + " no fue encontrada"));
+        LocalDate today = LocalDate.now();
+        if (rentalRequest.getArrivalDate().isBefore(today)) {
+            throw new InvalidDateException("La fecha inicial no puede ser anterior a la fecha actual");
+        }
+        if (rentalRequest.getDepartureDate().isBefore(rentalRequest.getArrivalDate().plusDays(1))) {
+            throw new InvalidDateException("La fecha final no puede ser anterior a un día posterior a la fecha inicial");
+        }
+
+        if (rentalRequest.getAmountOfResidents() > property.getAmountOfResidents()) {
+            throw new InvalidAmountOfResidentsException("La cantidad de residentes no puede ser superior a la permitida en la propiedad");
+        }
         rentalRequestRepository.save(request);
+
+        request.setProperty(property);
+        request.setRequester(userRepository.findById(userId).get());
+        request.setRequestDateTime(LocalDateTime.now()); 
+        request.setAccepted(false); 
+        request.setRejected(false);
+        request.setCanceled(false); 
+        request.setPaid(false);
+        request.setReviewed(false); 
+        request.setLessorReviewed(false);
+        request.setPropertyReviewed(false);
+        request.setCompleted(false); 
+        request.setApproved(false);
+        request.setExpired(false);
     }
     
     public List<RentalRequest> getRequestsByProperty(Long propertyId) {
@@ -177,50 +207,6 @@ public class RentalRequestService {
         } else {
             throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
         }
-    }
-
-    // Crear solicitud de arriendo
-    public RentalRequestDto createRentalRequest(Long propertyId, RentalRequestCreateDTO rentalRequestCreateDTO) {
-
-        RentalRequest rentalRequest = modelMapper.map(rentalRequestCreateDTO,RentalRequest.class);
-  
-        Long userId = userRepository.findIdByEmail(rentalRequestCreateDTO.getRequesterEmail());
-
-        if (userId == null) {
-            throw new PropertyNotFoundException("Usuario con email " + rentalRequestCreateDTO.getRequesterEmail() + " mo fue encontrado");
-        }
-
-        Property property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new PropertyNotFoundException("Propiedad con ID " + propertyId + " no fue encontrada"));
-
-        LocalDate today = LocalDate.now();
-        if (rentalRequestCreateDTO.getStartDate().isBefore(today)) {
-            throw new InvalidDateException("La fecha inicial no puede ser anterior a la fecha actual");
-        }
-        if (rentalRequestCreateDTO.getEndDate().isBefore(rentalRequestCreateDTO.getStartDate().plusDays(1))) {
-            throw new InvalidDateException("La fecha final no puede ser anterior a un día posterior a la fecha inicial");
-        }
-
-        if (rentalRequestCreateDTO.getAmountOfResidents() > property.getAmountOfResidents()) {
-            throw new InvalidAmountOfResidentsException("La cantidad de residentes no puede ser superior a la permitida en la propiedad");
-        }
-
-        rentalRequest.setProperty(property);
-        rentalRequest.setRequester(userRepository.findById(userId).get());
-        rentalRequest.setRequestDateTime(LocalDateTime.now()); 
-        rentalRequest.setAccepted(false); 
-        rentalRequest.setRejected(false);
-        rentalRequest.setCanceled(false); 
-        rentalRequest.setPaid(false);
-        rentalRequest.setReviewed(false); 
-        rentalRequest.setLessorReviewed(false);
-        rentalRequest.setPropertyReviewed(false);
-        rentalRequest.setCompleted(false); 
-        rentalRequest.setApproved(false);
-        rentalRequest.setExpired(false);
-
-        RentalRequest savedRentalRequest = rentalRequestRepository.save(rentalRequest);
-        return modelMapper.map(savedRentalRequest, RentalRequestDto.class);
     }
 
     // Obtener las solicitudes de arriendo de un requester (email)

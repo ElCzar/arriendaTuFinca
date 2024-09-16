@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gossip.arrienda_tu_finca.dto.PaymentDTO;
-import com.gossip.arrienda_tu_finca.dto.RentalRequestCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestViewDTO;
 import com.gossip.arrienda_tu_finca.services.RentalRequestService;
@@ -37,9 +36,9 @@ public class RentalRequestController {
         this.modelMapper = modelMapper;
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<String> createRequest(RentalRequestDto rentalRequest) {
-        rentalRequestService.createRequest(rentalRequest);
+    @PostMapping("/create/{propertyId}")
+    public ResponseEntity<String> createRequest(Long propertyId, RentalRequestDto rentalRequest) {
+        rentalRequestService.createRequest(propertyId, rentalRequest);
         return new ResponseEntity<>("Solicitud de arriendo creada", HttpStatus.OK);
     }
 
@@ -125,14 +124,6 @@ public class RentalRequestController {
     public ResponseEntity<String> reviewProperty(@PathVariable Long requestId) {
         rentalRequestService.reviewProperty(requestId);
         return new ResponseEntity<>("Propiedad calificada", HttpStatus.OK);
-    }
-
-    // Crear solicitud de arriendo (Usa RentalRequestCreateDTO)
-    @PostMapping("/create/{propertyId}")
-    public ResponseEntity<RentalRequestDto> createRentalRequest(@PathVariable Long propertyId, @Valid @RequestBody RentalRequestCreateDTO rentalRequestCreateDTO) {
-
-        RentalRequestDto createdRentalRequest = rentalRequestService.createRentalRequest(propertyId, rentalRequestCreateDTO);
-        return ResponseEntity.ok(createdRentalRequest);
     }
 
     // Obtener todas las solicitudes de arriendo de un requester (email)
