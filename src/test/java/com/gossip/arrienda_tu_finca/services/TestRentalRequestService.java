@@ -236,6 +236,7 @@ class TestRentalRequestService {
     void givenValidRequestId_whenPayRequest_thenRequestShouldBePaid() {
         // Given
         RentalRequest request = new RentalRequest();
+        request.setAccepted(true);
         request = rentalRequestRepository.save(request);
 
         // When

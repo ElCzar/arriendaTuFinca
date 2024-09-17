@@ -373,7 +373,7 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
         propertyRepository.save(property2);
 
         // Act & Assert
-        mvc.perform(MockMvcRequestBuilders.get("/random-municipality")
+        mvc.perform(MockMvcRequestBuilders.get("/property/random-municipality")
                 .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
@@ -401,7 +401,7 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
         propertyRepository.save(property2);
 
         // Act & Assert
-        mvc.perform(MockMvcRequestBuilders.get("/properties/name/Finca Bella")
+        mvc.perform(MockMvcRequestBuilders.get("/property/name/Finca Bella")
                 .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
@@ -416,11 +416,12 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
     @Description("Test to get properties by invalid name")
     void givenInvalidPropertyName_whenGetPropertiesByName_thenNotFound() throws Exception {
         // Act & Assert
-        mvc.perform(MockMvcRequestBuilders.get("/properties/name/Villa Maria")
+        mvc.perform(MockMvcRequestBuilders.get("/property/name/NombreInvalido")
                 .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())  // Debe devolver 404 Not Found
-                .andExpect(MockMvcResultMatchers.content().string("Properties with name InvalidName not found"));  // Verifica el mensaje
+                .andExpect(MockMvcResultMatchers.content().string("Propiedades con el nombre NombreInvalido no fueron encontradas"));  // Verifica el mensaje
     }
+    
 
     // 15. Caso de éxito: Obtener todas las propiedades que hagan parte de un municipio en especifico
     @Test
@@ -442,7 +443,7 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
         propertyRepository.save(property2);
     
         // Act & Assert
-        mvc.perform(MockMvcRequestBuilders.get("/properties/municipality/Bogota")
+        mvc.perform(MockMvcRequestBuilders.get("/property/municipality/Bogota")
                 .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
@@ -458,10 +459,10 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
     @Description("Test to get properties by invalid municipality")
     void givenInvalidMunicipality_whenGetPropertiesByMunicipality_thenNotFound() throws Exception {
         // Act & Assert
-        mvc.perform(MockMvcRequestBuilders.get("/properties/municipality/Barranquilla")
+        mvc.perform(MockMvcRequestBuilders.get("/property/municipality/Barranquilla")
                 .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())  // Debe devolver 404 Not Found
-                .andExpect(MockMvcResultMatchers.content().string("Properties with municipality InvalidMunicipality not found"));  // Verifica el mensaje
+                .andExpect(MockMvcResultMatchers.content().string("Propiedades del municipio Barranquilla no fueron encontradas"));  // Verifica el mensaje
     }
 
     // 17. Caso de éxito: Obtener todas las propiedades que tengan una cantidad de residentes en especifico
@@ -486,7 +487,7 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
         propertyRepository.save(property2);
     
         // Act & Assert
-        mvc.perform(MockMvcRequestBuilders.get("/properties/residents/4")
+        mvc.perform(MockMvcRequestBuilders.get("/property/residents/4")
                 .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
@@ -501,10 +502,10 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
     @Description("Test to get properties by invalid amount of residents")
     void givenInvalidAmountOfResidents_whenGetPropertiesByAmountOfResidents_thenNotFound() throws Exception {
         // Act & Assert
-        mvc.perform(MockMvcRequestBuilders.get("/properties/residents/999")
+        mvc.perform(MockMvcRequestBuilders.get("/property/residents/999")
                 .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())  // Debe devolver 404 Not Found
-                .andExpect(MockMvcResultMatchers.content().string("Properties with amount of residents 999 not found"));  // Verifica el mensaje
+                .andExpect(MockMvcResultMatchers.content().string("Propiedades con cantidad de residentes 999 no fueron encontradas"));  // Verifica el mensaje
     }
 }
 

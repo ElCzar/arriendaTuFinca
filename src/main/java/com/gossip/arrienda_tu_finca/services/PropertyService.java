@@ -103,6 +103,9 @@ public class PropertyService {
     // Obtener todas las propiedades con un nombre especifico
     public List<PropertyDTO> findPropertiesByName(String name) {
         List<Property> properties = propertyRepository.findPropertiesByName(name);
+        if (properties.isEmpty()) {
+            throw new PropertyNotFoundException("Propiedades con el nombre " + name + " no fueron encontradas");
+        }
         return properties.stream()
                 .map(property -> modelMapper.map(property, PropertyDTO.class)) 
                 .collect(Collectors.toList());
@@ -111,6 +114,9 @@ public class PropertyService {
     // Obtener todas las propiedades de un municipio especifico
     public List<PropertyDTO> findPropertiesByMunicipality(String municipality) {
         List<Property> properties = propertyRepository.findPropertiesByMunicipality(municipality);
+        if (properties.isEmpty()) {
+            throw new PropertyNotFoundException("Propiedades del municipio " + municipality + " no fueron encontradas");
+        }
         return properties.stream()
                 .map(property -> modelMapper.map(property, PropertyDTO.class)) 
                 .collect(Collectors.toList());
@@ -119,6 +125,9 @@ public class PropertyService {
     // Obtener todas las propiedades con una cantidad de residentes especifica
     public List<PropertyDTO> findPropertiesByAmountOfResidents(Integer amountOfResidents) {
         List<Property> properties = propertyRepository.findPropertiesByAmountOfResidents(amountOfResidents);
+        if (properties.isEmpty()) {
+            throw new PropertyNotFoundException("Propiedades con cantidad de residentes " + amountOfResidents + " no fueron encontradas");
+        }
         return properties.stream()
                 .map(property -> modelMapper.map(property, PropertyDTO.class)) 
                 .collect(Collectors.toList());
