@@ -319,21 +319,6 @@ class TestRentalRequestService {
     @DirtiesContext
     @Transactional
     @Description("Given a requester has no requests should return a NOT FOUND status")
-    void givenValidUserEmailButNoRequest_whenGetRequestByRequester_thenReceiveNotFoundError(){
-        // Given
-        User user = new User();
-        user.setEmail("example@example.com");
-        user.setPassword("123456");
-        userRepository.save(user);
-
-        // When and Then
-        assertThrows(RentalRequestNotFoundException.class, () -> rentalRequestService.getRequestsByRequesterEmail("example@example.com"));
-    }
-
-    @Test
-    @DirtiesContext
-    @Transactional
-    @Description("Given a requester has no requests should return a NOT FOUND status")
     void givenValidRequesterEmailButNoRequest_whenGetRequestByRequester_thenReceiveNotFoundError(){
         // Given
         User requester = new User();
@@ -344,10 +329,5 @@ class TestRentalRequestService {
         // When and Then
         assertThrows(RentalRequestNotFoundException.class, () -> rentalRequestService.getRequestsByRequesterEmail("requester@example.com"));
     }
-
-
-
-    
-
 
 }
