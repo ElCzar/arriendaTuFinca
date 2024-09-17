@@ -19,7 +19,7 @@ import com.gossip.arrienda_tu_finca.dto.UserInfoDTO;
 import com.gossip.arrienda_tu_finca.services.UserService;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/user")
 public class UserController {
     private final UserService userService;
 
