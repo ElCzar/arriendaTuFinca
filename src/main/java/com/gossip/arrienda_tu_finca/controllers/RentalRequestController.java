@@ -11,14 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
 import com.gossip.arrienda_tu_finca.services.RentalRequestService;
-
-import jakarta.validation.Valid;
 
 import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
 
@@ -35,7 +32,7 @@ public class RentalRequestController {
     }
 
     @PostMapping("/create/{propertyId}")
-    public ResponseEntity<String> createRequest(Long propertyId, RentalRequestDto rentalRequest) {
+    public ResponseEntity<String> createRequest(@PathVariable Long propertyId, RentalRequestDto rentalRequest) {
         rentalRequestService.createRequest(propertyId, rentalRequest);
         return new ResponseEntity<>("Solicitud de arriendo creada", HttpStatus.OK);
     }

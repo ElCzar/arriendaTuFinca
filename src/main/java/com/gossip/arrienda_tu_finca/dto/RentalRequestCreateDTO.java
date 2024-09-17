@@ -1,7 +1,6 @@
 package com.gossip.arrienda_tu_finca.dto;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 
 import jakarta.validation.constraints.NotBlank;

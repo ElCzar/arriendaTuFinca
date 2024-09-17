@@ -2,7 +2,6 @@ package com.gossip.arrienda_tu_finca.services;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +12,6 @@ import java.time.LocalDate;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 import com.gossip.arrienda_tu_finca.repositories.RentalRequestRepository;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
-import com.gossip.arrienda_tu_finca.dto.PropertyCreateDTO;
-import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
 import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.entities.RentalRequest;
@@ -24,7 +21,6 @@ import com.gossip.arrienda_tu_finca.exceptions.InvalidPaymentException;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidReviewException;
 import com.gossip.arrienda_tu_finca.exceptions.PropertyNotFoundException;
 import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
-import com.gossip.arrienda_tu_finca.exceptions.UserNotFoundException;
 
 @Service
 public class RentalRequestService {
