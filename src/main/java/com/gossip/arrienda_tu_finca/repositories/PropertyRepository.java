@@ -20,7 +20,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
     List<Property> findAllByOwnerEmail(@Param("email") String ownerEmail);
 
     // Consulta personalizada para obtener una propiedad como DTO usando su ID
-    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyDTO(p.id, p.name, p.description, p.municipality, p.typeOfEntrance, p.address, p.isAvailable, p.pricePerNight, p.amountOfRooms, p.amountOfBathrooms, p.isPetFriendly, p.hasPool, p.hasGril, p.owner.email) FROM Property p WHERE p.id = :propertyId")
+    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyDTO(p.id, p.name, p.description, p.municipality, p.department, p.typeOfEntrance, p.address, p.link, p.isAvailable, p.pricePerNight, p.amountOfRooms, p.amountOfBathrooms, p.amountOfResidents, p.isPetFriendly, p.hasPool, p.hasGril, p.owner.email) FROM Property p WHERE p.id = :propertyId")
     PropertyDTO findPropertyDTOById(@Param("propertyId") Long propertyId);
 
     // Encuentra todas las propiedades disponibles (activas)
@@ -40,5 +40,24 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
     @Transactional // Importante para los métodos que modifican la base de datos
     @Query("UPDATE Property p SET p.isAvailable = false WHERE p.id = :propertyId")
     void deactivatePropertyById(@Param("propertyId") Long propertyId);
+
+    // Arrendatario
+
+    // Encuentra todas las propiedades que pertenecen a un municipio aleatorio
+    @Query("SELECT p.municipality FROM Property p ORDER BY RAND()")
+    String findRandomMunicipality();
+
+    // Encuentra todas las propiedades con un nombre especifico
+    @Query("SELECT p FROM Property p WHERE p.name = :name")
+    List<Property> findPropertiesByName(@Param("name") String name);
+    
+    // Encuentra todas las propiedades de un municipio especifico
+    @Query("SELECT p FROM Property p WHERE p.municipality = :municipality")
+    List<Property> findPropertiesByMunicipality(@Param("municipality") String municipality);
+
+    // Encuentra todas las propiedades con una cantidad de residentes especifica
+    @Query("SELECT p FROM Property p WHERE p.amountOfResidents = :amountOfResidents")
+    List<Property> findPropertiesByAmountOfResidents(@Param("amountOfResidents") Integer amountOfResidents);
+
 }
 

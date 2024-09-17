@@ -69,11 +69,14 @@ class TestPropertyController {
             "name": "Finca La Esperanza",
             "description": "Hermosa finca en el campo",
             "municipality": "Medellin",
+            "department": "Antioquia",
             "typeOfEntrance": "Carretera",
             "address": "Km 10 via a El Retiro",
+            "link": "www.fincaesperanza.com",
             "pricePerNight": 150.0,
             "amountOfRooms": 3,
             "amountOfBathrooms": 2,
+            "amountOfResidents": 6,
             "isPetFriendly": true,
             "hasPool": true,
             "hasGril": true,
@@ -115,11 +118,14 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
         {
             "description": "Hermosa finca en el campo",
             "municipality": "Medellin",
+            "department": "Antioquia",
             "typeOfEntrance": "Carretera",
             "address": "Km 10 via a El Retiro",
+            "link": "www.fincaesperanza.com",
             "pricePerNight": 150.0,
             "amountOfRooms": 3,
             "amountOfBathrooms": 2,
+            "amountOfResidents": 5,
             "isPetFriendly": true,
             "hasPool": true,
             "hasGril": true,
@@ -189,9 +195,12 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
             "name": "Finca Actualizada",
             "description": "Finca con piscina",
             "municipality": "Bogota",
+            "department": "Bogotá D.C.",
+            "link": "www.fincaactualizada.com",
             "pricePerNight": 250.0,
             "amountOfRooms": 5,
             "amountOfBathrooms": 3,
+            "amountOfResidents": 4,
             "isPetFriendly": true,
             "hasPool": true,
             "hasGril": true
@@ -221,9 +230,12 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
             "name": "Finca Actualizada",
             "description": "Finca con piscina",
             "municipality": "Bogota",
+            "department": "Bogotá D.C.",
+            "link": "www.fincaactualizada.com",
             "pricePerNight": 250.0,
             "amountOfRooms": 5,
             "amountOfBathrooms": 3,
+            "amountOfResidents": 4,
             "isPetFriendly": true,
             "hasPool": true,
             "hasGril": true
@@ -311,8 +323,7 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
             .andExpect(MockMvcResultMatchers.status().isNotFound()); 
     }
     
-    
-    
+
     // 11. Caso de éxito: Obtener todas las propiedades
     @Test
     @DirtiesContext
@@ -338,6 +349,163 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value("Finca Bella"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1].name").value("Finca La Esperanza"));
+    }
+
+    // Arrendatario
+
+    // 12. Caso de éxito: Obtener todas las propiedades de un municipio aleatorio
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test to get all properties from a random municipality")
+    void givenPropertiesInRandomMunicipality_whenGetPropertiesByRandomMunicipality_thenReturnProperties() throws Exception {
+        // Arrange
+        Property property1 = new Property();
+        property1.setName("Finca Bella");
+        property1.setDescription("Hermosa finca");
+        property1.setMunicipality("Bogota");
+        propertyRepository.save(property1);
+
+        Property property2 = new Property();
+        property2.setName("Finca La Esperanza");
+        property2.setDescription("Finca en el campo");
+        property2.setMunicipality("Bogota");
+        propertyRepository.save(property2);
+
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.get("/property/random-municipality")
+                .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].municipality").value("Bogota"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].municipality").value("Bogota"));
+    }
+
+    // 13. Caso de éxito: Obtener todas las propiedades que coincidan con un nombre en especifico
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test to get properties by name")
+    void givenValidPropertyName_whenGetPropertiesByName_thenReturnProperties() throws Exception {
+        // Arrange
+        Property property1 = new Property();
+        property1.setName("Finca Bella");
+        property1.setDescription("Hermosa finca");
+        property1.setMunicipality("Bogota");
+        propertyRepository.save(property1);
+
+        Property property2 = new Property();
+        property2.setName("Finca Bella");
+        property2.setDescription("Finca en el campo");
+        property2.setMunicipality("Bogota");
+        propertyRepository.save(property2);
+
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.get("/property/name/Finca Bella")
+                .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value("Finca Bella"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].name").value("Finca Bella"));
+    }
+    
+    // 14. Caso de error: Obtener todas las propiedades que coincidan con un nombre invalido
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test to get properties by invalid name")
+    void givenInvalidPropertyName_whenGetPropertiesByName_thenNotFound() throws Exception {
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.get("/property/name/NombreInvalido")
+                .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())  // Debe devolver 404 Not Found
+                .andExpect(MockMvcResultMatchers.content().string("Propiedades con el nombre NombreInvalido no fueron encontradas"));  // Verifica el mensaje
+    }
+    
+
+    // 15. Caso de éxito: Obtener todas las propiedades que hagan parte de un municipio en especifico
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test to get properties by municipality")
+    void givenValidMunicipality_whenGetPropertiesByMunicipality_thenReturnProperties() throws Exception {
+        // Arrange
+        Property property1 = new Property();
+        property1.setName("Finca Bella");
+        property1.setDescription("Hermosa finca");
+        property1.setMunicipality("Bogota");
+        propertyRepository.save(property1);
+    
+        Property property2 = new Property();
+        property2.setName("Finca La Esperanza");
+        property2.setDescription("Finca en el campo");
+        property2.setMunicipality("Bogota");
+        propertyRepository.save(property2);
+    
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.get("/property/municipality/Bogota")
+                .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].municipality").value("Bogota"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].municipality").value("Bogota"));
+    }
+         
+
+    // 16. Caso de error: Obtener todas las propiedades que hagan parte de un municipio invalido
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test to get properties by invalid municipality")
+    void givenInvalidMunicipality_whenGetPropertiesByMunicipality_thenNotFound() throws Exception {
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.get("/property/municipality/Barranquilla")
+                .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())  // Debe devolver 404 Not Found
+                .andExpect(MockMvcResultMatchers.content().string("Propiedades del municipio Barranquilla no fueron encontradas"));  // Verifica el mensaje
+    }
+
+    // 17. Caso de éxito: Obtener todas las propiedades que tengan una cantidad de residentes en especifico
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test to get properties by amount of residents")
+    void givenValidAmountOfResidents_whenGetPropertiesByAmountOfResidents_thenReturnProperties() throws Exception {
+        // Arrange
+        Property property1 = new Property();
+        property1.setName("Finca Bella");
+        property1.setDescription("Hermosa finca");
+        property1.setMunicipality("Bogota");
+        property1.setAmountOfResidents(4);
+        propertyRepository.save(property1);
+    
+        Property property2 = new Property();
+        property2.setName("Finca La Esperanza");
+        property2.setDescription("Finca en el campo");
+        property2.setMunicipality("Bogota");
+        property2.setAmountOfResidents(4);
+        propertyRepository.save(property2);
+    
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.get("/property/residents/4")
+                .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].amountOfResidents").value(4))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].amountOfResidents").value(4));
+    }
+
+    // 18. Caso de error: Obtener todas las propiedades que tengan una cantidad de residentes invalida
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test to get properties by invalid amount of residents")
+    void givenInvalidAmountOfResidents_whenGetPropertiesByAmountOfResidents_thenNotFound() throws Exception {
+        // Act & Assert
+        mvc.perform(MockMvcRequestBuilders.get("/property/residents/999")
+                .contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())  // Debe devolver 404 Not Found
+                .andExpect(MockMvcResultMatchers.content().string("Propiedades con cantidad de residentes 999 no fueron encontradas"));  // Verifica el mensaje
     }
 }
 

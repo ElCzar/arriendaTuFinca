@@ -236,6 +236,7 @@ class TestRentalRequestService {
     void givenValidRequestId_whenPayRequest_thenRequestShouldBePaid() {
         // Given
         RentalRequest request = new RentalRequest();
+        request.setAccepted(true);
         request = rentalRequestRepository.save(request);
 
         // When
@@ -246,4 +247,87 @@ class TestRentalRequestService {
         RentalRequest updatedRequest = rentalRequestRepository.findById(request.getId()).orElseThrow();
         assertTrue(updatedRequest.isPaid());
     }
+
+    // Arrendatario 
+    @Test
+    @Transactional
+    @Description("Given a valid request ID, when reviewLessor is called, then the request should be marked as lessor reviewed")
+    void givenValidRequestId_whenReviewLessor_thenRequestShouldBeLessorReviewed() {
+        // Given
+        RentalRequest request = new RentalRequest();
+        request = rentalRequestRepository.save(request);
+
+        // When
+        rentalRequestService.reviewLessor(request.getId());
+
+        // Then
+        RentalRequest updatedRequest = rentalRequestRepository.findById(request.getId()).orElseThrow();
+        assertTrue(updatedRequest.isLessorReviewed());
+    }
+
+    @Test
+    @Transactional
+    @Description("Given a valid request ID, when reviewProperty is called, then the request should be marked as property reviewed")
+    void givenValidRequestId_whenReviewProperty_thenRequestShouldBePropertyReviewed() {
+        // Given
+        RentalRequest request = new RentalRequest();
+        request = rentalRequestRepository.save(request);
+
+        // When
+        rentalRequestService.reviewProperty(request.getId());
+
+        // Then
+        RentalRequest updatedRequest = rentalRequestRepository.findById(request.getId()).orElseThrow();
+        assertTrue(updatedRequest.isPropertyReviewed());
+    }
+
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Given a requester email, retrieve all rental requests for that requester")
+    void givenValidRequesterEmail_whenGetAllRequesterRequest_thenFetchAllRequesterRequests(){
+        // Given
+        User owner = new User();
+        owner.setEmail("owner@example.com");
+        owner.setPassword("123456");
+        userRepository.save(owner);
+
+        User requester = new User();
+        requester.setEmail("requester@example.com");
+        requester.setPassword("123456");
+        userRepository.save(requester);
+
+        Property property = new Property();
+        property.setOwner(owner); // Asignar el ID del owner
+        property.setAddress("Calle 123");
+        property.setDescription("Casa campestre");
+        propertyRepository.save(property);
+
+        RentalRequest rentalRequest = new RentalRequest();
+        rentalRequest.setProperty(property);
+        rentalRequest.setRequester(requester);
+        rentalRequestRepository.save(rentalRequest);
+
+        // When
+        List<RentalRequest> rentalRequests = rentalRequestService.getRequestsByRequesterEmail("requester@example.com");
+
+        // Then
+        assertEquals(1, rentalRequests.size());
+    }
+
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Given a requester has no requests should return a NOT FOUND status")
+    void givenValidRequesterEmailButNoRequest_whenGetRequestByRequester_thenReceiveNotFoundError(){
+        // Given
+        User requester = new User();
+        requester.setEmail("requester@example.com");
+        requester.setPassword("123456");
+        userRepository.save(requester);
+
+        // When and Then
+        assertThrows(RentalRequestNotFoundException.class, () -> rentalRequestService.getRequestsByRequesterEmail("requester@example.com"));
+    }
+
 }

@@ -19,12 +19,18 @@ public class RentalRequestDto {
 	private LocalDateTime requestDateTime;
 	private LocalDate arrivalDate;
 	private LocalDate departureDate;
+	private Integer amountOfResidents;
 	private Double amount;
 	private boolean accepted;
 	private boolean rejected;
 	private boolean canceled;
 	private boolean paid;
 	private boolean reviewed;
+	private boolean isLessorReviewed;
+    private boolean isPropertyReviewed;
 	private boolean completed;
 	private boolean approved;
+	private boolean expired;
+	private String bank;
+    private Integer accountNumber;
 }

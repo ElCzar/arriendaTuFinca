@@ -88,4 +88,48 @@ public class PropertyService {
         photoBytes = photo.getBytes();
         property.setPhoto(photoBytes);
     }
+
+    // Arrendatario
+
+    // Obtener todas las propiedades de un municipio aleatorio
+    public List<PropertyDTO> findPropertiesByRandomMunicipality() {
+        String randomMunicipality = propertyRepository.findRandomMunicipality();
+        List<Property> properties = propertyRepository.findPropertiesByMunicipality(randomMunicipality);
+        return properties.stream()
+                .map(property -> modelMapper.map(property, PropertyDTO.class)) 
+                .collect(Collectors.toList());
+    }
+
+    // Obtener todas las propiedades con un nombre especifico
+    public List<PropertyDTO> findPropertiesByName(String name) {
+        List<Property> properties = propertyRepository.findPropertiesByName(name);
+        if (properties.isEmpty()) {
+            throw new PropertyNotFoundException("Propiedades con el nombre " + name + " no fueron encontradas");
+        }
+        return properties.stream()
+                .map(property -> modelMapper.map(property, PropertyDTO.class)) 
+                .collect(Collectors.toList());
+    }
+
+    // Obtener todas las propiedades de un municipio especifico
+    public List<PropertyDTO> findPropertiesByMunicipality(String municipality) {
+        List<Property> properties = propertyRepository.findPropertiesByMunicipality(municipality);
+        if (properties.isEmpty()) {
+            throw new PropertyNotFoundException("Propiedades del municipio " + municipality + " no fueron encontradas");
+        }
+        return properties.stream()
+                .map(property -> modelMapper.map(property, PropertyDTO.class)) 
+                .collect(Collectors.toList());
+    }
+
+    // Obtener todas las propiedades con una cantidad de residentes especifica
+    public List<PropertyDTO> findPropertiesByAmountOfResidents(Integer amountOfResidents) {
+        List<Property> properties = propertyRepository.findPropertiesByAmountOfResidents(amountOfResidents);
+        if (properties.isEmpty()) {
+            throw new PropertyNotFoundException("Propiedades con cantidad de residentes " + amountOfResidents + " no fueron encontradas");
+        }
+        return properties.stream()
+                .map(property -> modelMapper.map(property, PropertyDTO.class)) 
+                .collect(Collectors.toList());
+    }
 }

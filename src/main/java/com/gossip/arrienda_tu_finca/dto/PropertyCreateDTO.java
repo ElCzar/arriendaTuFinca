@@ -21,11 +21,17 @@ public class PropertyCreateDTO {
     @NotBlank(message = "Municipality is required")
     private String municipality;
 
+    @NotBlank(message = "Department is required")
+    private String department;
+
     @NotBlank(message = "Type of entrance is required")
     private String typeOfEntrance;
 
     @NotBlank(message = "Address is required")
     private String address;
+
+    @NotBlank(message = "Link with the details of the property is required")
+    private String link;
 
     @NotNull(message = "Price per night is required")
     @Positive(message = "Price per night must be positive")
@@ -38,6 +44,10 @@ public class PropertyCreateDTO {
     @NotNull(message = "Amount of bathrooms is required")
     @Positive(message = "Amount of bathrooms must be positive")
     private Integer amountOfBathrooms;
+
+    @NotNull(message = "Amount of residents is required")
+    @Positive(message = "Amount of residents must be required")
+    private Integer amountOfResidents;
 
     @NotNull(message = "Pet friendly status is required")
     private Boolean isPetFriendly;

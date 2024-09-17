@@ -78,4 +78,34 @@ public class PropertyController {
         }
         return ResponseEntity.noContent().build();
     }
+
+    // Arrendatario
+
+    // Obtener todas las propiedades de un municipio aleatorio
+    @GetMapping("/random-municipality")
+    public ResponseEntity<List<PropertyDTO>> findPropertiesByRandomMunicipality() {
+        List<PropertyDTO> properties = propertyService.findPropertiesByRandomMunicipality();
+        return ResponseEntity.ok(properties);
+    }
+
+    // Obtener todas las propiedades con un nombre especifico
+    @GetMapping("/name/{name}")
+    public ResponseEntity<List<PropertyDTO>> findPropertiesByName(@PathVariable String name) {
+        List<PropertyDTO> properties = propertyService.findPropertiesByName(name);
+        return ResponseEntity.ok(properties);
+    }
+
+    // Obtener todas las propiedades de un municipio especifico
+    @GetMapping("/municipality/{municipality}")
+    public ResponseEntity<List<PropertyDTO>> findPropertiesByMunicipality(@PathVariable String municipality) {
+        List<PropertyDTO> properties = propertyService.findPropertiesByMunicipality(municipality);
+        return ResponseEntity.ok(properties);
+    }
+
+    // Obtener todas las propiedades con una cantidad de residentes especifica
+    @GetMapping("/residents/{amountOfResidents}")
+    public ResponseEntity<List<PropertyDTO>> findPropertiesByAmountOfResidents(@PathVariable Integer amountOfResidents) {
+        List<PropertyDTO> properties = propertyService.findPropertiesByAmountOfResidents(amountOfResidents);
+        return ResponseEntity.ok(properties);
+    }
 }
