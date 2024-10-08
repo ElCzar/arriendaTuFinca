@@ -32,9 +32,11 @@ public class RentalRequestService {
     private static final String RENTAL_REQUEST_NOT_FOUND = "Solicitud de arriendo no encontrada";
 
     @Autowired
-    public RentalRequestService(RentalRequestRepository rentalRequestRepository, ModelMapper modelMapper) {
+    public RentalRequestService(RentalRequestRepository rentalRequestRepository, ModelMapper modelMapper, UserRepository userRepository, PropertyRepository propertyRepository) {
         this.rentalRequestRepository = rentalRequestRepository;
         this.modelMapper = modelMapper;
+        this.userRepository = userRepository;
+        this.propertyRepository = propertyRepository;
     }
 
     public void createRequest(Long propertyId, RentalRequestDto rentalRequest) {
@@ -56,8 +58,7 @@ public class RentalRequestService {
         if (rentalRequest.getAmountOfResidents() > property.getAmountOfResidents()) {
             throw new InvalidAmountOfResidentsException("La cantidad de residentes no puede ser superior a la permitida en la propiedad");
         }
-        rentalRequestRepository.save(request);
-
+        
         request.setProperty(property);
         request.setRequester(userRepository.findById(userId).get());
         request.setRequestDateTime(LocalDateTime.now()); 
@@ -71,6 +72,7 @@ public class RentalRequestService {
         request.setCompleted(false); 
         request.setApproved(false);
         request.setExpired(false);
+        rentalRequestRepository.save(request);
     }
     
     public List<RentalRequest> getRequestsByProperty(Long propertyId) {

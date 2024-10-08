@@ -1,14 +1,14 @@
-# Takes the tomcat base image version 10-jdk17
-FROM tomcat:10-jdk17
+# Uses openjdk 17
+FROM openjdk:17
 
-# Remove the default Tomcat applications
-RUN rm -rf /usr/local/tomcat/webapps/*
+# Copy the source code to the container
+COPY . /usr/src/myapp
 
-# Copy your WAR file into the webapps directory
-COPY target/*.war /usr/local/tomcat/webapps/ROOT.war
+# Set the working directory
+WORKDIR /usr/src/myapp
 
-# Expose the port your app runs on
-EXPOSE 8080
+# Run the build script
+RUN ./mvnw clean install -DskipTests
 
 # Run the startup script
-CMD ["catalina.sh", "run"]
+CMD ["java", "-jar", "target/*.jar"]
