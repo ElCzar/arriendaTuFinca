@@ -10,8 +10,8 @@
 	</parent>
 	<groupId>com.gossip</groupId>
 	<artifactId>arrienda_tu_finca</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<version>2.0</version>
+	<packaging>jar</packaging>
 	<name>arrienda_tu_finca</name>
 	<description>API Backend for estates rental</description>
 	<url/>
