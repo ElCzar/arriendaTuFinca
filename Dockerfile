@@ -1,14 +1,12 @@
-# Uses openjdk 17
-FROM openjdk:17
+# Build with maven
+FROM maven:3.8.3-openjdk-17-slim AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Copy the source code to the container
-COPY . /usr/src/myapp
-
-# Set the working directory
-WORKDIR /usr/src/myapp
-
-# Run the build script
-RUN ./mvnw clean install -DskipTests
-
-# Run the startup script
-CMD ["java", "-jar", "target/*.jar"]
+# Runs the jar file
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
