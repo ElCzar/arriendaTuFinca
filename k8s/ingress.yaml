@@ -9,11 +9,11 @@ spec:
    - host: 
      http:
        paths:
-       - path: /api/javeriana/estudiante
+       - path: /api/v2
          pathType: Prefix
          backend:
            service:
              name: arrienda-api
              port:
-               number: 8080
+               number: 8090
 
