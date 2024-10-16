@@ -24,13 +24,15 @@ spec:
               - name: SPRING_DATASOURCE_URL
                 value: "jdbc:mysql://10.43.101.59:3306/arrienda_tu_finca"
               - name: SPRING_DATASOURCE_USERNAME
-                secretKeyRef:
-                  name: db-secrets
-                  key: dbuser
+                valueFrom:
+                  secretKeyRef:
+                    name: db-secrets
+                    key: dbuser
               - name: SPRING_DATASOURCE_PASSWORD
-                secretKeyRef:
-                  name: db-secrets
-                  key: dbpassword
+                valueFrom:
+                  secretKeyRef:
+                    name: db-secrets
+                    key: dbpassword
            
 ---
 apiVersion: v1
