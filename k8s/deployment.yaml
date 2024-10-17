@@ -33,7 +33,7 @@ spec:
                   secretKeyRef:
                     name: db-secrets
                     key: dbpassword
-           
+
 ---
 apiVersion: v1
 kind: Service
@@ -42,8 +42,9 @@ metadata:
   namespace: arriendatufinca
 spec:
   selector:
-    app: estudiante
+    app: arrienda-api  
   ports:
     - protocol: TCP
       port: 8090
       targetPort: 8080
+
