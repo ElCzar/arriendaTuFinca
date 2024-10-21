@@ -1,5 +1,7 @@
 package com.gossip.arrienda_tu_finca.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -29,5 +31,6 @@ public class PropertyDTO {
     private boolean hasPool;
     private boolean hasGril;
     private String ownerEmail;
+    private List<Integer> imagesIds;
 }
 

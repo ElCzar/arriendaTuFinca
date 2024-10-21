@@ -12,8 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.gossip.arrienda_tu_finca.dto.PropertyCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyDTO;
 import com.gossip.arrienda_tu_finca.dto.PropertyUpdateDTO;
+import com.gossip.arrienda_tu_finca.entities.Image;
 import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.exceptions.PropertyNotFoundException;
+import com.gossip.arrienda_tu_finca.repositories.ImageRepository;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
 
@@ -21,13 +23,15 @@ import com.gossip.arrienda_tu_finca.repositories.UserRepository;
 public class PropertyService {
     private PropertyRepository propertyRepository;
     private ModelMapper modelMapper;
-    private UserRepository userRepository;  
+    private UserRepository userRepository;
+    private ImageRepository imageRepository;
 
     @Autowired
-    public PropertyService(PropertyRepository propertyRepository, ModelMapper modelMapper, UserRepository userRepository) {
+    public PropertyService(PropertyRepository propertyRepository, ModelMapper modelMapper, UserRepository userRepository, ImageRepository imageRepository) {
         this.propertyRepository = propertyRepository;
         this.modelMapper = modelMapper; 
         this.userRepository = userRepository;
+        this.imageRepository = imageRepository;
     }
 
     // Crear propiedad
@@ -84,9 +88,11 @@ public class PropertyService {
     public void uploadPhoto(Long id, MultipartFile photo) throws IOException {
         Property property = propertyRepository.findById(id)
             .orElseThrow(() -> new PropertyNotFoundException("Property not found"));
-        byte[] photoBytes;
-        photoBytes = photo.getBytes();
-        property.setPhoto(photoBytes);
+        Image image = new Image();
+        image.setName(photo.getOriginalFilename());
+        image.setImageData(photo.getBytes());
+        int imageId = imageRepository.save(image).getId();
+        property.getImagesIds().add(imageId);
     }
 
     // Arrendatario

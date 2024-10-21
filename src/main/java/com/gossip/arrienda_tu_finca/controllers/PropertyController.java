@@ -104,8 +104,6 @@ public class PropertyController {
         return ResponseEntity.noContent().build();
     }
 
-    //
-
     /**
      * Obtains the information of all properties with a given name
      * @return List<PropertyDTO> with the information of all properties with a given name as a JSON
