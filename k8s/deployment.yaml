@@ -22,18 +22,18 @@ spec:
               - containerPort: 8080
            env:
               - name: SPRING_DATASOURCE_URL
-                value: jdbc:mysql://arrienda-tu-finca-mysql:3306/arrienda_tu_finca
+                value: "jdbc:mysql://10.43.101.59:3306/arrienda_tu_finca"
               - name: SPRING_DATASOURCE_USERNAME
                 valueFrom:
                   secretKeyRef:
-                    name: arrienda-tu-finca-secrets
-                    key: username
+                    name: db-secrets
+                    key: dbuser
               - name: SPRING_DATASOURCE_PASSWORD
                 valueFrom:
                   secretKeyRef:
-                    name: arrienda-tu-finca-secrets
-                    key: password
-           
+                    name: db-secrets
+                    key: dbpassword
+
 ---
 apiVersion: v1
 kind: Service
@@ -42,8 +42,9 @@ metadata:
   namespace: arriendatufinca
 spec:
   selector:
-    app: estudiante
+    app: arrienda-api  
   ports:
     - protocol: TCP
-      port: 8080
+      port: 8090
       targetPort: 8080
+
