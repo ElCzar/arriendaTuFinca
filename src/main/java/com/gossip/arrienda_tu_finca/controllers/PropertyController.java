@@ -33,42 +33,67 @@ public class PropertyController {
         this.propertyService = propertyService;
     }
 
-    // Obtener una propiedad por ID
+    /**
+     * Obtains the information of a property with a given id
+     * @param id
+     * @return PropertyDTO with the information of the property as a JSON
+     */
     @GetMapping("/{id}")
     public ResponseEntity<PropertyDTO> getPropertyById(@PathVariable Long id) {
         PropertyDTO propertyDTO = propertyService.getPropertyById(id);
         return ResponseEntity.ok(propertyDTO);
     }
 
-    // Obtener todas las propiedades
+    /**
+     * Obtains the information of all properties
+     * @return List<PropertyDTO> with the information of all properties as a JSON
+     */
     @GetMapping
     public ResponseEntity<List<PropertyDTO>> getAllProperties() {
         List<PropertyDTO> properties = propertyService.getAllProperties();
         return ResponseEntity.ok(properties);
     }
 
-    // Crear una propiedad (Usa PropertyCreateDTO)
+    /**
+     * Creates a new property
+     * @param propertyCreateDTO
+     * @return PropertyDTO with the information of the created property as a JSON
+     */
     @PostMapping
     public ResponseEntity<PropertyDTO> createProperty(@Valid @RequestBody PropertyCreateDTO propertyCreateDTO) {
         PropertyDTO createdProperty = propertyService.createProperty(propertyCreateDTO);
         return ResponseEntity.ok(createdProperty);
     }
 
-    // Actualizar una propiedad (Usa PropertyUpdateDTO)
+    /**
+     * Updates the information of a property with a given id
+     * @param id
+     * @param propertyUpdateDTO
+     * @return PropertyDTO with the information of the updated property as a JSON
+     */
     @PutMapping("/{id}")
     public ResponseEntity<PropertyDTO> updateProperty(@PathVariable Long id, @RequestBody PropertyUpdateDTO propertyUpdateDTO) {
         PropertyDTO updatedProperty = propertyService.updateProperty(id, propertyUpdateDTO);
         return ResponseEntity.ok(updatedProperty);
     }
 
-    // Desactivar una propiedad (Cambiar su estado a no disponible)
+    /**
+     * Deactivates a property with a given id
+     * @param id
+     * @return ResponseEntity<Void> with status 200
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deactivateProperty(@PathVariable Long id) {
         propertyService.deactivateProperty(id); // Desactiva la propiedad en lugar de eliminarla
-        return ResponseEntity.noContent().build(); 
+        return ResponseEntity.ok().build();
     }
 
-    // Subir una foto para una propiedad
+    /**
+     * Uploads a photo to a property with a given a property id
+     * @param id
+     * @param photo
+     * @return
+     */
     @PostMapping("/{id}/upload-photo")
     public ResponseEntity<Void> uploadPhoto(@PathVariable Long id, @RequestParam("photo") MultipartFile photo) {
         try {
@@ -79,30 +104,45 @@ public class PropertyController {
         return ResponseEntity.noContent().build();
     }
 
-    // Arrendatario
+    //
 
-    // Obtener todas las propiedades de un municipio aleatorio
+    /**
+     * Obtains the information of all properties with a given name
+     * @return List<PropertyDTO> with the information of all properties with a given name as a JSON
+     */
     @GetMapping("/random-municipality")
     public ResponseEntity<List<PropertyDTO>> findPropertiesByRandomMunicipality() {
         List<PropertyDTO> properties = propertyService.findPropertiesByRandomMunicipality();
         return ResponseEntity.ok(properties);
     }
 
-    // Obtener todas las propiedades con un nombre especifico
-    @GetMapping("/name/{name}")
-    public ResponseEntity<List<PropertyDTO>> findPropertiesByName(@PathVariable String name) {
+    /**
+     * Obtains the information of all properties with a given name
+     * @param name
+     * @return List<PropertyDTO> with the information of all properties with a given name as a JSON
+     */
+    @GetMapping("/name")
+    public ResponseEntity<List<PropertyDTO>> findPropertiesByName(@RequestBody String name) {
         List<PropertyDTO> properties = propertyService.findPropertiesByName(name);
         return ResponseEntity.ok(properties);
     }
 
-    // Obtener todas las propiedades de un municipio especifico
+    /**
+     * Obtains the information of all properties with a given municipality
+     * @param municipality
+     * @return List<PropertyDTO> with the information of all properties with a given municipality as a JSON
+     */
     @GetMapping("/municipality/{municipality}")
     public ResponseEntity<List<PropertyDTO>> findPropertiesByMunicipality(@PathVariable String municipality) {
         List<PropertyDTO> properties = propertyService.findPropertiesByMunicipality(municipality);
         return ResponseEntity.ok(properties);
     }
 
-    // Obtener todas las propiedades con una cantidad de residentes especifica
+    /**
+     * Obtains the information of all properties with a given amount of residents
+     * @param amountOfResidents
+     * @return List<PropertyDTO> with the information of all properties with a given amount of residents as a JSON
+     */
     @GetMapping("/residents/{amountOfResidents}")
     public ResponseEntity<List<PropertyDTO>> findPropertiesByAmountOfResidents(@PathVariable Integer amountOfResidents) {
         List<PropertyDTO> properties = propertyService.findPropertiesByAmountOfResidents(amountOfResidents);
