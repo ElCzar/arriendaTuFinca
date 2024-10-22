@@ -55,17 +55,6 @@ public class PropertyController {
     }
 
     /**
-     * Obtain the image with a given id
-     * @param id
-     * @return ResponseEntity<byte[]> with the image as a byte array
-     */
-    @GetMapping("/photo/{id}")
-    public ResponseEntity<byte[]> getPhoto(@PathVariable int id) {
-        byte[] photo = propertyService.getPhoto(id);
-        return ResponseEntity.ok(photo);
-    }
-
-    /**
      * Creates a new property
      * @param propertyCreateDTO
      * @return PropertyDTO with the information of the created property as a JSON
@@ -105,14 +94,14 @@ public class PropertyController {
      * @param photo
      * @return
      */
-    @PostMapping("/{id}/upload-photo")
+    @PostMapping("/uploadPhoto/{id}")
     public ResponseEntity<Void> uploadPhoto(@PathVariable Long id, @RequestParam("photo") MultipartFile photo) {
         try {
             propertyService.uploadPhoto(id, photo);
         } catch (IOException e) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     /**

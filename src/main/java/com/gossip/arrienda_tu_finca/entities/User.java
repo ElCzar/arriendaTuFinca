@@ -37,6 +37,7 @@ public class User {
     private String phone;
     private boolean isHost;
     private boolean isRenter;
+    private int imageId;
     
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Property> properties;

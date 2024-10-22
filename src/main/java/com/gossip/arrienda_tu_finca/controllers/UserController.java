@@ -1,5 +1,7 @@
 package com.gossip.arrienda_tu_finca.controllers;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,13 +11,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.gossip.arrienda_tu_finca.dto.ChangePasswordDTO;
 import com.gossip.arrienda_tu_finca.dto.ChangeUserInfoDTO;
 import com.gossip.arrienda_tu_finca.dto.LoginDTO;
 import com.gossip.arrienda_tu_finca.dto.UserDTO;
 import com.gossip.arrienda_tu_finca.dto.UserInfoDTO;
+import com.gossip.arrienda_tu_finca.exceptions.UserNotFoundException;
 import com.gossip.arrienda_tu_finca.services.UserService;
 
 @RestController
@@ -58,6 +63,20 @@ public class UserController {
     @PostMapping("/create")
     public ResponseEntity<Void> createUser(@RequestBody UserDTO userDTO) {
         userService.createUser(userDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Uploads a photo for a user
+     * @param photo
+     * @param userId
+     * @return
+     * @throws IOException 
+     * @throws UserNotFoundException 
+     */
+    @PostMapping("/uploadPhoto/{userId}")
+    public ResponseEntity<Void> uploadPhoto(@RequestParam("photo") MultipartFile photo, @PathVariable Long userId) throws UserNotFoundException, IOException {
+        userService.uploadPhoto(photo, userId);
         return ResponseEntity.ok().build();
     }
 

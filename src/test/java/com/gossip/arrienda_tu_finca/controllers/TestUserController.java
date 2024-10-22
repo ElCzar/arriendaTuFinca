@@ -339,7 +339,7 @@ class TestUserController {
         // Check if the user information is retrieved correctly
         MvcResult result = resultActions.andReturn();
         String contentAsString = result.getResponse().getContentAsString();
-        assertEquals("{\"id\":1,\"email\":\"johnDoe@gmail.com\",\"name\":\"John\",\"surname\":\"Doe\",\"phone\":\"123456789\",\"host\":true,\"renter\":false}", contentAsString);
+        assertEquals("{\"id\":1,\"email\":\"johnDoe@gmail.com\",\"name\":\"John\",\"surname\":\"Doe\",\"phone\":\"123456789\",\"imageId\":0,\"host\":true,\"renter\":false}", contentAsString);
     }
 
     @Test

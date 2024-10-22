@@ -20,7 +20,7 @@ public interface PropertyRepository extends JpaRepository<Property, Long> {
     List<Property> findAllByOwnerEmail(@Param("email") String ownerEmail);
 
     // Consulta personalizada para obtener una propiedad como DTO usando su ID
-    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyDTO(p.id, p.name, p.description, p.municipality, p.department, p.typeOfEntrance, p.address, p.link, p.isAvailable, p.pricePerNight, p.amountOfRooms, p.amountOfBathrooms, p.amountOfResidents, p.isPetFriendly, p.hasPool, p.hasGril, p.owner.email, p.imagesIds) FROM Property p WHERE p.id = :propertyId")
+    @Query("SELECT new com.gossip.arrienda_tu_finca.dto.PropertyDTO(p.id, p.name, p.description, p.municipality, p.department, p.typeOfEntrance, p.address, p.link, p.isAvailable, p.pricePerNight, p.amountOfRooms, p.amountOfBathrooms, p.amountOfResidents, p.isPetFriendly, p.hasPool, p.hasGril, p.owner.email, p.imageIds) FROM Property p WHERE p.id = :propertyId")
     PropertyDTO findPropertyDTOById(@Param("propertyId") Long propertyId);
 
     // Encuentra todas las propiedades disponibles (activas)

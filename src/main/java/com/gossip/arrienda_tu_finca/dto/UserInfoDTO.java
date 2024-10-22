@@ -17,4 +17,5 @@ public class UserInfoDTO {
     private String phone;
     private boolean isHost;
     private boolean isRenter;
+    private int imageId;
 }

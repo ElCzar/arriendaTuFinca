@@ -1,7 +1,5 @@
 package com.gossip.arrienda_tu_finca.dto;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,5 +24,5 @@ public class PropertyViewDTO {
     private boolean isPetFriendly;
     private boolean hasPool;
     private boolean hasGril;
-    private List<Integer> imagesIds;
+    private String imageIds;
 }

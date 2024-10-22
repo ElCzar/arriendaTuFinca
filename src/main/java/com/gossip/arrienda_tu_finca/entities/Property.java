@@ -1,7 +1,5 @@
 package com.gossip.arrienda_tu_finca.entities;
 
-import java.util.List;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -44,7 +42,7 @@ public class Property {
     private boolean hasPool;
     private boolean hasGril;
 
-    private List<Integer> imagesIds;
+    private String imageIds;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id", referencedColumnName = "id")

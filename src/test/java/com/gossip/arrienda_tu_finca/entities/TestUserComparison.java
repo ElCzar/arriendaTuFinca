@@ -30,12 +30,12 @@ class TestUserComparison {
     private static Stream<Arguments> provideUsersForEquality() {
         return Stream.of(
             Arguments.of(
-                new User(1L, "john@ex.com", "John", "Doe", "password", "123456789", true, false, null),
-                new User(2L, "john@ex.com", "John", "Doe", "password", "123456789", true, false, null)
+                new User(1L, "john@ex.com", "John", "Doe", "password", "123456789", true, false, 0, null),
+                new User(2L, "john@ex.com", "John", "Doe", "password", "123456789", true, false, 0, null)
             ),
             Arguments.of(
-                new User(2L, "jane@ex.com", "Jane", "Smith", "password123", "987654321", false, true, null),
-                new User(3L, "jane@ex.com", "Jane", "Smith", "password123", "987654321", false, true, null)
+                new User(2L, "jane@ex.com", "Jane", "Smith", "password123", "987654321", false, true, 0, null),
+                new User(3L, "jane@ex.com", "Jane", "Smith", "password123", "987654321", false, true, 0, null)
             ),
             Arguments.of(
                 new User(),
@@ -58,11 +58,11 @@ class TestUserComparison {
     private static Stream<Arguments> provideUsersForInequality() {
         return Stream.of(
             Arguments.of(
-                new User(1L, "john@ex.com", "John", "Doe", "password", "123456789", true, false, null),
-                new User(2L, "jane@ex.com", "Jane", "Smith", "password123", "987654321", false, true, null)
+                new User(1L, "john@ex.com", "John", "Doe", "password", "123456789", true, false, 0, null),
+                new User(2L, "jane@ex.com", "Jane", "Smith", "password123", "987654321", false, true, 0, null)
             ),
             Arguments.of(
-                new User(1L, "john@ex.com", "John", "Doe", "password", "123456789", true, false, null),
+                new User(1L, "john@ex.com", "John", "Doe", "password", "123456789", true, false, 0, null),
                 new User()
             )
         );

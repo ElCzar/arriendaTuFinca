@@ -1,19 +1,23 @@
 package com.gossip.arrienda_tu_finca.services;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.gossip.arrienda_tu_finca.dto.ChangePasswordDTO;
 import com.gossip.arrienda_tu_finca.dto.ChangeUserInfoDTO;
 import com.gossip.arrienda_tu_finca.dto.LoginDTO;
 import com.gossip.arrienda_tu_finca.dto.UserDTO;
 import com.gossip.arrienda_tu_finca.dto.UserInfoDTO;
+import com.gossip.arrienda_tu_finca.entities.Image;
 import com.gossip.arrienda_tu_finca.entities.User;
 import com.gossip.arrienda_tu_finca.exceptions.UserNotFoundException;
 import com.gossip.arrienda_tu_finca.exceptions.UserNotValidException;
+import com.gossip.arrienda_tu_finca.repositories.ImageRepository;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
 
 @Service
@@ -21,12 +25,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncryptionService passwordEncryptionService;
+    private final ImageRepository imageRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, ModelMapper modelMapper) {
+    public UserService(UserRepository userRepository, ModelMapper modelMapper, ImageRepository imageRepository) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncryptionService = new PasswordEncryptionService();
+        this.imageRepository = imageRepository;
     }
 
     /**
@@ -91,6 +97,32 @@ public class UserService {
         user.setPassword(passwordEncryptionService.encryptPassword(user.getPassword()));
         userRepository.save(user);
     }
+
+    /**
+     * Uploads a photo for a user
+     * @param photo
+     * @param userId
+     * @throws UserNotFoundException
+     * @throws IOException
+     */
+    public void uploadPhoto(MultipartFile photo, Long userId) throws UserNotFoundException, IOException {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            throw new UserNotFoundException("User for photo upload not found by id: " + userId);
+        }
+        int imageId = user.getImageId();
+        if (imageId != 0) {
+            imageRepository.deleteById(imageId);
+        }
+        Image image = new Image();
+        image.setImageData(photo.getBytes());
+        image.setName(photo.getOriginalFilename());
+        
+        int newImageId = imageRepository.save(image).getId();
+        user.setImageId(newImageId);
+        userRepository.save(user);
+    }
+
 
     /**
      * Updates an existing user after checking if all the fields are valid and email is already in use
