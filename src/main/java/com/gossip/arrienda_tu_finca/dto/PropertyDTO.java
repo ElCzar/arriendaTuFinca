@@ -29,5 +29,6 @@ public class PropertyDTO {
     private boolean hasPool;
     private boolean hasGril;
     private String ownerEmail;
+    private String imageIds;
 }
 

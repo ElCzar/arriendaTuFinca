@@ -24,4 +24,5 @@ public class PropertyViewDTO {
     private boolean isPetFriendly;
     private boolean hasPool;
     private boolean hasGril;
+    private String imageIds;
 }
