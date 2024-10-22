@@ -55,6 +55,17 @@ public class PropertyController {
     }
 
     /**
+     * Obtain the image with a given id
+     * @param id
+     * @return ResponseEntity<byte[]> with the image as a byte array
+     */
+    @GetMapping("/photo/{id}")
+    public ResponseEntity<byte[]> getPhoto(@PathVariable int id) {
+        byte[] photo = propertyService.getPhoto(id);
+        return ResponseEntity.ok(photo);
+    }
+
+    /**
      * Creates a new property
      * @param propertyCreateDTO
      * @return PropertyDTO with the information of the created property as a JSON

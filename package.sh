@@ -39,7 +39,7 @@ if VERSION="test"; then
   docker build -t elczar/arrienda_tu_finca:$VERSION .
   docker network create arrienda-network
   docker run --name arrienda-db --network arrienda-network -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=$SPRING_DATASOURCE_PASSWORD -e MYSQL_DATABASE=arrienda_tu_finca mysql:8
-  docker run --name arrienda-api --network arrienda-network -d -p 8080:8080 -e SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL -e SPRING_DATASOURCE_USERNAME=$SPRING_DATASOURCE_USERNAME -e SPRING_DATASOURCE_PASSWORD=$SPRING_DATASOURCE_PASSWORD elczar/arrienda_tu_finca:$VERSION
+  docker run --name arrienda-api --network arrienda-network -d -p 8081:8080 -e SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL -e SPRING_DATASOURCE_USERNAME=$SPRING_DATASOURCE_USERNAME -e SPRING_DATASOURCE_PASSWORD=$SPRING_DATASOURCE_PASSWORD elczar/arrienda_tu_finca:$VERSION
 else
   docker build -t elczar/arrienda_tu_finca:$VERSION -t elczar/arrienda_tu_finca:latest .
 fi

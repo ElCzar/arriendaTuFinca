@@ -34,7 +34,11 @@ public class PropertyService {
         this.imageRepository = imageRepository;
     }
 
-    // Crear propiedad
+    /**
+     * Creates a property with the information given in the PropertyCreateDTO
+     * @param propertyCreateDTO
+     * @return PropertyDTO with the information of the created property
+     */
     public PropertyDTO createProperty(PropertyCreateDTO propertyCreateDTO) {
         Property property = modelMapper.map(propertyCreateDTO, Property.class); 
         property.setAvailable(true); 
@@ -51,13 +55,21 @@ public class PropertyService {
         return modelMapper.map(savedProperty, PropertyDTO.class); 
     }
 
+    /**
+     * Obtains the information of a property with a given id
+     * @param id
+     * @return PropertyDTO with the information of the property
+     */
     public PropertyDTO getPropertyById(Long id) {
         Property property = propertyRepository.findById(id)
             .orElseThrow(() -> new PropertyNotFoundException("Property with ID " + id + " not found for fetching"));
         return modelMapper.map(property, PropertyDTO.class);
     }
 
-    // Obtener todas las propiedades
+    /**
+     * Obtains the information of all properties
+     * @return List<PropertyDTO> with the information of all properties
+     */
     public List<PropertyDTO> getAllProperties() {
         List<Property> properties = propertyRepository.findAll();
         return properties.stream()
@@ -65,7 +77,25 @@ public class PropertyService {
                 .collect(Collectors.toList());
     }
 
-    // Actualizar propiedad
+    /**
+     * Obtain the image with a given id
+     * @param id
+     * @return byte[] with the image
+     */
+    public byte[] getPhoto(int id) {
+        Image image = imageRepository.findById(id);
+        if (image == null) {
+            throw new PropertyNotFoundException("Image with ID " + id + " not found");
+        }
+        return image.getImageData();
+    }
+
+    /**
+     * Update a property with the information given in the PropertyUpdateDTO
+     * @param id
+     * @param propertyUpdateDTO
+     * @return
+    */
     public PropertyDTO updateProperty(Long id, PropertyUpdateDTO propertyUpdateDTO) {
         Property property = propertyRepository.findById(id)
             .orElseThrow(() -> new PropertyNotFoundException("To update property with ID " + id + " not found"));
