@@ -154,7 +154,7 @@ public class PropertyService {
     public List<PropertyDTO> findPropertiesByName(String name) {
         List<Property> properties = propertyRepository.findPropertiesByName(name);
         if (properties.isEmpty()) {
-            throw new PropertyNotFoundException("Propiedades con el nombre " + name + " no fueron encontradas");
+            throw new PropertyNotFoundException("Propiedades no encontradas con el nombre " + name);
         }
         return properties.stream()
                 .map(property -> modelMapper.map(property, PropertyDTO.class)) 

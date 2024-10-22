@@ -268,7 +268,7 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
 
         // Act
         mvc.perform(MockMvcRequestBuilders.delete("/property/" + property.getId()))
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+            .andExpect(MockMvcResultMatchers.status().isOk());
 
         // Assert
         Property deactivatedProperty = propertyRepository.findById(property.getId()).orElseThrow();
@@ -304,9 +304,9 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
         MockMultipartFile photoFile = new MockMultipartFile("photo", "finca.jpg", "image/jpeg", "fake-image-content".getBytes());
 
         // Act
-        mvc.perform(MockMvcRequestBuilders.multipart("/property/" + property.getId() + "/upload-photo")
+        mvc.perform(MockMvcRequestBuilders.multipart("/property/uploadPhoto/" + property.getId())
             .file(photoFile))
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+            .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     // 10. Caso de error: Subir una foto a una propiedad con ID inexistente
@@ -400,9 +400,12 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
         property2.setMunicipality("Bogota");
         propertyRepository.save(property2);
 
+        String name = "Finca Bella";
+
         // Act & Assert
-        mvc.perform(MockMvcRequestBuilders.get("/property/name/Finca Bella")
-                .contentType("application/json"))
+        mvc.perform(MockMvcRequestBuilders.get("/property/name")
+                .contentType("application/json")
+                .content(name))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value("Finca Bella"))
@@ -415,11 +418,14 @@ void givenInvalidData_whenCreateProperty_thenBadRequest() throws Exception {
     @Transactional
     @Description("Test to get properties by invalid name")
     void givenInvalidPropertyName_whenGetPropertiesByName_thenNotFound() throws Exception {
+        // Arrange
+        String name = "NombreInvalido";
         // Act & Assert
-        mvc.perform(MockMvcRequestBuilders.get("/property/name/NombreInvalido")
+        mvc.perform(MockMvcRequestBuilders.get("/property/name")
+                .content(name)
                 .contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())  // Debe devolver 404 Not Found
-                .andExpect(MockMvcResultMatchers.content().string("Propiedades con el nombre NombreInvalido no fueron encontradas"));  // Verifica el mensaje
+                .andExpect(MockMvcResultMatchers.content().string("Propiedades no encontradas con el nombre NombreInvalido"));  // Verifica el mensaje
     }
     
 
