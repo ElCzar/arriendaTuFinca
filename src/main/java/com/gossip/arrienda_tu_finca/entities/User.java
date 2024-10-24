@@ -38,6 +38,7 @@ public class User {
     private boolean isHost;
     private boolean isRenter;
     private int imageId;
+    private boolean rating;
     
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Property> properties;

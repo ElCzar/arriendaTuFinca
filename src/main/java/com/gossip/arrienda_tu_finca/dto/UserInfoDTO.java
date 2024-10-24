@@ -18,4 +18,5 @@ public class UserInfoDTO {
     private boolean isHost;
     private boolean isRenter;
     private int imageId;
+    private boolean rating;
 }

@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 @Setter
 @Table(name = "rental_requests")
 public class RentalRequest {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -52,8 +51,8 @@ public class RentalRequest {
     private Integer accountNumber;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tenant_comment_id", referencedColumnName = "id")
-    private Comment tenantComment;
+    @JoinColumn(name = "host_comment_id", referencedColumnName = "id")
+    private Comment hostComment;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "renter_comment_id", referencedColumnName = "id")

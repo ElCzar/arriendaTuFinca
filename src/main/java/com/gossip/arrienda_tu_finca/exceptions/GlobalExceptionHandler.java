@@ -19,7 +19,31 @@ public class GlobalExceptionHandler {
         logger.error("Rental request not found: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
-  
+ 
+    @ExceptionHandler(InvalidAmountOfResidentsException.class)
+    public ResponseEntity<String> handleInvalidAmountOfResidentsException(InvalidAmountOfResidentsException ex) {
+        logger.error("Invalid amount of residents: {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidDateException.class)
+    public ResponseEntity<String> handleInvalidDateException(InvalidDateException ex) {
+        logger.error("Invalid date: {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidPaymentException.class)
+    public ResponseEntity<String> handleInvalidPaymentException(InvalidPaymentException ex) {
+        logger.error("Invalid payment: {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidReviewException.class)
+    public ResponseEntity<String> handleInvalidReviewException(InvalidReviewException ex) {
+        logger.error("Invalid review: {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+    
     @ExceptionHandler(PropertyNotFoundException.class)
     public ResponseEntity<String> handlePropertyNotFoundException(PropertyNotFoundException ex) {
         logger.error("Property not found: {}", ex.getMessage());

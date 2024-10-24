@@ -12,7 +12,9 @@ import java.time.LocalDate;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 import com.gossip.arrienda_tu_finca.repositories.RentalRequestRepository;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
+import com.gossip.arrienda_tu_finca.dto.CommentDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
+import com.gossip.arrienda_tu_finca.entities.Comment;
 import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.entities.RentalRequest;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidAmountOfResidentsException;
@@ -207,5 +209,44 @@ public class RentalRequestService {
         }
     }
 
-    // Reviews of the different entities involved
+    /**
+     * Checks if the renter comment is valid and if the renter is correct for the request id
+     * @param commentDto
+     * @return
+     */
+    private Optional<Comment> isRenterCommentValid(Long requestId, CommentDTO commentDto) {
+        
+    }
+
+    /**
+     * Renter reviews the property given the request ID
+     * @param requestId
+     * @param commentDto
+     * @return
+     */
+    public RentalRequest reviewProperty(Long requestId, CommentDTO commentDto) {
+        Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
+        if (!optionalRequest.isPresent()) {
+            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
+        }
+        RentalRequest request = optionalRequest.get();
+        if (!request.isPaid()) {
+            throw new InvalidReviewException("La solicitud de arriendo no ha sido pagada.");
+        }
+        Optional<Comment> comment = isRenterCommentValid(requestId, commentDto);
+        if (!comment.isPresent()) {
+            throw new InvalidReviewException("El comentario no es válido.");
+        }
+        Comment finalComment = comment.get();
+        request.setPropertyComment(finalComment);
+        rentalRequestRepository.save(request);
+        updatePropertyRating(request.getProperty().getId());
+        return request;
+    }
+
+    /**
+     * The rating for the property is updated
+     * @param propertyId
+     * @return
+     */
 }
