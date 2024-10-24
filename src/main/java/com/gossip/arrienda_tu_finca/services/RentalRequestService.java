@@ -92,12 +92,12 @@ public class RentalRequestService {
      * @throws RentalRequestNotFoundException if no request were found
      * @return List<RentalRequest> of the request about the property
      */
-    public List<RentalRequest> getRequestsByProperty(Long propertyId) {
+    public List<RentalRequestDto> getRequestsByProperty(Long propertyId) {
         List<RentalRequest> requests = rentalRequestRepository.findByPropertyId(propertyId);
         if (requests.isEmpty()) {
             throw new RentalRequestNotFoundException("No se encontraron solicitudes de arriendo para la propiedad con ID: " + propertyId);
         }
-        return requests;
+        return requests.stream().map(request -> modelMapper.map(request, RentalRequestDto.class)).toList();
     }
 
     /**
@@ -105,12 +105,12 @@ public class RentalRequestService {
      * @param hostEmail email of the host
      * @return
      */
-    public List<RentalRequest> getRequestsByHost(String hostEmail) {
+    public List<RentalRequestDto> getRequestsByHost(String hostEmail) {
         List<RentalRequest> requests = rentalRequestRepository.findByHostEmail(hostEmail);
         if (requests.isEmpty()) {
             throw new RentalRequestNotFoundException("No se encontraron solicitudes de arriendo para el propietario con email: " + hostEmail);
         }
-        return requests;
+        return requests.stream().map(request -> modelMapper.map(request, RentalRequestDto.class)).toList();
     }
 
     /**
@@ -118,12 +118,12 @@ public class RentalRequestService {
      * @param renterEmail email of the renter
      * @return
      */
-    public List<RentalRequest> getRequestsByRenter(String renterEmail) {
+    public List<RentalRequestDto> getRequestsByRenter(String renterEmail) {
         List<RentalRequest> requests = rentalRequestRepository.findByRenterEmail(renterEmail);
         if (requests.isEmpty()) {
             throw new RentalRequestNotFoundException("No se encontraron solicitudes de arriendo para el arrendatario con email: " + renterEmail);
         }
-        return requests;
+        return requests.stream().map(request -> modelMapper.map(request, RentalRequestDto.class)).toList();
     }
 
     /**

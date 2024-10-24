@@ -1,9 +1,6 @@
 package com.gossip.arrienda_tu_finca.controllers;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +22,10 @@ import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
 @RequestMapping("/rental-requests")
 public class RentalRequestController {
     private final RentalRequestService rentalRequestService;
-    private final ModelMapper modelMapper;
 
     @Autowired
-    public RentalRequestController(RentalRequestService rentalRequestService, ModelMapper modelMapper) {
+    public RentalRequestController(RentalRequestService rentalRequestService) {
         this.rentalRequestService = rentalRequestService;
-        this.modelMapper = modelMapper;
     }
 
     /**
@@ -52,10 +47,7 @@ public class RentalRequestController {
      */
     @GetMapping("/host")
     public ResponseEntity<List<RentalRequestDto>> getRequestsByHost(@RequestBody String email) {
-        List<RentalRequestDto> requests = rentalRequestService.getRequestsByHost(email)
-            .stream()
-            .map( request -> modelMapper.map(request, RentalRequestDto.class))
-            .collect(Collectors.toList());
+        List<RentalRequestDto> requests = rentalRequestService.getRequestsByHost(email);
         return new ResponseEntity<>(requests, HttpStatus.OK);
     }
 
@@ -66,10 +58,7 @@ public class RentalRequestController {
      */
     @GetMapping("/renter")
     public ResponseEntity<List<RentalRequestDto>> getRequestsByRenter(@RequestBody String email) {
-        List<RentalRequestDto> requests = rentalRequestService.getRequestsByRenter(email)
-            .stream()
-            .map( request -> modelMapper.map(request, RentalRequestDto.class))
-            .collect(Collectors.toList());
+        List<RentalRequestDto> requests = rentalRequestService.getRequestsByRenter(email);
         return new ResponseEntity<>(requests, HttpStatus.OK);
     }
 
@@ -80,10 +69,7 @@ public class RentalRequestController {
      */
     @GetMapping("/property/{propertyId}")
     public ResponseEntity<List<RentalRequestDto>> getRequestsByProperty(@PathVariable Long propertyId) {
-        List<RentalRequestDto> requests = rentalRequestService.getRequestsByProperty(propertyId)
-            .stream()
-            .map( request -> modelMapper.map(request, RentalRequestDto.class))
-            .collect(Collectors.toList());
+        List<RentalRequestDto> requests = rentalRequestService.getRequestsByProperty(propertyId);
         return new ResponseEntity<>(requests, HttpStatus.OK);
     }
 
