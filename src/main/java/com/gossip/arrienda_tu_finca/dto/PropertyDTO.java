@@ -30,5 +30,6 @@ public class PropertyDTO {
     private boolean hasGril;
     private String ownerEmail;
     private String imageIds;
+    private double rating;
 }
 

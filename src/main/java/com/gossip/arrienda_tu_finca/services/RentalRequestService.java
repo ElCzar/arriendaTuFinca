@@ -17,6 +17,7 @@ import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
 import com.gossip.arrienda_tu_finca.entities.Comment;
 import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.entities.RentalRequest;
+import com.gossip.arrienda_tu_finca.entities.User;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidAmountOfResidentsException;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidDateException;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidPaymentException;
@@ -67,9 +68,14 @@ public class RentalRequestService {
         if (rentalRequest.getAmountOfResidents() > property.getAmountOfResidents()) {
             throw new InvalidAmountOfResidentsException("La cantidad de residentes no puede ser superior a la permitida en la propiedad");
         }
-        
+
+        Optional<User> renter = userRepository.findById(userId);
+        if (!renter.isPresent()) {
+            throw new PropertyNotFoundException("Usuario con ID " + userId + " no fue encontrado");
+        }
+
         request.setProperty(property);
-        request.setRequester(userRepository.findById(userId).get());
+        request.setRequester(renter.get());
         request.setRequestDateTime(LocalDateTime.now()); 
         request.setRejected(false);
         request.setCanceled(false); 
@@ -100,7 +106,7 @@ public class RentalRequestService {
      * @return
      */
     public List<RentalRequest> getRequestsByHost(String hostEmail) {
-        List<RentalRequest> requests = rentalRequestRepository.findByPropertyOwnerEmail(hostEmail);
+        List<RentalRequest> requests = rentalRequestRepository.findByHostEmail(hostEmail);
         if (requests.isEmpty()) {
             throw new RentalRequestNotFoundException("No se encontraron solicitudes de arriendo para el propietario con email: " + hostEmail);
         }
@@ -113,7 +119,7 @@ public class RentalRequestService {
      * @return
      */
     public List<RentalRequest> getRequestsByRenter(String renterEmail) {
-        List<RentalRequest> requests = rentalRequestRepository.findByRequesterEmail(renterEmail);
+        List<RentalRequest> requests = rentalRequestRepository.findByRenterEmail(renterEmail);
         if (requests.isEmpty()) {
             throw new RentalRequestNotFoundException("No se encontraron solicitudes de arriendo para el arrendatario con email: " + renterEmail);
         }
@@ -214,8 +220,18 @@ public class RentalRequestService {
      * @param commentDto
      * @return
      */
-    private Optional<Comment> isRenterCommentValid(Long requestId, CommentDTO commentDto) {
-        
+    private Comment isRenterCommentValid(RentalRequest rentalRequest, CommentDTO commentDto) {
+        if(commentDto.getComment() == null || commentDto.getComment().isEmpty()) {
+            throw new InvalidReviewException("El comentario no puede estar vacío.");
+        }
+        if(commentDto.getRating() < 1 || commentDto.getRating() > 5) {
+            throw new InvalidReviewException("La calificación debe estar entre 1 y 5.");
+        }
+        String renterEmail = rentalRequest.getRequester().getEmail();
+        if (!renterEmail.equals(commentDto.getAuthorEmail())) {
+            throw new InvalidReviewException("El arrendatario no coincide con el autor del comentario.");
+        }
+        return modelMapper.map(commentDto, Comment.class);
     }
 
     /**
@@ -224,7 +240,7 @@ public class RentalRequestService {
      * @param commentDto
      * @return
      */
-    public RentalRequest reviewProperty(Long requestId, CommentDTO commentDto) {
+    public void reviewProperty(Long requestId, CommentDTO commentDto) {
         Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
         if (!optionalRequest.isPresent()) {
             throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
@@ -233,15 +249,10 @@ public class RentalRequestService {
         if (!request.isPaid()) {
             throw new InvalidReviewException("La solicitud de arriendo no ha sido pagada.");
         }
-        Optional<Comment> comment = isRenterCommentValid(requestId, commentDto);
-        if (!comment.isPresent()) {
-            throw new InvalidReviewException("El comentario no es válido.");
-        }
-        Comment finalComment = comment.get();
-        request.setPropertyComment(finalComment);
+        Comment comment = isRenterCommentValid(request, commentDto);
+        request.setPropertyComment(comment);
         rentalRequestRepository.save(request);
         updatePropertyRating(request.getProperty().getId());
-        return request;
     }
 
     /**
@@ -249,4 +260,114 @@ public class RentalRequestService {
      * @param propertyId
      * @return
      */
+    private void updatePropertyRating(Long propertyId) {
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new PropertyNotFoundException("Propiedad con ID " + propertyId + " no fue encontrada"));
+        List<Comment> requests = rentalRequestRepository.findCommentsByPropertyId(propertyId);
+        double rating = 0;
+        for (Comment request : requests) {
+            rating += request.getRating();
+        }
+        rating = rating / requests.size();
+        property.setRating(rating);
+        propertyRepository.save(property);
+    }
+
+    /**
+     * Renter reviews the host given the request ID
+     * @param requestId
+     * @param commentDto
+     * @return
+     */
+    public void reviewHost(Long requestId, CommentDTO commentDto) {
+        Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
+        if (!optionalRequest.isPresent()) {
+            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
+        }
+        RentalRequest request = optionalRequest.get();
+        if (!request.isPaid()) {
+            throw new InvalidReviewException("La solicitud de arriendo no ha sido pagada.");
+        }
+        Comment comment = isRenterCommentValid(request, commentDto);
+        request.setHostComment(comment);
+        rentalRequestRepository.save(request);
+        updateHostRating(request);
+    }
+
+    /**
+     * The rating for host is updated
+     * @param requestId
+     * @return
+     */
+    private void updateHostRating(RentalRequest request) {
+        User host = request.getProperty().getOwner();
+        List<Comment> requests = rentalRequestRepository.findCommentsByHostEmail(host.getEmail());
+        double rating = 0;
+        for (Comment comment : requests) {
+            rating += comment.getRating();
+        }
+        rating = rating / requests.size();
+        host.setRatingHost(rating);
+        userRepository.save(host);
+    }
+
+    /**
+     * Checks it the comment is valid and if the host is correct for the request id
+     * @param requestId
+     * @param commentDto
+     * @return Comment
+     */
+    private Comment isHostCommentValid(Long requestId, CommentDTO commentDto) {
+        if(commentDto.getComment() == null || commentDto.getComment().isEmpty()) {
+            throw new InvalidReviewException("El comentario no puede estar vacío.");
+        }
+        if(commentDto.getRating() < 1 || commentDto.getRating() > 5) {
+            throw new InvalidReviewException("La calificación debe estar entre 1 y 5.");
+        }
+        Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
+        if (!optionalRequest.isPresent()) {
+            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
+        }
+        RentalRequest request = optionalRequest.get();
+        String hostEmail = request.getProperty().getOwner().getEmail();
+        if (!hostEmail.equals(commentDto.getAuthorEmail())) {
+            throw new InvalidReviewException("El propietario no coincide con el autor del comentario.");
+        }
+        return modelMapper.map(commentDto, Comment.class);
+    }
+
+    /**
+     * Host reviews the renter given the request ID
+     * @param requestId
+     * @param commentDto
+     * @return
+     */
+    public void reviewRenter(Long requestId, CommentDTO commentDto) {
+        Comment comment = isHostCommentValid(requestId, commentDto);
+        Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
+        if (!optionalRequest.isPresent()) {
+            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
+        }
+        RentalRequest request = optionalRequest.get();
+        request.setRenterComment(comment);
+        rentalRequestRepository.save(request);
+        updateRenterRating(request);
+    }
+
+    /**
+     * The rating for the renter is updated
+     * @param RentalRequest
+     * @return
+     */
+    private void updateRenterRating(RentalRequest request) {
+        User renter = request.getRequester();
+        List<Comment> requests = rentalRequestRepository.findCommentsByRenterEmail(renter.getEmail());
+        double rating = 0;
+        for (Comment comment : requests) {
+            rating += comment.getRating();
+        }
+        rating = rating / requests.size();
+        renter.setRatingRenter(rating);
+        userRepository.save(renter);
+    }
 }
