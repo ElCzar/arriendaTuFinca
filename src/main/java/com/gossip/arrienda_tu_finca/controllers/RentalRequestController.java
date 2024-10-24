@@ -111,7 +111,7 @@ public class RentalRequestController {
      * @param requestId
      * @return
      */
-    @PutMapping("/approve/{requestId")
+    @PutMapping("/approve/{requestId}")
     public ResponseEntity<String> approveRequest(@PathVariable Long requestId) {
         try {
             rentalRequestService.approveRequest(requestId);
