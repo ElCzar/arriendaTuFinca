@@ -10,12 +10,10 @@ import com.gossip.arrienda_tu_finca.entities.RentalRequest;
 
 @Repository
 public interface RentalRequestRepository extends JpaRepository<RentalRequest, Long> {
-
-    
-    List<RentalRequest> findByPropertyOwnerEmail(String ownerEmail);
-
-    
+    List<RentalRequest> findByHostEmail(String hostEmail);
+    List<RentalRequest> findByRenterEmail(String renterEmail);
     List<RentalRequest> findByPropertyId(Long propertyId);
+
 
     @Query("SELECT r FROM RentalRequest r WHERE r.requester.email = :email ORDER BY r.requestDateTime DESC")
     List<RentalRequest> findByRequesterEmailOrderByRequestDateTime(@Param("email") String requesterEmail);

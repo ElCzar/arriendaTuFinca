@@ -32,21 +32,51 @@ public class RentalRequestController {
         this.modelMapper = modelMapper;
     }
 
+    /**
+     * Creates a rental request from a renter to a property
+     * @param propertyId
+     * @param rentalRequest
+     * @return
+     */
     @PostMapping("/create/{propertyId}")
     public ResponseEntity<String> createRequest(@PathVariable Long propertyId, @RequestBody RentalRequestDto rentalRequest) {
         rentalRequestService.createRequest(propertyId, rentalRequest);
         return new ResponseEntity<>("Solicitud de arriendo creada", HttpStatus.OK);
     }
 
-    @GetMapping("/owner/{email}")
-    public ResponseEntity<List<RentalRequestDto>> getRequestsByOwner(@PathVariable String email) {
-        List<RentalRequestDto> requests = rentalRequestService.getRequestsByOwner(email)
+    /**
+     * Gets all rental requests given the host email
+     * @param email
+     * @return
+     */
+    @GetMapping("/host")
+    public ResponseEntity<List<RentalRequestDto>> getRequestsByHost(@RequestBody String email) {
+        List<RentalRequestDto> requests = rentalRequestService.getRequestsByHost(email)
             .stream()
             .map( request -> modelMapper.map(request, RentalRequestDto.class))
             .collect(Collectors.toList());
         return new ResponseEntity<>(requests, HttpStatus.OK);
     }
 
+    /**
+     * Gets all rental requests given the renter email
+     * @param email
+     * @return
+     */
+    @GetMapping("/requester")
+    public ResponseEntity<List<RentalRequestDto>> getRequestsByRenter(@RequestBody String email) {
+        List<RentalRequestDto> requests = rentalRequestService.getRequestsByRenter(email)
+            .stream()
+            .map( request -> modelMapper.map(request, RentalRequestDto.class))
+            .collect(Collectors.toList());
+        return new ResponseEntity<>(requests, HttpStatus.OK);
+    }
+
+    /**
+     * Gets all rental requests given the property ID
+     * @param propertyId
+     * @return
+     */
     @GetMapping("/property/{propertyId}")
     public ResponseEntity<List<RentalRequestDto>> getRequestsByProperty(@PathVariable Long propertyId) {
         List<RentalRequestDto> requests = rentalRequestService.getRequestsByProperty(propertyId)
@@ -56,37 +86,45 @@ public class RentalRequestController {
         return new ResponseEntity<>(requests, HttpStatus.OK);
     }
 
-    @PutMapping("/{requestId}/accept")
-    public ResponseEntity<String> acceptRequest(@PathVariable Long requestId) {
-        rentalRequestService.acceptRequest(requestId);
-        return new ResponseEntity<>("Solicitud de arriendo aceptada", HttpStatus.OK);
-    }
-
-    @PutMapping("/{requestId}/cancel")
+    /**
+     * A renter cancels a rental request
+     * @param requestId
+     * @return
+     */
+    @PutMapping("/cancel/{requestId}")
     public ResponseEntity<String> cancelRequest(@PathVariable Long requestId) {
         rentalRequestService.cancelRequest(requestId);
         return new ResponseEntity<>("Solicitud de arriendo cancelada", HttpStatus.OK);
     }
 
-    @PutMapping("/{requestId}/review")
-    public ResponseEntity<String> reviewRenter(@PathVariable Long requestId) {
-        rentalRequestService.reviewRenter(requestId);
-        return new ResponseEntity<>("Arrendatario calificado", HttpStatus.OK);
-    }
-
-    @PutMapping("/{requestId}/complete")
+    /**
+     * A host completes a rental request
+     * @param requestId
+     * @return
+     */
+    @PutMapping("/complete/{requestId}")
     public ResponseEntity<String> completeRequest(@PathVariable Long requestId) {
         rentalRequestService.completeRequest(requestId);
         return new ResponseEntity<>("Solicitud de arriendo completada", HttpStatus.OK);
     }
 
-    @PutMapping("/{requestId}/reject")
+    /**
+     * A host rejects a rental request
+     * @param requestId
+     * @return
+     */
+    @PutMapping("/reject/{requestId}")
     public ResponseEntity<String> rejectRequest(@PathVariable Long requestId) {
         rentalRequestService.rejectRequest(requestId);
         return new ResponseEntity<>("Solicitud de arriendo rechazada", HttpStatus.OK);
     }
 
-    @PutMapping("/{requestId}/approve")
+    /**
+     * A host approves a rental request
+     * @param requestId
+     * @return
+     */
+    @PutMapping("/approve/{requestId")
     public ResponseEntity<String> approveRequest(@PathVariable Long requestId) {
         try {
             rentalRequestService.approveRequest(requestId);
@@ -96,7 +134,12 @@ public class RentalRequestController {
         }
     }
 
-    @PutMapping("/{requestId}/pay")
+    /**
+     * A renter pays a rental request 
+     * @param requestId
+     * @return
+     */
+    @PutMapping("/pay/{requestId}")
     public ResponseEntity<String> payRequest(@PathVariable Long requestId) {
         try {
             rentalRequestService.payRequest(requestId);
@@ -104,32 +147,6 @@ public class RentalRequestController {
         } catch (RentalRequestNotFoundException e) {
             return new ResponseEntity<>("Solicitud de arriendo no encontrada", HttpStatus.NOT_FOUND);
         }
-    }
-
-    // Arrendatario
-
-    // Calificar arrendador
-    @PutMapping("/{requestId}/reviewLessor")
-    public ResponseEntity<String> reviewLessor(@PathVariable Long requestId) {
-        rentalRequestService.reviewLessor(requestId);
-        return new ResponseEntity<>("Arrendador calificado", HttpStatus.OK);
-    }
-
-    // Calificar arrendatario
-    @PutMapping("/{requestId}/reviewProperty")
-    public ResponseEntity<String> reviewProperty(@PathVariable Long requestId) {
-        rentalRequestService.reviewProperty(requestId);
-        return new ResponseEntity<>("Propiedad calificada", HttpStatus.OK);
-    }
-
-    // Obtener todas las solicitudes de arriendo de un requester (email)
-    @GetMapping("/requester/{email}")
-    public ResponseEntity<List<RentalRequestDto>> getRequestsByRequesterEmail(@PathVariable String email) {
-        List<RentalRequestDto> requests = rentalRequestService.getRequestsByRequesterEmail(email)
-            .stream()
-            .map( request -> modelMapper.map(request, RentalRequestDto.class))
-            .collect(Collectors.toList());
-        return new ResponseEntity<>(requests, HttpStatus.OK);
     }
 
 }

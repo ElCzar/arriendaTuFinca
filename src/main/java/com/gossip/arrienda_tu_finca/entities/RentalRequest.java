@@ -1,11 +1,13 @@
 package com.gossip.arrienda_tu_finca.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,17 +42,24 @@ public class RentalRequest {
     private LocalDate departureDate;  
     private Integer amountOfResidents;
     private Double amount;  
-    private boolean accepted;
+    private boolean approved;
     private boolean rejected;
     private boolean canceled;
     private boolean paid;
-    private boolean reviewed;
-    private boolean isLessorReviewed;
-    private boolean isPropertyReviewed;
     private boolean completed;
-    private boolean approved;
     private boolean expired;
     private String bank;
     private Integer accountNumber;
-}
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tenant_comment_id", referencedColumnName = "id")
+    private Comment tenantComment;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "renter_comment_id", referencedColumnName = "id")
+    private Comment renterComment;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "property_comment_id", referencedColumnName = "id")
+    private Comment propertyComment;
+}

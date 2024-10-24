@@ -39,8 +39,16 @@ public class RentalRequestService {
         this.propertyRepository = propertyRepository;
     }
 
+    /**
+     * Creates a rental request from a renter to a property
+     * @param propertyId
+     * @param rentalRequest
+     * @throws PropertyNotFoundException
+     * @throws InvalidRenterException 
+     */
     public void createRequest(Long propertyId, RentalRequestDto rentalRequest) {
         RentalRequest request = modelMapper.map(rentalRequest, RentalRequest.class);
+
         Long userId = userRepository.findIdByEmail(rentalRequest.getRequesterEmail());
         if (userId == null) {
             throw new PropertyNotFoundException("Usuario con email " + rentalRequest.getRequesterEmail() + " mo fue encontrado");
@@ -54,7 +62,6 @@ public class RentalRequestService {
         if (rentalRequest.getDepartureDate().isBefore(rentalRequest.getArrivalDate().plusDays(1))) {
             throw new InvalidDateException("La fecha final no puede ser anterior a un día posterior a la fecha inicial");
         }
-
         if (rentalRequest.getAmountOfResidents() > property.getAmountOfResidents()) {
             throw new InvalidAmountOfResidentsException("La cantidad de residentes no puede ser superior a la permitida en la propiedad");
         }
@@ -62,43 +69,59 @@ public class RentalRequestService {
         request.setProperty(property);
         request.setRequester(userRepository.findById(userId).get());
         request.setRequestDateTime(LocalDateTime.now()); 
-        request.setAccepted(false); 
         request.setRejected(false);
         request.setCanceled(false); 
         request.setPaid(false);
-        request.setReviewed(false); 
-        request.setLessorReviewed(false);
-        request.setPropertyReviewed(false);
         request.setCompleted(false); 
         request.setApproved(false);
         request.setExpired(false);
         rentalRequestRepository.save(request);
     }
-    
-    public List<RentalRequest> getRequestsByProperty(Long propertyId) {
-        return rentalRequestRepository.findByPropertyId(propertyId);
-    }
 
-    public List<RentalRequest> getRequestsByOwner(String ownerEmail) {
-        List<RentalRequest> requests = rentalRequestRepository.findByPropertyOwnerEmail(ownerEmail);
+    /**
+     * Gets all rental requests given the property ID
+     * @param propertyId ID of the property
+     * @throws RentalRequestNotFoundException if no request were found
+     * @return List<RentalRequest> of the request about the property
+     */
+    public List<RentalRequest> getRequestsByProperty(Long propertyId) {
+        List<RentalRequest> requests = rentalRequestRepository.findByPropertyId(propertyId);
         if (requests.isEmpty()) {
-            throw new RentalRequestNotFoundException("No se encontraron solicitudes de arriendo para el propietario con email: " + ownerEmail);
+            throw new RentalRequestNotFoundException("No se encontraron solicitudes de arriendo para la propiedad con ID: " + propertyId);
         }
         return requests;
     }
 
-    public void acceptRequest(Long requestId) {
-        Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
-        if (optionalRequest.isPresent()) {
-            RentalRequest request = optionalRequest.get();
-            
-            request.setAccepted(true);
-            rentalRequestRepository.save(request);
-        } else {
-            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
+    /**
+     * Gets all rental request given the host email
+     * @param hostEmail email of the host
+     * @return
+     */
+    public List<RentalRequest> getRequestsByHost(String hostEmail) {
+        List<RentalRequest> requests = rentalRequestRepository.findByPropertyOwnerEmail(hostEmail);
+        if (requests.isEmpty()) {
+            throw new RentalRequestNotFoundException("No se encontraron solicitudes de arriendo para el propietario con email: " + hostEmail);
         }
+        return requests;
     }
 
+    /**
+     * Gets all the rental request given the renter email
+     * @param renterEmail email of the renter
+     * @return
+     */
+    public List<RentalRequest> getRequestsByRenter(String renterEmail) {
+        List<RentalRequest> requests = rentalRequestRepository.findByRequesterEmail(renterEmail);
+        if (requests.isEmpty()) {
+            throw new RentalRequestNotFoundException("No se encontraron solicitudes de arriendo para el arrendatario con email: " + renterEmail);
+        }
+        return requests;
+    }
+
+    /**
+     * Renter cancels the rental request given the request ID
+     * @param requestId
+     */
     public void cancelRequest(Long requestId) {
         Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
         if (optionalRequest.isPresent()) {
@@ -111,18 +134,10 @@ public class RentalRequestService {
         }
     }
 
-    public void reviewRenter(Long requestId) {
-        Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
-        if (optionalRequest.isPresent()) {
-            RentalRequest request = optionalRequest.get();
-          
-            request.setReviewed(true);
-            rentalRequestRepository.save(request);
-        } else {
-            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
-        }
-    }
-
+    /**
+     * Host completes the rental request given the request ID
+     * @param requestId
+     */
     public void completeRequest(Long requestId) {
         Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
         if (optionalRequest.isPresent()) {
@@ -134,6 +149,10 @@ public class RentalRequestService {
         }
     }
 
+    /**
+     * Host rejects the rental request given the request ID
+     * @param requestId
+     */
     public void rejectRequest(Long requestId) {
         Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
         if (optionalRequest.isPresent()) {
@@ -145,6 +164,11 @@ public class RentalRequestService {
         }
     }
 
+    /**
+     * Host approve the rental request given the request ID
+     * @param requestId
+     * @return
+     */
     public RentalRequest approveRequest(Long requestId) {
         Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
         if (optionalRequest.isPresent()) {
@@ -161,7 +185,7 @@ public class RentalRequestService {
         Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
         if (optionalRequest.isPresent()) {
             RentalRequest request = optionalRequest.get();
-            if (!request.isAccepted()) {
+            if (!request.isApproved()) {
                 throw new InvalidPaymentException("La solicitud de arriendo no ha sido aceptada.");
              }
              if (request.isPaid()) {
@@ -178,48 +202,5 @@ public class RentalRequestService {
         }
     }
 
-    // Arrendatario
-
-    // Calificar arrendador
-    public void reviewLessor(Long requestId) {
-        Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
-        if (optionalRequest.isPresent()) {
-            RentalRequest request = optionalRequest.get();
-
-            if (request.isLessorReviewed()) {
-                throw new InvalidReviewException("La calificación del arrendador ya fue realizada.");
-            }
-
-            request.setLessorReviewed(true);
-            rentalRequestRepository.save(request);
-        } else {
-            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
-        }
-    }
-
-    // Calificar propiedad
-    public void reviewProperty(Long requestId) {
-        Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
-        if (optionalRequest.isPresent()) {
-            RentalRequest request = optionalRequest.get();
-
-            if (request.isPropertyReviewed()) {
-                throw new InvalidReviewException("La calificación de la propiedad ya fue realizada.");
-            }
-          
-            request.setPropertyReviewed(true);
-            rentalRequestRepository.save(request);
-        } else {
-            throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
-        }
-    }
-
-    // Obtener las solicitudes de arriendo de un requester (email)
-    public List<RentalRequest> getRequestsByRequesterEmail(String requesterEmail) {
-        List<RentalRequest> requests = rentalRequestRepository.findByRequesterEmailOrderByRequestDateTime(requesterEmail);
-        if (requests.isEmpty()) {
-            throw new RentalRequestNotFoundException("No se encontraron solicitudes de arriendo para el propietario con email: " + requesterEmail);
-        }
-        return requests;
-    }
+    // Reviews of the different entities involved
 }
