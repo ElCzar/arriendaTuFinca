@@ -1,5 +1,6 @@
 package com.gossip.arrienda_tu_finca.controllers;
 
+import java.net.http.HttpResponse.ResponseInfo;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gossip.arrienda_tu_finca.dto.CommentDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
 import com.gossip.arrienda_tu_finca.services.RentalRequestService;
 
@@ -63,7 +65,7 @@ public class RentalRequestController {
      * @param email
      * @return
      */
-    @GetMapping("/requester")
+    @GetMapping("/renter")
     public ResponseEntity<List<RentalRequestDto>> getRequestsByRenter(@RequestBody String email) {
         List<RentalRequestDto> requests = rentalRequestService.getRequestsByRenter(email)
             .stream()
@@ -149,4 +151,72 @@ public class RentalRequestController {
         }
     }
 
+    /**
+     * A renter reviews a property given the rental request ID
+     * @param requestId
+     * @param commentDto
+     * @return ResponseEntity<Void> which indicates the success of the operation
+     */
+    @PostMapping("/review-property/{requestId}")
+    public ResponseEntity<Void> reviewProperty(@PathVariable Long requestId, @RequestBody CommentDTO commentDto) {
+        rentalRequestService.reviewProperty(requestId, commentDto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * A renter reviews a host given the rental request ID
+     * @param requestId
+     * @param commentDto
+     * @return ResponseEntity<Void> which indicates the success of the operation
+     */
+    @PostMapping("/review-host/{requestId}")
+    public ResponseEntity<Void> reviewHost(@PathVariable Long requestId, @RequestBody CommentDTO commentDto) {
+        rentalRequestService.reviewHost(requestId, commentDto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * A host reviews a renter given the rental request ID
+     * @param requestId
+     * @param commentDto
+     * @return ResponseEntity<Void> which indicates the success of the operation
+     */
+    @PostMapping("/review-renter/{requestId}")
+    public ResponseEntity<Void> reviewRenter(@PathVariable Long requestId, @RequestBody CommentDTO commentDto) {
+        rentalRequestService.reviewRenter(requestId, commentDto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
+    /**
+     * Get the comments that rate the renter given the renter email
+     * @param requestId
+     * @return ResponseEntity<List<CommentDTO>> which contains the comments
+     */
+    @GetMapping("/renter-comments")
+    public ResponseEntity<List<CommentDTO>> getRenterComments(@RequestBody String email) {
+        List<CommentDTO> comments = rentalRequestService.getRenterComments(email);
+        return new ResponseEntity<>(comments, HttpStatus.OK);
+    }
+
+    /**
+     * Get the comments that rate the host given the host email
+     * @param email
+     * @return ResponseEntity<List<CommentDTO>> which contains the comments 
+     */
+    @GetMapping("/host-comments")
+    public ResponseEntity<List<CommentDTO>> getHostComments(@RequestBody String email) {
+        List<CommentDTO> comments = rentalRequestService.getHostComments(email);
+        return new ResponseEntity<>(comments, HttpStatus.OK);
+    }
+
+    /**
+     * Get the comments that rate the property given the property ID
+     * @param requestId
+     * @return ResponseEntity<List<CommentDTO>> which contains the comments
+     */
+    @GetMapping("/property-comments/{propertyId}")
+    public ResponseEntity<List<CommentDTO>> getPropertyComments(@PathVariable Long propertyId) {
+        List<CommentDTO> comments = rentalRequestService.getPropertyComments(propertyId);
+        return new ResponseEntity<>(comments, HttpStatus.OK);
+    }
 }

@@ -181,6 +181,11 @@ public class RentalRequestService {
         }
     }
 
+    /**
+     * Renter pays the rental request given the request ID
+     * @param requestId
+     * @return
+     */
     public RentalRequest payRequest(Long requestId) {
         Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
         if (optionalRequest.isPresent()) {
