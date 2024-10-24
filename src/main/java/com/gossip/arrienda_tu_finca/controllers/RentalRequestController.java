@@ -1,6 +1,5 @@
 package com.gossip.arrienda_tu_finca.controllers;
 
-import java.net.http.HttpResponse.ResponseInfo;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -370,4 +370,34 @@ public class RentalRequestService {
         renter.setRatingRenter(rating);
         userRepository.save(renter);
     }
+
+    /**
+     * Gets all the comments that rate the renter given the renter email
+     * @param email
+     * @return List<CommentDTO>
+     */
+    public List<CommentDTO> getRenterComments(String email) {
+        List<Comment> comments = rentalRequestRepository.findCommentsByRenterEmail(email);
+        return comments.stream().map(comment -> modelMapper.map(comment, CommentDTO.class)).toList();
+    }
+
+    /**
+     * Gets all the comments that rate the host given the host email
+     * @param email
+     * @return List<CommentDTO>
+     */
+    public List<CommentDTO> getHostComments(String email) {
+        List<Comment> comments = rentalRequestRepository.findCommentsByHostEmail(email);
+        return comments.stream().map(comment -> modelMapper.map(comment, CommentDTO.class)).toList();
+    }
+
+    /**
+     * Gets all the comments that rate the property given the property ID
+     * @param propertyId
+     * @return List<CommentDTO>
+     */
+    public List<CommentDTO> getPropertyComments(Long propertyId) {
+        List<Comment> comments = rentalRequestRepository.findCommentsByPropertyId(propertyId);
+        return comments.stream().map(comment -> modelMapper.map(comment, CommentDTO.class)).toList();
+    } 
 }
