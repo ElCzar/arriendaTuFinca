@@ -21,13 +21,9 @@ public class RentalRequestDto {
 	private LocalDate departureDate;
 	private Integer amountOfResidents;
 	private Double amount;
-	private boolean accepted;
 	private boolean rejected;
 	private boolean canceled;
 	private boolean paid;
-	private boolean reviewed;
-	private boolean isLessorReviewed;
-    private boolean isPropertyReviewed;
 	private boolean completed;
 	private boolean approved;
 	private boolean expired;
