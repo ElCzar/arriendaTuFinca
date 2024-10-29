@@ -1,5 +1,7 @@
 package com.gossip.arrienda_tu_finca;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,28 +18,33 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
-            .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll() // Allow access to all endpoints
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())  // Move CSRF before authorizeHttpRequests
+            .authorizeHttpRequests(auth -> 
+                auth.requestMatchers("/**").permitAll()
             )
-            .formLogin(form -> form.disable()) // Disable the default login form
-            .httpBasic(basic -> basic.disable()) // Disable basic authentication
-            .csrf(csrf -> csrf.disable()); // Disable CSRF for testing or non-browser clients
-
+            .formLogin(form -> form.disable())
+            .httpBasic(basic -> basic.disable());
+            
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*");  // Allows all origins
-        configuration.addAllowedMethod("*");  // Allows all methos
-        configuration.addAllowedHeader("*");  // Allow all headers
-        configuration.setAllowCredentials(true);  // Allow credentials/cookies 
-
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:4200",
+            "http://localhost:80",
+            "http://10.43.100.118",
+            "http://10.43.100.118:80",
+            "http://10.43.100.118:4200"
+        ));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
+        configuration.setAllowCredentials(true);
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);  // Apply this configuration to all endpoints 
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 }
-
