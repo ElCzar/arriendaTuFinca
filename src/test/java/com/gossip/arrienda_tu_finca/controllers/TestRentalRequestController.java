@@ -1,27 +1,20 @@
 package com.gossip.arrienda_tu_finca.controllers;
 
 import com.gossip.arrienda_tu_finca.ArriendaTuFincaApplication;
-import com.gossip.arrienda_tu_finca.entities.Comment;
 import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.entities.RentalRequest;
 import com.gossip.arrienda_tu_finca.entities.User;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 import com.gossip.arrienda_tu_finca.repositories.RentalRequestRepository;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
-import com.gossip.arrienda_tu_finca.services.RentalRequestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Description;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
@@ -30,12 +23,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import jakarta.transaction.Transactional;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -113,22 +103,10 @@ class TestRentalRequestController {
         // Creates JSON string with the rental request
         String json = """
             {
-                "id": 1,
-                "propertyId": 1,
                 "requesterEmail": "renter@example.com",
-                "requestDateTime": "2024-10-28T15:30:00",
                 "arrivalDate": "2024-11-01",
                 "departureDate": "2024-11-10",
-                "amountOfResidents": 4,
-                "amount": 250.75,
-                "rejected": false,
-                "canceled": false,
-                "paid": false,
-                "completed": false,
-                "approved": false,
-                "expired": false,
-                "bank": "Example Bank",
-                "accountNumber": 123456789
+                "amountOfResidents": 4
             }
             """;
 
@@ -143,12 +121,7 @@ class TestRentalRequestController {
         assertEquals(1, rentalRequests.size());
     }
 
-    @Test
-    @DirtiesContext
-    @Transactional
-    @Description("Test getting all rental requests by host")
-    void testGetRequestsByHost() throws Exception {
-        // Creates a rental request
+    private Long createNewRentalRequest() {
         RentalRequest rentalRequest = new RentalRequest();
         rentalRequest.setId(1L);
         rentalRequest.setProperty(propertyRepository.findById(1L).get());
@@ -157,8 +130,16 @@ class TestRentalRequestController {
         rentalRequest.setAmountOfResidents(4);
         rentalRequest.setBank("Example Bank");
         rentalRequest.setAccountNumber(123456789);
-        rentalRequestRepository.save(rentalRequest);
+        return rentalRequestRepository.save(rentalRequest).getId();
+    }
 
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test getting all rental requests by host")
+    void testGetRequestsByHost() throws Exception {
+        // Creates a rental request
+        createNewRentalRequest();
         String email = "host@example.com";
 
         // Act
@@ -174,5 +155,144 @@ class TestRentalRequestController {
             .andExpect(jsonPath("$[0].requesterEmail").value("renter@example.com"));
     }
 
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test getting all rental requests by renter")
+    void testGetRequestsByRenter() throws Exception {
+        // Creates a rental request
+        createNewRentalRequest();
+        String email = "renter@example.com";
+        
+        // Act
+        ResultActions resultActions = mvc.perform(get("/rental-requests/renter")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(email));
+
+        // Assert
+        resultActions.andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$[0].id").value(1))
+            .andExpect(jsonPath("$[0].propertyId").value(1))
+            .andExpect(jsonPath("$[0].requesterEmail").value("renter@example.com"));
+    }
+
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test getting all rental requests by property")
+    void testGetRequestsByProperty() throws Exception{
+        // Creates a rental request
+        createNewRentalRequest();
+
+        // Act
+        ResultActions resultActions = mvc.perform(get("/rental-requests/property/1")
+            .contentType(MediaType.APPLICATION_JSON));
+
+        // Assert
+        resultActions.andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$[0].id").value(1))
+            .andExpect(jsonPath("$[0].propertyId").value(1))
+            .andExpect(jsonPath("$[0].requesterEmail").value("renter@example.com"));
+    }
+
+
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test cancelling a rental request")
+    void testCancelRequest() throws Exception {
+        // Creates a rental request
+        Long id = createNewRentalRequest();
+
+        // Act
+        mvc.perform(put("/rental-requests/cancel/" + id)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+
+        // Assert
+        List<RentalRequest> rentalRequests = rentalRequestRepository.findAll();
+        assertEquals(1, rentalRequests.size());
+        assertEquals(true, rentalRequests.get(0).isCanceled());
+    }
     
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test completing a rental request")
+    void testCompleteRequest() throws Exception {
+        // Creates a rental request
+        Long id = createNewRentalRequest();
+
+        // Act
+        mvc.perform(put("/rental-requests/complete/" + id)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+
+        // Assert
+        List<RentalRequest> rentalRequests = rentalRequestRepository.findAll();
+        assertEquals(1, rentalRequests.size());
+        assertEquals(true, rentalRequests.get(0).isCompleted());
+    }
+
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test rejecting a rental request")
+    void testRejectRequest() throws Exception {
+        // Creates a rental request
+        Long id = createNewRentalRequest();
+
+        // Act
+        mvc.perform(put("/rental-requests/reject/" + id)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+
+        // Assert
+        List<RentalRequest> rentalRequests = rentalRequestRepository.findAll();
+        assertEquals(1, rentalRequests.size());
+        assertEquals(true, rentalRequests.get(0).isRejected());
+    }
+
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test approving a rental request")
+    void testApproveRequest() throws Exception {
+        // Creates a rental request
+        Long id = createNewRentalRequest();
+
+        // Act
+        mvc.perform(put("/rental-requests/approve/" + id)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+
+        // Assert
+        List<RentalRequest> rentalRequests = rentalRequestRepository.findAll();
+        assertEquals(1, rentalRequests.size());
+        assertEquals(true, rentalRequests.get(0).isApproved());
+    }
+
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test paying a rental request")
+    void testPayRequest() throws Exception {
+        // Creates a rental request
+        Long id = createNewRentalRequest();
+        RentalRequest rentalRequest = rentalRequestRepository.findById(id).get();
+        rentalRequest.setApproved(true);
+        rentalRequestRepository.save(rentalRequest);
+
+        // Act
+        mvc.perform(put("/rental-requests/pay/" + id)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+
+        // Assert
+        List<RentalRequest> rentalRequests = rentalRequestRepository.findAll();
+        assertEquals(1, rentalRequests.size());
+        assertEquals(true, rentalRequests.get(0).isPaid());
+    }
 }
