@@ -2,7 +2,6 @@ package com.gossip.arrienda_tu_finca.dto;
 
 import java.time.LocalDate;
 
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -21,10 +20,10 @@ public class RentalRequestCreateDTO {
     private String requesterEmail;  
 
     @NotBlank(message = "Start date is required")
-    private LocalDate startDate;
+    private LocalDate arrivalDate;
 
     @NotBlank(message = "End date is required")
-    private LocalDate endDate;
+    private LocalDate departureDate;
 
     @NotNull(message = "Amount of residents is required")
     @Positive(message = "Amount of residents must be positive")

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gossip.arrienda_tu_finca.dto.CommentDTO;
+import com.gossip.arrienda_tu_finca.dto.RentalRequestCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
 import com.gossip.arrienda_tu_finca.services.RentalRequestService;
 
@@ -35,7 +36,7 @@ public class RentalRequestController {
      * @return
      */
     @PostMapping("/create/{propertyId}")
-    public ResponseEntity<String> createRequest(@PathVariable Long propertyId, @RequestBody RentalRequestDto rentalRequest) {
+    public ResponseEntity<String> createRequest(@PathVariable Long propertyId, @RequestBody RentalRequestCreateDTO rentalRequest) {
         rentalRequestService.createRequest(propertyId, rentalRequest);
         return new ResponseEntity<>("Solicitud de arriendo creada", HttpStatus.OK);
     }

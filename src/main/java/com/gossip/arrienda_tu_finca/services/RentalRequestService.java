@@ -15,6 +15,7 @@ import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 import com.gossip.arrienda_tu_finca.repositories.RentalRequestRepository;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
 import com.gossip.arrienda_tu_finca.dto.CommentDTO;
+import com.gossip.arrienda_tu_finca.dto.RentalRequestCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
 import com.gossip.arrienda_tu_finca.entities.Comment;
 import com.gossip.arrienda_tu_finca.entities.Property;
@@ -51,7 +52,7 @@ public class RentalRequestService {
      * @throws PropertyNotFoundException
      * @throws InvalidRenterException 
      */
-    public void createRequest(Long propertyId, RentalRequestDto rentalRequest) {
+    public void createRequest(Long propertyId, RentalRequestCreateDTO rentalRequest) {
         RentalRequest request = modelMapper.map(rentalRequest, RentalRequest.class);
 
         Long userId = userRepository.findIdByEmail(rentalRequest.getRequesterEmail());
