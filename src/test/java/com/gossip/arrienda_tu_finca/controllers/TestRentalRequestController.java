@@ -4,9 +4,12 @@ import com.gossip.arrienda_tu_finca.ArriendaTuFincaApplication;
 import com.gossip.arrienda_tu_finca.entities.Property;
 import com.gossip.arrienda_tu_finca.entities.RentalRequest;
 import com.gossip.arrienda_tu_finca.entities.User;
+import com.gossip.arrienda_tu_finca.entities.Comment;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
+import com.gossip.arrienda_tu_finca.repositories.CommentRepository;
 import com.gossip.arrienda_tu_finca.repositories.RentalRequestRepository;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,6 +53,8 @@ class TestRentalRequestController {
     private PropertyRepository propertyRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
     @BeforeEach
     @Transactional
@@ -294,5 +299,193 @@ class TestRentalRequestController {
         List<RentalRequest> rentalRequests = rentalRequestRepository.findAll();
         assertEquals(1, rentalRequests.size());
         assertEquals(true, rentalRequests.get(0).isPaid());
+    }
+
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test reviewing the property of a rental request")
+    void testReviewProperty() throws Exception {
+        // Creates a rental request
+        Long id = createNewRentalRequest();
+        RentalRequest rentalRequest = rentalRequestRepository.findById(id).get();
+        rentalRequest.setPaid(true);
+        rentalRequestRepository.save(rentalRequest);
+        // Creates comment for the property
+        String json = """
+            {
+                "content": "Good property",
+                "rating": 5,
+                "authorEmail": "renter@example.com"
+            }
+            """;
+
+        // Act
+        mvc.perform(post("/rental-requests/review-property/" + id)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json))
+            .andExpect(status().isOk());
+
+        // Assert
+        List<RentalRequest> rentalRequests = rentalRequestRepository.findAll();
+        assertEquals(1, rentalRequests.size());
+        assertEquals("Good property", rentalRequests.get(0).getPropertyComment().getContent());
+        assertEquals(5, rentalRequests.get(0).getPropertyComment().getRating());
+        assertEquals(5, rentalRequests.get(0).getProperty().getRating());
+    }
+
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test reviewing the host of a rental request")
+    void testReviewHost() throws Exception {
+        // Creates a rental request
+        Long id = createNewRentalRequest();
+        RentalRequest rentalRequest = rentalRequestRepository.findById(id).get();
+        rentalRequest.setPaid(true);
+        rentalRequestRepository.save(rentalRequest);
+        // Creates comment for the host
+        String json = """
+            {
+                "content": "Good host",
+                "rating": 5,
+                "authorEmail": "renter@example.com"
+            }
+        """;
+
+        // Act
+        mvc.perform(post("/rental-requests/review-host/" + id)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json))
+            .andExpect(status().isOk());
+
+        // Assert
+        List<RentalRequest> rentalRequests = rentalRequestRepository.findAll();
+        assertEquals(1, rentalRequests.size());
+        assertEquals("Good host", rentalRequests.get(0).getHostComment().getContent());
+        assertEquals(5, rentalRequests.get(0).getHostComment().getRating());
+        assertEquals(5, rentalRequests.get(0).getProperty().getOwner().getRatingHost());
+    }
+
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test reviewing the renter of a rental request")
+    void testReviewRenter() throws Exception {
+        // Creates a rental request
+        Long id = createNewRentalRequest();
+        RentalRequest rentalRequest = rentalRequestRepository.findById(id).get();
+        rentalRequest.setPaid(true);
+        rentalRequestRepository.save(rentalRequest);
+        // Creates comment for the renter
+        String json = """
+            {
+                "content": "Good renter",
+                "rating": 5,
+                "authorEmail": "host@example.com"
+            }
+        """;
+
+        // Act
+        mvc.perform(post("/rental-requests/review-renter/" + id)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json))
+            .andExpect(status().isOk());
+
+        // Assert
+        List<RentalRequest> rentalRequests = rentalRequestRepository.findAll();
+        assertEquals(1, rentalRequests.size());
+        assertEquals("Good renter", rentalRequests.get(0).getRenterComment().getContent());
+        assertEquals(5, rentalRequests.get(0).getRenterComment().getRating());
+        assertEquals(5, rentalRequests.get(0).getRequester().getRatingRenter());
+    }
+
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test getting all comments based on the renter email")
+    void testGetCommentsByRenter() throws Exception {
+        // Creates a rental request
+        Long id = createNewRentalRequest();
+        RentalRequest rentalRequest = rentalRequestRepository.findById(id).get();
+        rentalRequest.setPaid(true);
+        // Creates comment for the renter
+        Comment comment = new Comment();
+        comment.setContent("Good renter");
+        comment.setRating(5);
+        comment.setUser(userRepository.findById(1L).get());
+        commentRepository.save(comment);
+        rentalRequest.setRenterComment(comment);
+        rentalRequestRepository.save(rentalRequest);
+
+        // Act
+        ResultActions resultActions = mvc.perform(get("/rental-requests/renter-comments")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("renter@example.com"));
+
+        // Assert
+        resultActions.andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$[0].content").value("Good renter"))
+            .andExpect(jsonPath("$[0].rating").value(5));
+    }
+
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test getting all comments based on the host email")
+    void testGetCommentsByHost() throws Exception {
+        // Creates a rental request
+        Long id = createNewRentalRequest();
+        RentalRequest rentalRequest = rentalRequestRepository.findById(id).get();
+        rentalRequest.setPaid(true);
+        // Creates comment for the host
+        Comment comment = new Comment();
+        comment.setContent("Good host");
+        comment.setRating(5);
+        comment.setUser(userRepository.findById(2L).get());
+        commentRepository.save(comment);
+        rentalRequest.setHostComment(comment);
+        rentalRequestRepository.save(rentalRequest);
+
+        // Act
+        ResultActions resultActions = mvc.perform(get("/rental-requests/host-comments")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("host@example.com"));
+
+        // Assert
+        resultActions.andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$[0].content").value("Good host"))
+            .andExpect(jsonPath("$[0].rating").value(5));
+    }
+
+    @Test
+    @DirtiesContext
+    @Transactional
+    @Description("Test getting all comments based on the property ID")
+    void testGetCommentsByProperty() throws Exception {
+        // Creates a rental request
+        Long id = createNewRentalRequest();
+        RentalRequest rentalRequest = rentalRequestRepository.findById(id).get();
+        rentalRequest.setPaid(true);
+        // Creates comment for the property
+        Comment comment = new Comment();
+        comment.setContent("Good property");
+        comment.setRating(5);
+        comment.setUser(userRepository.findById(2L).get());
+        commentRepository.save(comment);
+        rentalRequest.setPropertyComment(comment);
+        rentalRequestRepository.save(rentalRequest);
+
+        // Act
+        ResultActions resultActions = mvc.perform(get("/rental-requests/property-comments/1")
+            .contentType(MediaType.APPLICATION_JSON));
+
+        // Assert
+        resultActions.andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$[0].content").value("Good property"))
+            .andExpect(jsonPath("$[0].rating").value(5));
     }
 }

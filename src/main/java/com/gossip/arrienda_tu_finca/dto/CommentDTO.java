@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class CommentDTO {
-    private String comment;
+    private String content;
     private int rating;
     private String authorEmail;
 }

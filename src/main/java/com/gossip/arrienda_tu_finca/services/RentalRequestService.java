@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
 import com.gossip.arrienda_tu_finca.repositories.RentalRequestRepository;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
+import com.gossip.arrienda_tu_finca.repositories.CommentRepository;
 import com.gossip.arrienda_tu_finca.dto.CommentDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
@@ -33,16 +34,18 @@ public class RentalRequestService {
 
     private final RentalRequestRepository rentalRequestRepository;
     private final ModelMapper modelMapper;
+    private CommentRepository commentRepository;
     private UserRepository userRepository;
     private PropertyRepository propertyRepository;
     private static final String RENTAL_REQUEST_NOT_FOUND = "Solicitud de arriendo no encontrada";
 
     @Autowired
-    public RentalRequestService(RentalRequestRepository rentalRequestRepository, ModelMapper modelMapper, UserRepository userRepository, PropertyRepository propertyRepository) {
+    public RentalRequestService(RentalRequestRepository rentalRequestRepository, ModelMapper modelMapper, UserRepository userRepository, PropertyRepository propertyRepository, CommentRepository commentRepository) {
         this.rentalRequestRepository = rentalRequestRepository;
         this.modelMapper = modelMapper;
         this.userRepository = userRepository;
         this.propertyRepository = propertyRepository;
+        this.commentRepository = commentRepository;
     }
 
     /**
@@ -224,7 +227,7 @@ public class RentalRequestService {
      * @return
      */
     private Comment isRenterCommentValid(RentalRequest rentalRequest, CommentDTO commentDto) {
-        if(commentDto.getComment() == null || commentDto.getComment().isEmpty()) {
+        if(commentDto.getContent() == null || commentDto.getContent().isEmpty()) {
             throw new InvalidReviewException("El comentario no puede estar vacío.");
         }
         if(commentDto.getRating() < 1 || commentDto.getRating() > 5) {
@@ -253,7 +256,8 @@ public class RentalRequestService {
             throw new InvalidReviewException("La solicitud de arriendo no ha sido pagada.");
         }
         Comment comment = isRenterCommentValid(request, commentDto);
-        request.setPropertyComment(comment);
+        Comment databaseComment = commentRepository.save(comment);
+        request.setPropertyComment(databaseComment);
         rentalRequestRepository.save(request);
         updatePropertyRating(request.getProperty().getId());
     }
@@ -292,7 +296,8 @@ public class RentalRequestService {
             throw new InvalidReviewException("La solicitud de arriendo no ha sido pagada.");
         }
         Comment comment = isRenterCommentValid(request, commentDto);
-        request.setHostComment(comment);
+        Comment databaseComment = commentRepository.save(comment);
+        request.setHostComment(databaseComment);
         rentalRequestRepository.save(request);
         updateHostRating(request);
     }
@@ -321,7 +326,7 @@ public class RentalRequestService {
      * @return Comment
      */
     private Comment isHostCommentValid(Long requestId, CommentDTO commentDto) {
-        if(commentDto.getComment() == null || commentDto.getComment().isEmpty()) {
+        if(commentDto.getContent() == null || commentDto.getContent().isEmpty()) {
             throw new InvalidReviewException("El comentario no puede estar vacío.");
         }
         if(commentDto.getRating() < 1 || commentDto.getRating() > 5) {
@@ -347,12 +352,13 @@ public class RentalRequestService {
      */
     public void reviewRenter(Long requestId, CommentDTO commentDto) {
         Comment comment = isHostCommentValid(requestId, commentDto);
+        Comment databaseComment = commentRepository.save(comment);
         Optional<RentalRequest> optionalRequest = rentalRequestRepository.findById(requestId);
         if (!optionalRequest.isPresent()) {
             throw new RentalRequestNotFoundException(RENTAL_REQUEST_NOT_FOUND);
         }
         RentalRequest request = optionalRequest.get();
-        request.setRenterComment(comment);
+        request.setRenterComment(databaseComment);
         rentalRequestRepository.save(request);
         updateRenterRating(request);
     }
