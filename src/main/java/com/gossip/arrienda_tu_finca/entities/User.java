@@ -36,7 +36,9 @@ public class User {
     private String password;
     private String phone;
     private boolean isHost;
+    private double ratingHost;
     private boolean isRenter;
+    private double ratingRenter;
     private int imageId;
     
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)

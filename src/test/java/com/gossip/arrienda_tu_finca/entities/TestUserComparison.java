@@ -21,7 +21,6 @@ class TestUserComparison {
         boolean areEqual = userA.equals(userB);
         int code1 = userA.hashCode();
         int code2 = userB.hashCode();
-
         // Then
         assertTrue(areEqual);
         assertEquals(code1, code2);
@@ -30,12 +29,12 @@ class TestUserComparison {
     private static Stream<Arguments> provideUsersForEquality() {
         return Stream.of(
             Arguments.of(
-                new User(1L, "john@ex.com", "John", "Doe", "password", "123456789", true, false, 0, null),
-                new User(2L, "john@ex.com", "John", "Doe", "password", "123456789", true, false, 0, null)
+                new User(1L, "john@ex.com", "John", "Doe", "password", "123456789", true, 0D, false, 0D, 0, null),
+                new User(2L, "john@ex.com", "John", "Doe", "password", "123456789", true, 0D, false, 0D, 0, null)
             ),
             Arguments.of(
-                new User(2L, "jane@ex.com", "Jane", "Smith", "password123", "987654321", false, true, 0, null),
-                new User(3L, "jane@ex.com", "Jane", "Smith", "password123", "987654321", false, true, 0, null)
+                new User(2L, "jane@ex.com", "Jane", "Smith", "password123", "987654321", false, 0D, true, 0D, 0, null),
+                new User(3L, "jane@ex.com", "Jane", "Smith", "password123", "987654321", false, 0D, true, 0D, 0, null)
             ),
             Arguments.of(
                 new User(),
@@ -58,11 +57,11 @@ class TestUserComparison {
     private static Stream<Arguments> provideUsersForInequality() {
         return Stream.of(
             Arguments.of(
-                new User(1L, "john@ex.com", "John", "Doe", "password", "123456789", true, false, 0, null),
-                new User(2L, "jane@ex.com", "Jane", "Smith", "password123", "987654321", false, true, 0, null)
+                new User(1L, "jane@ex.com", "Jane", "Smith", "password123", "987654321", false, 0D, true, 0D, 0, null),
+                new User(2L, "notjane@ex.com", "Jane", "Smith", "password123", "987654321", false, 0D, true, 0D, 0, null)
             ),
             Arguments.of(
-                new User(1L, "john@ex.com", "John", "Doe", "password", "123456789", true, false, 0, null),
+                new User(1L, "john@ex.com", "John", "Doe", "password", "123456789", true, 0D, false, 0D, 0, null),
                 new User()
             )
         );

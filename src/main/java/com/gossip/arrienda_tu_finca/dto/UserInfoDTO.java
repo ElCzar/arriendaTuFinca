@@ -16,6 +16,8 @@ public class UserInfoDTO {
     private String surname;
     private String phone;
     private boolean isHost;
+    private double ratingHost;
     private boolean isRenter;
+    private double ratingRenter;
     private int imageId;
 }

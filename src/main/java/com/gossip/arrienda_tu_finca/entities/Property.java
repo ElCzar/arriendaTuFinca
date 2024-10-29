@@ -43,6 +43,7 @@ public class Property {
     private boolean hasGril;
 
     private String imageIds;
+    private double rating;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
