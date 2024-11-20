@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RentalRequestViewDTO {
-
+    private int id;
     private String propertyName;
     private LocalDateTime requestDateTime;  
     private LocalDate arrivalDate; 
