@@ -1,18 +1,14 @@
 package com.gossip.arrienda_tu_finca.services;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
-import java.time.LocalDate;
 
-import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
-import com.gossip.arrienda_tu_finca.repositories.RentalRequestRepository;
-import com.gossip.arrienda_tu_finca.repositories.UserRepository;
-import com.gossip.arrienda_tu_finca.repositories.CommentRepository;
 import com.gossip.arrienda_tu_finca.dto.CommentDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
@@ -26,6 +22,10 @@ import com.gossip.arrienda_tu_finca.exceptions.InvalidPaymentException;
 import com.gossip.arrienda_tu_finca.exceptions.InvalidReviewException;
 import com.gossip.arrienda_tu_finca.exceptions.PropertyNotFoundException;
 import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
+import com.gossip.arrienda_tu_finca.repositories.CommentRepository;
+import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
+import com.gossip.arrienda_tu_finca.repositories.RentalRequestRepository;
+import com.gossip.arrienda_tu_finca.repositories.UserRepository;
 
 @Service
 public class RentalRequestService {
@@ -235,7 +235,12 @@ public class RentalRequestService {
         if (!renterEmail.equals(commentDto.getAuthorEmail())) {
             throw new InvalidReviewException("El arrendatario no coincide con el autor del comentario.");
         }
-        return modelMapper.map(commentDto, Comment.class);
+        User user = userRepository.findByEmail(renterEmail);
+        Comment comment = new Comment();
+        comment.setContent(commentDto.getContent());
+        comment.setRating(commentDto.getRating());
+        comment.setUser(user);
+        return comment;
     }
 
     /**
@@ -339,7 +344,12 @@ public class RentalRequestService {
         if (!hostEmail.equals(commentDto.getAuthorEmail())) {
             throw new InvalidReviewException("El propietario no coincide con el autor del comentario.");
         }
-        return modelMapper.map(commentDto, Comment.class);
+        User user = userRepository.findByEmail(hostEmail);
+        Comment comment = new Comment();
+        comment.setContent(commentDto.getContent());
+        comment.setRating(commentDto.getRating());
+        comment.setUser(user);
+        return comment;
     }
 
     /**
