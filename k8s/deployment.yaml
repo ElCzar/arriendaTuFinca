@@ -18,7 +18,7 @@ spec:
       - name: github-secret
       containers:
       - name: arrienda-api-container
-        image: elczar/arrienda_tu_finca:beta3.0.6
+        image: elczar/arrienda_tu_finca:3.0
         ports:
         - containerPort: 8080
         resources:
