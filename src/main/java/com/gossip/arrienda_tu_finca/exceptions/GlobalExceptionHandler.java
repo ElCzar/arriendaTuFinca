@@ -81,4 +81,10 @@ public class GlobalExceptionHandler {
         logger.error("Image not found: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(JWTNotGeneratedException.class)
+    public ResponseEntity<String> handleJWTNotGeneratedException(JWTNotGeneratedException ex) {
+        logger.error("JWT not generated: {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
