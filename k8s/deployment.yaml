@@ -11,28 +11,38 @@ spec:
   template:
     metadata:
       labels:
-         app: arrienda-api
+        app: arrienda-api
     spec:
+      automountServiceAccountToken: false
       imagePullSecrets:
-         - name: github-secret
+      - name: github-secret
       containers:
-         - name: estudiante
-           image: localhost:5000/arrienda_tu_finca:latest
-           ports:
-              - containerPort: 8080
-           env:
-              - name: SPRING_DATASOURCE_URL
-                value: "jdbc:mysql://10.43.101.59:3306/arrienda_tu_finca"
-              - name: SPRING_DATASOURCE_USERNAME
-                valueFrom:
-                  secretKeyRef:
-                    name: db-secrets
-                    key: dbuser
-              - name: SPRING_DATASOURCE_PASSWORD
-                valueFrom:
-                  secretKeyRef:
-                    name: db-secrets
-                    key: dbpassword
+      - name: arrienda-api-container
+        image: elczar/arrienda_tu_finca:2.3
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+            ephemeral-storage: "1Gi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+            ephemeral-storage: "2Gi"
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:mysql://192.168.10.12:3306/arrienda_tu_finca"
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: dbuser
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: dbpassword
 
 ---
 apiVersion: v1
@@ -42,9 +52,8 @@ metadata:
   namespace: arriendatufinca
 spec:
   selector:
-    app: arrienda-api  
+    app: arrienda-api
   ports:
-    - protocol: TCP
-      port: 8090
-      targetPort: 8080
-
+  - protocol: TCP
+    port: 8090
+    targetPort: 8080
