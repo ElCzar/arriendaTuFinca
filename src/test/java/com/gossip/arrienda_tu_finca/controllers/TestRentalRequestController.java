@@ -1,15 +1,8 @@
 package com.gossip.arrienda_tu_finca.controllers;
 
-import com.gossip.arrienda_tu_finca.ArriendaTuFincaApplication;
-import com.gossip.arrienda_tu_finca.entities.Property;
-import com.gossip.arrienda_tu_finca.entities.RentalRequest;
-import com.gossip.arrienda_tu_finca.entities.User;
-import com.gossip.arrienda_tu_finca.entities.Comment;
-import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
-import com.gossip.arrienda_tu_finca.repositories.CommentRepository;
-import com.gossip.arrienda_tu_finca.repositories.RentalRequestRepository;
-import com.gossip.arrienda_tu_finca.repositories.UserRepository;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,13 +17,24 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.gossip.arrienda_tu_finca.ArriendaTuFincaApplication;
+import com.gossip.arrienda_tu_finca.entities.Comment;
+import com.gossip.arrienda_tu_finca.entities.Property;
+import com.gossip.arrienda_tu_finca.entities.RentalRequest;
+import com.gossip.arrienda_tu_finca.entities.User;
+import com.gossip.arrienda_tu_finca.repositories.CommentRepository;
+import com.gossip.arrienda_tu_finca.repositories.PropertyRepository;
+import com.gossip.arrienda_tu_finca.repositories.RentalRequestRepository;
+import com.gossip.arrienda_tu_finca.repositories.UserRepository;
 
 import jakarta.transaction.Transactional;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(
@@ -330,6 +334,7 @@ class TestRentalRequestController {
         List<RentalRequest> rentalRequests = rentalRequestRepository.findAll();
         assertEquals(1, rentalRequests.size());
         assertEquals("Good property", rentalRequests.get(0).getPropertyComment().getContent());
+        assertEquals("renter@example.com", rentalRequests.get(0).getPropertyComment().getUser().getEmail());
         assertEquals(5, rentalRequests.get(0).getPropertyComment().getRating());
         assertEquals(5, rentalRequests.get(0).getProperty().getRating());
     }
@@ -363,6 +368,7 @@ class TestRentalRequestController {
         List<RentalRequest> rentalRequests = rentalRequestRepository.findAll();
         assertEquals(1, rentalRequests.size());
         assertEquals("Good host", rentalRequests.get(0).getHostComment().getContent());
+        assertEquals("renter@example.com", rentalRequests.get(0).getHostComment().getUser().getEmail());
         assertEquals(5, rentalRequests.get(0).getHostComment().getRating());
         assertEquals(5, rentalRequests.get(0).getProperty().getOwner().getRatingHost());
     }
@@ -396,6 +402,7 @@ class TestRentalRequestController {
         List<RentalRequest> rentalRequests = rentalRequestRepository.findAll();
         assertEquals(1, rentalRequests.size());
         assertEquals("Good renter", rentalRequests.get(0).getRenterComment().getContent());
+        assertEquals("host@example.com", rentalRequests.get(0).getRenterComment().getUser().getEmail());
         assertEquals(5, rentalRequests.get(0).getRenterComment().getRating());
         assertEquals(5, rentalRequests.get(0).getRequester().getRatingRenter());
     }
