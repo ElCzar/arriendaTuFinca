@@ -5,12 +5,14 @@ import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.gossip.arrienda_tu_finca.dto.ChangePasswordDTO;
 import com.gossip.arrienda_tu_finca.dto.ChangeUserInfoDTO;
 import com.gossip.arrienda_tu_finca.dto.LoginDTO;
+import com.gossip.arrienda_tu_finca.dto.TokenDTO;
 import com.gossip.arrienda_tu_finca.dto.UserDTO;
 import com.gossip.arrienda_tu_finca.dto.UserInfoDTO;
 import com.gossip.arrienda_tu_finca.entities.Image;
@@ -19,6 +21,8 @@ import com.gossip.arrienda_tu_finca.exceptions.UserNotFoundException;
 import com.gossip.arrienda_tu_finca.exceptions.UserNotValidException;
 import com.gossip.arrienda_tu_finca.repositories.ImageRepository;
 import com.gossip.arrienda_tu_finca.repositories.UserRepository;
+import com.gossip.arrienda_tu_finca.security.CustomUserDetailsService;
+import com.gossip.arrienda_tu_finca.security.JWTTokenService;
 
 @Service
 public class UserService {
@@ -26,13 +30,17 @@ public class UserService {
     private final ModelMapper modelMapper;
     private final PasswordEncryptionService passwordEncryptionService;
     private final ImageRepository imageRepository;
+    private final CustomUserDetailsService userDetailsService;
+    private final JWTTokenService jwtTokenService;
 
     @Autowired
-    public UserService(UserRepository userRepository, ModelMapper modelMapper, ImageRepository imageRepository) {
+    public UserService(UserRepository userRepository, ModelMapper modelMapper, ImageRepository imageRepository, CustomUserDetailsService userDetailsService, JWTTokenService jwtTokenService) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.passwordEncryptionService = new PasswordEncryptionService();
         this.imageRepository = imageRepository;
+        this.userDetailsService = userDetailsService;
+        this.jwtTokenService = jwtTokenService;
     }
 
     /**
@@ -53,11 +61,11 @@ public class UserService {
 
     /**
      * Makes login with the user's email and password
-     * @param userDTO
+     * @param loginDTO
      * @throws UserNotValidException if the user or password is not valid
-     * TODO change function to create a session and a token for the user
+     * @return TokenDTO with the token of the user
      */
-    public Long login(LoginDTO loginDTO) throws UserNotValidException {
+    public TokenDTO login(LoginDTO loginDTO) throws UserNotValidException {
         User user = modelMapper.map(loginDTO, User.class);
 
         if (user == null) {
@@ -75,8 +83,10 @@ public class UserService {
         if (userFromDB == null || !passwordEncryptionService.checkPassword(user.getPassword(), userFromDB.getPassword())) {
             throw new UserNotValidException("Email or password is incorrect");
         }
-
-        return userRepository.findIdByEmail(user.getEmail());
+        Long id = userRepository.findIdByEmail(user.getEmail());
+        UserDetails userDetails = userDetailsService.loadByEmail(user.getEmail());
+        String token = jwtTokenService.generarToken(userDetails);
+        return new TokenDTO(token, id);
     }
 
     /**

@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.gossip.arrienda_tu_finca.dto.ChangePasswordDTO;
 import com.gossip.arrienda_tu_finca.dto.ChangeUserInfoDTO;
 import com.gossip.arrienda_tu_finca.dto.LoginDTO;
+import com.gossip.arrienda_tu_finca.dto.TokenDTO;
 import com.gossip.arrienda_tu_finca.dto.UserDTO;
 import com.gossip.arrienda_tu_finca.dto.UserInfoDTO;
 import com.gossip.arrienda_tu_finca.exceptions.UserNotFoundException;
@@ -50,9 +51,9 @@ public class UserController {
      * @return ResponseEntity<Void> with status 200
      */
     @PostMapping("/login")
-    public ResponseEntity<Long> login(@RequestBody LoginDTO loginDTO) {
-        Long userId = userService.login(loginDTO);
-        return ResponseEntity.ok().body(userId);
+    public ResponseEntity<TokenDTO> login(@RequestBody LoginDTO loginDTO) {
+        TokenDTO tokenDTO = userService.login(loginDTO);
+        return ResponseEntity.ok(tokenDTO);
     }
 
     /**

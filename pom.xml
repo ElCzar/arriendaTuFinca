@@ -45,7 +45,7 @@
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
-			<version>9.0.0</version>
+			<scope>runtime</scope>
 		</dependency>
 
 		<!-- Web -->
@@ -77,6 +77,12 @@
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.11.2</version>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>4.0.1</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Others -->
@@ -115,12 +121,12 @@
 		<dependency>
       <groupId>jakarta.validation</groupId>
       <artifactId>jakarta.validation-api</artifactId>
-      <version>3.0.2</version> <!-- O la versión más reciente -->
+	  <!-- O la versión más reciente -->
     </dependency>
     <dependency>
         <groupId>org.hibernate.validator</groupId>
         <artifactId>hibernate-validator</artifactId>
-        <version>7.0.4.Final</version> <!-- O la versión más reciente -->
+		<!-- version removed to use the managed version -->
     </dependency>
     <dependency>
         <groupId>org.glassfish</groupId>

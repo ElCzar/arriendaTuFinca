@@ -1,5 +1,7 @@
 package com.gossip.arrienda_tu_finca.repositories;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,6 +11,7 @@ import com.gossip.arrienda_tu_finca.dto.UserInfoDTO;
 import com.gossip.arrienda_tu_finca.entities.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findOptionalByEmail(String email);
     User findByEmail(String email);
 
     boolean existsByEmail(String email);
