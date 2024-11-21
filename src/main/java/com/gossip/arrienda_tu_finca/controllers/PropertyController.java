@@ -120,7 +120,7 @@ public class PropertyController {
      * @return List<PropertyDTO> with the information of all properties with a given name as a JSON
      */
     @GetMapping("/name")
-    public ResponseEntity<List<PropertyDTO>> findPropertiesByName(@RequestBody String name) {
+    public ResponseEntity<List<PropertyDTO>> findPropertiesByName(@RequestParam String name) {
         List<PropertyDTO> properties = propertyService.findPropertiesByName(name);
         return ResponseEntity.ok(properties);
     }

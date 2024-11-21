@@ -1,6 +1,7 @@
 package com.gossip.arrienda_tu_finca.controllers;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,14 +11,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gossip.arrienda_tu_finca.dto.CommentDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestCreateDTO;
 import com.gossip.arrienda_tu_finca.dto.RentalRequestDto;
-import com.gossip.arrienda_tu_finca.services.RentalRequestService;
-
 import com.gossip.arrienda_tu_finca.exceptions.RentalRequestNotFoundException;
+import com.gossip.arrienda_tu_finca.services.RentalRequestService;
 
 @RestController
 @RequestMapping("/rental-requests")
@@ -47,7 +48,7 @@ public class RentalRequestController {
      * @return
      */
     @GetMapping("/host")
-    public ResponseEntity<List<RentalRequestDto>> getRequestsByHost(@RequestBody String email) {
+    public ResponseEntity<List<RentalRequestDto>> getRequestsByHost(@RequestParam String email) {
         List<RentalRequestDto> requests = rentalRequestService.getRequestsByHost(email);
         return new ResponseEntity<>(requests, HttpStatus.OK);
     }
@@ -58,7 +59,7 @@ public class RentalRequestController {
      * @return
      */
     @GetMapping("/renter")
-    public ResponseEntity<List<RentalRequestDto>> getRequestsByRenter(@RequestBody String email) {
+    public ResponseEntity<List<RentalRequestDto>> getRequestsByRenter(@RequestParam String email) {
         List<RentalRequestDto> requests = rentalRequestService.getRequestsByRenter(email);
         return new ResponseEntity<>(requests, HttpStatus.OK);
     }
@@ -179,7 +180,7 @@ public class RentalRequestController {
      * @return ResponseEntity<List<CommentDTO>> which contains the comments
      */
     @GetMapping("/renter-comments")
-    public ResponseEntity<List<CommentDTO>> getRenterComments(@RequestBody String email) {
+    public ResponseEntity<List<CommentDTO>> getRenterComments(@RequestParam String email) {
         List<CommentDTO> comments = rentalRequestService.getRenterComments(email);
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }
@@ -190,7 +191,7 @@ public class RentalRequestController {
      * @return ResponseEntity<List<CommentDTO>> which contains the comments 
      */
     @GetMapping("/host-comments")
-    public ResponseEntity<List<CommentDTO>> getHostComments(@RequestBody String email) {
+    public ResponseEntity<List<CommentDTO>> getHostComments(@RequestParam String email) {
         List<CommentDTO> comments = rentalRequestService.getHostComments(email);
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }
