@@ -19,3 +19,10 @@ spec:
                 name: arrienda-api
                 port:
                   number: 8090
+          - path: /(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: arrienda-frontend
+                port:
+                  number: 4200

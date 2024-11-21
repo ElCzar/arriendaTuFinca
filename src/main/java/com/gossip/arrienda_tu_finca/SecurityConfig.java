@@ -76,7 +76,10 @@ public class SecurityConfig {
             "http://10.43.100.118:4200",
             "http://arriendatufinca.local",
             "http://arriendatufinca.local:80",
-            "http://arriendatufinca.local:4200"
+            "http://arriendatufinca.local:4200",
+            "http://front.local",
+            "http://front.local:80",
+            "http://front.local:4200"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
